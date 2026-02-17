@@ -1,8 +1,12 @@
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
+import { useDemoSession } from '../../hooks/useDemoSession';
+import { useSessionAppRole } from '../../hooks/useSessionAppRole';
+import { useGetUserRole } from '../../hooks/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import {
   LayoutDashboard,
   Users,
@@ -17,10 +21,12 @@ import {
   Tag,
 } from 'lucide-react';
 import { clearSignInIdentifier } from '../../utils/signInIdentifier';
+import { clearAllSessionAuth } from '../../utils/sessionAuth';
 import { UPLOADED_IMAGES } from '../../constants/uploadedImages';
 import { SafeImage } from '../common/SafeImage';
+import { canAccessPath } from '../../utils/rbac';
 
-const navItems = [
+const allNavItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/leads', label: 'Leads', icon: Users },
   { path: '/outreach', label: 'Outreach', icon: MessageSquare },
@@ -35,18 +41,32 @@ const navItems = [
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { clear, identity } = useInternetIdentity();
+  const { isDemoActive, endDemo } = useDemoSession();
+  const { selectedRole, clearRole } = useSessionAppRole();
+  const { data: backendRole } = useGetUserRole();
   const queryClient = useQueryClient();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
   const isAuthenticated = !!identity;
+  const effectiveRole = selectedRole || backendRole;
+
+  // Filter nav items based on role
+  const visibleNavItems = allNavItems.filter((item) =>
+    canAccessPath(effectiveRole, item.path, isDemoActive)
+  );
 
   const handleClearSession = async () => {
     if (isAuthenticated) {
       await clear();
     }
+    if (isDemoActive) {
+      await endDemo();
+    }
     queryClient.clear();
     clearSignInIdentifier();
+    clearAllSessionAuth();
+    clearRole();
   };
 
   return (
@@ -64,12 +84,22 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             <p className="text-xs text-muted-foreground">AI Growth Engine</p>
           </div>
         </div>
+        {isDemoActive && (
+          <Badge variant="outline" className="mt-3 w-full justify-center">
+            Demo Mode
+          </Badge>
+        )}
+        {effectiveRole && (
+          <div className="mt-2 text-xs text-muted-foreground text-center">
+            Role: <span className="font-medium text-foreground">{effectiveRole}</span>
+          </div>
+        )}
       </div>
 
       <Separator />
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPath === item.path;
 

@@ -2,15 +2,50 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-3d-icon-system-for-services-and-niches-and-render-the-appropriate-3d-icon-consistently-across-the-ui-wherever-a-service-or-niche-is-shown-at-minimum-services-page-service-cards-service-details-dialog-header-area-services-pricing-page-category-tier-cards-and-any-niche-labels-filters-where-present-include-a-safe-fallback-icon-when-no-specific-icon-exists-for-a-given-service-niche-value",
-      "featureTitle": "Add a 3D icon system for Services and Niches, and render the appropriate 3D icon consistently across the UI wherever a service or niche is shown (at minimum: Services page service cards, Service Details dialog header area, Services & Pricing page category/tier cards, and any niche labels/filters where present). Include a safe fallback icon when no specific icon exists for a given service/niche value.",
+      "featureId": "feature-update-the-existing-services-pricing-page-to-render-the-provided-complete-pricing-catalog-as-grouped-sections-with-all-30-offerings-and-their-exact-inr-prices-and-bullet-features-using-english-section-headings-no-emoji-only-headings",
+      "featureTitle": "Update the existing Services & Pricing page to render the provided complete pricing catalog as grouped sections with all 30 offerings and their exact INR prices and bullet features, using English section headings (no emoji-only headings).",
       "files": [
-        "frontend/src/components/common/LeadCard.tsx",
-        "frontend/src/components/common/SafeImage.tsx",
-        "frontend/src/components/common/ServiceNiche3dIcon.tsx",
-        "frontend/src/components/services/ServiceDetailsDialog.tsx",
-        "frontend/src/pages/LeadsPage.tsx",
-        "frontend/src/pages/ServicesPage.tsx",
+        "frontend/src/pages/ServicesPricingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-93"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-gradient-themed-visual-style-to-the-services-pricing-page-including-gradient-card-accents-backgrounds-and-consistent-premium-styling-spacing-typography-hierarchy-while-keeping-all-user-facing-text-in-english",
+      "featureTitle": "Apply a gradient-themed visual style to the Services & Pricing page, including gradient card accents/backgrounds and consistent premium styling (spacing, typography hierarchy), while keeping all user-facing text in English.",
+      "files": [
+        "frontend/src/index.css",
+        "frontend/src/pages/ServicesPricingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-94"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-and-render-gradient-styled-3d-icons-for-the-pricing-catalog-categories-offerings-on-the-services-pricing-page-using-the-existing-serviceniche3dicon-component-and-icon-mapping-with-a-safe-fallback-if-an-icon-asset-is-missing",
+      "featureTitle": "Add and render gradient-styled 3D icons for the pricing catalog categories/offerings on the Services & Pricing page, using the existing ServiceNiche3dIcon component and icon mapping, with a safe fallback if an icon asset is missing.",
+      "files": [
         "frontend/src/pages/ServicesPricingPage.tsx",
         "frontend/src/utils/icons/serviceNiche3dIcons.ts"
       ],
@@ -24,15 +59,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-85"
+        "REQ-95"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-checkout-flow-so-that-when-the-checkout-dialog-opens-from-any-entry-point-services-page-or-services-pricing-page-the-user-is-immediately-guided-redirected-to-the-payment-options-area-and-after-an-order-is-created-the-dialog-automatically-brings-the-payment-instructions-upi-razorpay-stripe-into-view-for-the-selected-payment-method",
-      "featureTitle": "Update the checkout flow so that when the Checkout dialog opens from any entry point (Services page or Services & Pricing page), the user is immediately guided/redirected to the payment options area, and after an order is created the dialog automatically brings the payment instructions (UPI/Razorpay/Stripe) into view for the selected payment method.",
+      "featureId": "feature-replace-the-current-single-monthly-maintenance-card-on-the-services-pricing-page-with-a-monthly-maintenance-plans-section-that-shows-exactly-3-plans-student-499-month-business-999-month-pro-1-999-month-and-the-included-bullets-minor-updates-basic-support-monitoring",
+      "featureTitle": "Replace the current single “Monthly Maintenance” card on the Services & Pricing page with a “Monthly Maintenance Plans” section that shows exactly 3 plans (Student ₹499/month, Business ₹999/month, Pro ₹1,999/month) and the included bullets: Minor updates, Basic support, Monitoring.",
       "files": [
-        "frontend/src/components/payments/CheckoutDialog.tsx"
+        "frontend/src/pages/ServicesPricingPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -44,7 +79,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-86"
+        "REQ-96"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-each-offering-and-maintenance-plan-displays-clear-ctas-consistent-with-the-app-s-pricing-flow-at-minimum-a-visible-select-plan-and-a-visible-get-started-action-per-offering-plan-and-keep-the-existing-checkoutdialog-integration-working-when-a-cta-triggers-checkout",
+      "featureTitle": "Ensure each offering and maintenance plan displays clear CTAs consistent with the app’s pricing flow (at minimum: a visible “Select Plan” and a visible “Get Started” action per offering/plan), and keep the existing CheckoutDialog integration working when a CTA triggers checkout.",
+      "files": [
+        "frontend/src/pages/ServicesPricingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-97"
       ],
       "confidence": "high"
     }

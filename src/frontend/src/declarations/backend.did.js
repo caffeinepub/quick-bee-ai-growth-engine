@@ -32,6 +32,15 @@ export const ClientServiceRequest = IDL.Record({
   'details' : IDL.Opt(IDL.Text),
   'serviceId' : IDL.Text,
 });
+export const Deal = IDL.Record({
+  'id' : IDL.Text,
+  'status' : IDL.Text,
+  'closeDate' : IDL.Opt(IDL.Int),
+  'value' : IDL.Nat,
+  'createdAt' : IDL.Int,
+  'agency' : IDL.Text,
+  'leadId' : IDL.Text,
+});
 export const Lead = IDL.Record({
   'id' : IDL.Text,
   'status' : IDL.Text,
@@ -43,6 +52,15 @@ export const Lead = IDL.Record({
   'revenuePotential' : IDL.Nat,
   'agency' : IDL.Text,
   'niche' : IDL.Text,
+});
+export const OutreachActivity = IDL.Record({
+  'createdAt' : IDL.Int,
+  'sent' : IDL.Bool,
+  'platform' : IDL.Text,
+  'leadId' : IDL.Text,
+  'message' : IDL.Text,
+  'replied' : IDL.Bool,
+  'followUpDate' : IDL.Int,
 });
 export const PaymentMethod = IDL.Variant({
   'upi' : IDL.Null,
@@ -99,11 +117,17 @@ export const Payment = IDL.Record({
   'serviceId' : IDL.Text,
   'amount' : IDL.Nat,
 });
+export const AppRole = IDL.Variant({
+  'Demo' : IDL.Null,
+  'Client' : IDL.Null,
+  'Admin' : IDL.Null,
+  'Manager' : IDL.Null,
+});
 export const UserProfile = IDL.Record({
   'revenueGoal' : IDL.Nat,
   'principal' : IDL.Text,
   'name' : IDL.Text,
-  'role' : IDL.Text,
+  'role' : AppRole,
   'subscriptionPlan' : IDL.Text,
   'agency' : IDL.Text,
   'mobileNumber' : IDL.Opt(IDL.Text),
@@ -154,7 +178,9 @@ export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createClientServiceRequest' : IDL.Func([ClientServiceRequest], [], []),
+  'createDeal' : IDL.Func([Deal], [], []),
   'createLead' : IDL.Func([Lead], [], []),
+  'createOutreachActivity' : IDL.Func([OutreachActivity], [], []),
   'createPayment' : IDL.Func(
       [IDL.Text, IDL.Nat, PaymentMethod],
       [IDL.Text],
@@ -162,8 +188,11 @@ export const idlService = IDL.Service({
     ),
   'createProject' : IDL.Func([Project], [], []),
   'createService' : IDL.Func([Service], [], []),
+  'deleteDeal' : IDL.Func([IDL.Text], [], []),
   'deleteLead' : IDL.Func([IDL.Text], [], []),
+  'deleteProject' : IDL.Func([IDL.Text], [], []),
   'deleteService' : IDL.Func([IDL.Text], [], []),
+  'endDemoSession' : IDL.Func([], [], []),
   'getAllPayments' : IDL.Func([], [IDL.Vec(Payment)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -172,9 +201,15 @@ export const idlService = IDL.Service({
       [IDL.Vec(ClientServiceRequest)],
       ['query'],
     ),
+  'getDeals' : IDL.Func([], [IDL.Vec(Deal)], ['query']),
   'getLeadsPaginated' : IDL.Func(
       [IDL.Nat, IDL.Nat],
       [IDL.Vec(Lead)],
+      ['query'],
+    ),
+  'getOutreachActivities' : IDL.Func(
+      [],
+      [IDL.Vec(OutreachActivity)],
       ['query'],
     ),
   'getPayment' : IDL.Func([IDL.Text], [IDL.Opt(Payment)], ['query']),
@@ -189,8 +224,12 @@ export const idlService = IDL.Service({
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'getUserRole' : IDL.Func([], [AppRole], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isDemoSession' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'startDemoSession' : IDL.Func([], [], []),
+  'updateDeal' : IDL.Func([IDL.Text, Deal], [], []),
   'updateLead' : IDL.Func([IDL.Text, Lead], [], []),
   'updatePaymentSettings' : IDL.Func([PaymentSettings], [], []),
   'updatePaymentStatus' : IDL.Func([IDL.Text, PaymentStatus], [], []),
@@ -226,6 +265,15 @@ export const idlFactory = ({ IDL }) => {
     'details' : IDL.Opt(IDL.Text),
     'serviceId' : IDL.Text,
   });
+  const Deal = IDL.Record({
+    'id' : IDL.Text,
+    'status' : IDL.Text,
+    'closeDate' : IDL.Opt(IDL.Int),
+    'value' : IDL.Nat,
+    'createdAt' : IDL.Int,
+    'agency' : IDL.Text,
+    'leadId' : IDL.Text,
+  });
   const Lead = IDL.Record({
     'id' : IDL.Text,
     'status' : IDL.Text,
@@ -237,6 +285,15 @@ export const idlFactory = ({ IDL }) => {
     'revenuePotential' : IDL.Nat,
     'agency' : IDL.Text,
     'niche' : IDL.Text,
+  });
+  const OutreachActivity = IDL.Record({
+    'createdAt' : IDL.Int,
+    'sent' : IDL.Bool,
+    'platform' : IDL.Text,
+    'leadId' : IDL.Text,
+    'message' : IDL.Text,
+    'replied' : IDL.Bool,
+    'followUpDate' : IDL.Int,
   });
   const PaymentMethod = IDL.Variant({
     'upi' : IDL.Null,
@@ -293,11 +350,17 @@ export const idlFactory = ({ IDL }) => {
     'serviceId' : IDL.Text,
     'amount' : IDL.Nat,
   });
+  const AppRole = IDL.Variant({
+    'Demo' : IDL.Null,
+    'Client' : IDL.Null,
+    'Admin' : IDL.Null,
+    'Manager' : IDL.Null,
+  });
   const UserProfile = IDL.Record({
     'revenueGoal' : IDL.Nat,
     'principal' : IDL.Text,
     'name' : IDL.Text,
-    'role' : IDL.Text,
+    'role' : AppRole,
     'subscriptionPlan' : IDL.Text,
     'agency' : IDL.Text,
     'mobileNumber' : IDL.Opt(IDL.Text),
@@ -348,7 +411,9 @@ export const idlFactory = ({ IDL }) => {
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createClientServiceRequest' : IDL.Func([ClientServiceRequest], [], []),
+    'createDeal' : IDL.Func([Deal], [], []),
     'createLead' : IDL.Func([Lead], [], []),
+    'createOutreachActivity' : IDL.Func([OutreachActivity], [], []),
     'createPayment' : IDL.Func(
         [IDL.Text, IDL.Nat, PaymentMethod],
         [IDL.Text],
@@ -356,8 +421,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'createProject' : IDL.Func([Project], [], []),
     'createService' : IDL.Func([Service], [], []),
+    'deleteDeal' : IDL.Func([IDL.Text], [], []),
     'deleteLead' : IDL.Func([IDL.Text], [], []),
+    'deleteProject' : IDL.Func([IDL.Text], [], []),
     'deleteService' : IDL.Func([IDL.Text], [], []),
+    'endDemoSession' : IDL.Func([], [], []),
     'getAllPayments' : IDL.Func([], [IDL.Vec(Payment)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -366,9 +434,15 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ClientServiceRequest)],
         ['query'],
       ),
+    'getDeals' : IDL.Func([], [IDL.Vec(Deal)], ['query']),
     'getLeadsPaginated' : IDL.Func(
         [IDL.Nat, IDL.Nat],
         [IDL.Vec(Lead)],
+        ['query'],
+      ),
+    'getOutreachActivities' : IDL.Func(
+        [],
+        [IDL.Vec(OutreachActivity)],
         ['query'],
       ),
     'getPayment' : IDL.Func([IDL.Text], [IDL.Opt(Payment)], ['query']),
@@ -383,8 +457,12 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'getUserRole' : IDL.Func([], [AppRole], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isDemoSession' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'startDemoSession' : IDL.Func([], [], []),
+    'updateDeal' : IDL.Func([IDL.Text, Deal], [], []),
     'updateLead' : IDL.Func([IDL.Text, Lead], [], []),
     'updatePaymentSettings' : IDL.Func([PaymentSettings], [], []),
     'updatePaymentStatus' : IDL.Func([IDL.Text, PaymentStatus], [], []),

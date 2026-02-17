@@ -10,6 +10,10 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export type AppRole = { 'Demo' : null } |
+  { 'Client' : null } |
+  { 'Admin' : null } |
+  { 'Manager' : null };
 export interface ClientServiceRequest {
   'id' : string,
   'principal' : string,
@@ -17,6 +21,15 @@ export interface ClientServiceRequest {
   'agency' : string,
   'details' : [] | [string],
   'serviceId' : string,
+}
+export interface Deal {
+  'id' : string,
+  'status' : string,
+  'closeDate' : [] | [bigint],
+  'value' : bigint,
+  'createdAt' : bigint,
+  'agency' : string,
+  'leadId' : string,
 }
 export type ExternalBlob = Uint8Array;
 export interface Lead {
@@ -30,6 +43,15 @@ export interface Lead {
   'revenuePotential' : bigint,
   'agency' : string,
   'niche' : string,
+}
+export interface OutreachActivity {
+  'createdAt' : bigint,
+  'sent' : boolean,
+  'platform' : string,
+  'leadId' : string,
+  'message' : string,
+  'replied' : boolean,
+  'followUpDate' : bigint,
 }
 export interface Payment {
   'id' : string,
@@ -98,7 +120,7 @@ export interface UserProfile {
   'revenueGoal' : bigint,
   'principal' : string,
   'name' : string,
-  'role' : string,
+  'role' : AppRole,
   'subscriptionPlan' : string,
   'agency' : string,
   'mobileNumber' : [] | [string],
@@ -138,17 +160,24 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createClientServiceRequest' : ActorMethod<[ClientServiceRequest], undefined>,
+  'createDeal' : ActorMethod<[Deal], undefined>,
   'createLead' : ActorMethod<[Lead], undefined>,
+  'createOutreachActivity' : ActorMethod<[OutreachActivity], undefined>,
   'createPayment' : ActorMethod<[string, bigint, PaymentMethod], string>,
   'createProject' : ActorMethod<[Project], undefined>,
   'createService' : ActorMethod<[Service], undefined>,
+  'deleteDeal' : ActorMethod<[string], undefined>,
   'deleteLead' : ActorMethod<[string], undefined>,
+  'deleteProject' : ActorMethod<[string], undefined>,
   'deleteService' : ActorMethod<[string], undefined>,
+  'endDemoSession' : ActorMethod<[], undefined>,
   'getAllPayments' : ActorMethod<[], Array<Payment>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getClientServiceRequests' : ActorMethod<[], Array<ClientServiceRequest>>,
+  'getDeals' : ActorMethod<[], Array<Deal>>,
   'getLeadsPaginated' : ActorMethod<[bigint, bigint], Array<Lead>>,
+  'getOutreachActivities' : ActorMethod<[], Array<OutreachActivity>>,
   'getPayment' : ActorMethod<[string], [] | [Payment]>,
   'getPaymentSettings' : ActorMethod<[], PaymentSettings>,
   'getProjects' : ActorMethod<[], Array<Project>>,
@@ -157,8 +186,12 @@ export interface _SERVICE {
   'getSettings' : ActorMethod<[], Settings>,
   'getUserPayments' : ActorMethod<[], Array<Payment>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getUserRole' : ActorMethod<[], AppRole>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isDemoSession' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'startDemoSession' : ActorMethod<[], undefined>,
+  'updateDeal' : ActorMethod<[string, Deal], undefined>,
   'updateLead' : ActorMethod<[string, Lead], undefined>,
   'updatePaymentSettings' : ActorMethod<[PaymentSettings], undefined>,
   'updatePaymentStatus' : ActorMethod<[string, PaymentStatus], undefined>,

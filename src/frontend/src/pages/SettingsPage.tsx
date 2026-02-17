@@ -1,542 +1,301 @@
 import { useState } from 'react';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useCurrentUserProfile';
+import { useGetUserPayments } from '../hooks/usePayments';
 import { useGetPaymentSettings, useUpdatePaymentSettings } from '../hooks/usePaymentSettings';
 import { useIsCallerAdmin } from '../hooks/useAuthRole';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Mail, Building, Phone, DollarSign, CreditCard, TrendingUp, Save, Smartphone, Globe } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Loader2, User, CreditCard, Settings as SettingsIcon, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { PaymentsList } from '../components/payments/PaymentsList';
-import type { UserProfile, PaymentSettings } from '../backend';
+import { AppRole } from '../backend';
 
 export default function SettingsPage() {
-  const { data: profile, isLoading, isFetched } = useGetCallerUserProfile();
-  const { data: paymentSettings, isLoading: paymentSettingsLoading } = useGetPaymentSettings();
-  const { data: isAdmin = false } = useIsCallerAdmin();
+  const { data: profile, isLoading: profileLoading } = useGetCallerUserProfile();
   const saveProfile = useSaveCallerUserProfile();
+  const { data: isAdmin } = useIsCallerAdmin();
+  const { isLoading: paymentsLoading } = useGetUserPayments();
+  const { data: paymentSettings, isLoading: paymentSettingsLoading } = useGetPaymentSettings();
   const updatePaymentSettings = useUpdatePaymentSettings();
-  const { identity } = useInternetIdentity();
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    mobileNumber: '',
-    agency: '',
-    revenueGoal: '',
-    subscriptionPlan: '',
-  });
 
-  const [paymentFormData, setPaymentFormData] = useState({
-    upiDetails: '',
-    razorpayLink: '',
-    stripeLink: '',
-  });
+  const [name, setName] = useState(profile?.name || '');
+  const [email, setEmail] = useState(profile?.email || '');
+  const [mobileNumber, setMobileNumber] = useState(profile?.mobileNumber || '');
+  const [agency, setAgency] = useState(profile?.agency || '');
+  const [revenueGoal, setRevenueGoal] = useState(profile?.revenueGoal?.toString() || '0');
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [isEditingPayments, setIsEditingPayments] = useState(false);
+  const [upiDetails, setUpiDetails] = useState(paymentSettings?.upiDetails || '');
+  const [razorpayLink, setRazorpayLink] = useState(paymentSettings?.razorpayLink || '');
+  const [stripeLink, setStripeLink] = useState(paymentSettings?.stripeLink || '');
 
-  // Initialize form when profile loads
+  // Update form when profile loads
   useState(() => {
     if (profile) {
-      setFormData({
-        name: profile.name || '',
-        email: profile.email || '',
-        mobileNumber: profile.mobileNumber || '',
-        agency: profile.agency || '',
-        revenueGoal: profile.revenueGoal ? Number(profile.revenueGoal).toString() : '',
-        subscriptionPlan: profile.subscriptionPlan || 'Free',
-      });
-    }
-    if (paymentSettings) {
-      setPaymentFormData({
-        upiDetails: paymentSettings.upiDetails || '',
-        razorpayLink: paymentSettings.razorpayLink || '',
-        stripeLink: paymentSettings.stripeLink || '',
-      });
+      setName(profile.name);
+      setEmail(profile.email);
+      setMobileNumber(profile.mobileNumber || '');
+      setAgency(profile.agency);
+      setRevenueGoal(profile.revenueGoal?.toString() || '0');
     }
   });
 
-  if (isLoading) {
+  // Update payment settings form when data loads
+  useState(() => {
+    if (paymentSettings) {
+      setUpiDetails(paymentSettings.upiDetails);
+      setRazorpayLink(paymentSettings.razorpayLink);
+      setStripeLink(paymentSettings.stripeLink);
+    }
+  });
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+
+    try {
+      await saveProfile.mutateAsync({
+        ...profile,
+        name,
+        email,
+        mobileNumber: mobileNumber.trim() || undefined,
+        agency,
+        revenueGoal: BigInt(revenueGoal || '0'),
+      });
+      toast.success('Profile updated successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update profile');
+    }
+  };
+
+  const handleSavePaymentSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      await updatePaymentSettings.mutateAsync({
+        upiDetails,
+        razorpayLink,
+        stripeLink,
+      });
+      toast.success('Payment settings updated successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update payment settings');
+    }
+  };
+
+  if (profileLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading settings...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  const isGuest = isFetched && !profile;
-
-  const handleEdit = () => {
-    if (profile) {
-      setFormData({
-        name: profile.name || '',
-        email: profile.email || '',
-        mobileNumber: profile.mobileNumber || '',
-        agency: profile.agency || '',
-        revenueGoal: profile.revenueGoal ? Number(profile.revenueGoal).toString() : '',
-        subscriptionPlan: profile.subscriptionPlan || 'Free',
-      });
-    } else {
-      setFormData({
-        name: '',
-        email: '',
-        mobileNumber: '',
-        agency: '',
-        revenueGoal: '0',
-        subscriptionPlan: 'Free',
-      });
-    }
-    setIsEditing(true);
-  };
-
-  const handleEditPayments = () => {
-    if (paymentSettings) {
-      setPaymentFormData({
-        upiDetails: paymentSettings.upiDetails || '',
-        razorpayLink: paymentSettings.razorpayLink || '',
-        stripeLink: paymentSettings.stripeLink || '',
-      });
-    }
-    setIsEditingPayments(true);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
-
-  const handleCancelPayments = () => {
-    setIsEditingPayments(false);
-  };
-
-  const handleSave = async () => {
-    try {
-      const principal = identity?.getPrincipal().toString() || 'anonymous';
-      
-      const updatedProfile: UserProfile = {
-        principal,
-        name: formData.name || 'Guest',
-        email: formData.email || '',
-        mobileNumber: formData.mobileNumber || undefined,
-        agency: formData.agency || 'Default Agency',
-        role: profile?.role || 'guest',
-        revenueGoal: formData.revenueGoal ? BigInt(formData.revenueGoal) : BigInt(0),
-        subscriptionPlan: formData.subscriptionPlan || 'Free',
-        totalRevenue: profile?.totalRevenue || BigInt(0),
-      };
-
-      await saveProfile.mutateAsync(updatedProfile);
-      toast.success('Settings saved successfully');
-      setIsEditing(false);
-    } catch (error: any) {
-      console.error('Save error:', error);
-      toast.error(error.message || 'Failed to save settings');
-    }
-  };
-
-  const handleSavePayments = async () => {
-    try {
-      const updatedSettings: PaymentSettings = {
-        upiDetails: paymentFormData.upiDetails,
-        razorpayLink: paymentFormData.razorpayLink,
-        stripeLink: paymentFormData.stripeLink,
-      };
-
-      await updatePaymentSettings.mutateAsync(updatedSettings);
-      toast.success('Payment settings saved successfully');
-      setIsEditingPayments(false);
-    } catch (error: any) {
-      console.error('Save payment settings error:', error);
-      toast.error(error.message || 'Failed to save payment settings');
-    }
-  };
-
   return (
-    <div className="space-y-8">
-      <div className="page-header">
+    <div className="space-y-6">
+      <div>
         <h1 className="page-title">Settings</h1>
-        <p className="page-description">Manage your account and preferences</p>
+        <p className="text-muted-foreground mt-2">Manage your account and payment settings</p>
       </div>
-
-      {isGuest && !isEditing && (
-        <div className="bg-muted/50 border border-border rounded-lg p-4 text-sm text-muted-foreground">
-          You are browsing as a guest. You can still edit and save your settings.
-        </div>
-      )}
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          {isAdmin && <TabsTrigger value="payment-settings">Payment Settings</TabsTrigger>}
+          <TabsTrigger value="profile" className="gap-2">
+            <User className="h-4 w-4" />
+            Profile
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="gap-2">
+            <CreditCard className="h-4 w-4" />
+            Payments
+          </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="payment-settings" className="gap-2">
+              <SettingsIcon className="h-4 w-4" />
+              Payment Settings
+            </TabsTrigger>
+          )}
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
-          {/* Profile Information */}
+        <TabsContent value="profile">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Profile Information</CardTitle>
-                {!isEditing && (
-                  <Button onClick={handleEdit} variant="outline" size="sm">
-                    Edit Profile
-                  </Button>
-                )}
-              </div>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>Update your personal and agency information</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {isEditing ? (
+            <CardContent>
+              <form onSubmit={handleSaveProfile} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Name
-                    </Label>
+                    <Label htmlFor="name">Name</Label>
                     <Input
                       id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Enter your name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email
-                    </Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="mobile" className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      Mobile Number
-                    </Label>
+                    <Label htmlFor="mobileNumber">Mobile Number</Label>
                     <Input
-                      id="mobile"
-                      value={formData.mobileNumber}
-                      onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
-                      placeholder="Enter your mobile number"
+                      id="mobileNumber"
+                      type="tel"
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
+                      placeholder="+1 234 567 8900"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="agency" className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      Agency
-                    </Label>
+                    <Label htmlFor="agency">Agency Name</Label>
                     <Input
                       id="agency"
-                      value={formData.agency}
-                      onChange={(e) => setFormData({ ...formData, agency: e.target.value })}
-                      placeholder="Enter your agency name"
+                      value={agency}
+                      onChange={(e) => setAgency(e.target.value)}
+                      placeholder="Your agency"
+                      required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subscription" className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Subscription Plan
-                    </Label>
-                    <Input
-                      id="subscription"
-                      value={formData.subscriptionPlan}
-                      onChange={(e) => setFormData({ ...formData, subscriptionPlan: e.target.value })}
-                      placeholder="e.g., Free, Pro, Enterprise"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Role</Label>
-                    <div>
-                      <Badge>{profile?.role || 'guest'}</Badge>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Name
-                    </Label>
-                    <p className="text-sm">{profile?.name || 'Guest'}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email
-                    </Label>
-                    <p className="text-sm">{profile?.email || 'Not set'}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      Mobile Number
-                    </Label>
-                    <p className="text-sm">{profile?.mobileNumber || 'Not set'}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      Agency
-                    </Label>
-                    <p className="text-sm">{profile?.agency || 'Not set'}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Role</Label>
-                    <div>
-                      <Badge>{profile?.role || 'guest'}</Badge>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Subscription Plan
-                    </Label>
-                    <p className="text-sm">{profile?.subscriptionPlan || 'Free'}</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Revenue Goal */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Revenue Goal</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isEditing ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="revenueGoal" className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Monthly Goal
-                    </Label>
+                    <Label htmlFor="revenueGoal">Revenue Goal (₹)</Label>
                     <Input
                       id="revenueGoal"
                       type="number"
-                      value={formData.revenueGoal}
-                      onChange={(e) => setFormData({ ...formData, revenueGoal: e.target.value })}
-                      placeholder="Enter monthly revenue goal"
+                      value={revenueGoal}
+                      onChange={(e) => setRevenueGoal(e.target.value)}
+                      placeholder="100000"
+                      min="0"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4" />
-                      Total Revenue
-                    </Label>
-                    <p className="text-2xl font-bold text-green-600">
-                      ${profile?.totalRevenue ? Number(profile.totalRevenue).toLocaleString() : '0'}
-                    </p>
+                    <Label htmlFor="role">Role</Label>
+                    <Input id="role" value={profile?.role || AppRole.Client} disabled />
                   </div>
                 </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Monthly Goal
-                    </Label>
-                    <p className="text-2xl font-bold">
-                      ${profile?.revenueGoal ? Number(profile.revenueGoal).toLocaleString() : '0'}
-                    </p>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4" />
-                      Total Revenue
-                    </Label>
-                    <p className="text-2xl font-bold text-green-600">
-                      ${profile?.totalRevenue ? Number(profile.totalRevenue).toLocaleString() : '0'}
-                    </p>
-                  </div>
+                <Separator />
+
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={saveProfile.isPending}>
+                    {saveProfile.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      'Save Changes'
+                    )}
+                  </Button>
                 </div>
-              )}
+              </form>
             </CardContent>
           </Card>
-
-          {isEditing && (
-            <div className="flex gap-3 justify-end">
-              <Button variant="outline" onClick={handleCancel} disabled={saveProfile.isPending}>
-                Cancel
-              </Button>
-              <Button onClick={handleSave} disabled={saveProfile.isPending}>
-                {saveProfile.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
         </TabsContent>
 
-        <TabsContent value="payments" className="space-y-6">
+        <TabsContent value="payments">
           <Card>
             <CardHeader>
-              <CardTitle>Your Payments</CardTitle>
-              <CardDescription>View and track your payment orders</CardDescription>
+              <CardTitle>Payment Orders</CardTitle>
+              <CardDescription>View and manage your payment orders</CardDescription>
             </CardHeader>
             <CardContent>
-              <PaymentsList />
+              {paymentsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <PaymentsList />
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {isAdmin && (
-          <TabsContent value="payment-settings" className="space-y-6">
+          <TabsContent value="payment-settings">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Payment Settings</CardTitle>
-                    <CardDescription>Configure payment gateway details for checkout</CardDescription>
-                  </div>
-                  {!isEditingPayments && (
-                    <Button onClick={handleEditPayments} variant="outline" size="sm">
-                      Edit Settings
-                    </Button>
-                  )}
-                </div>
+                <CardTitle>Payment Gateway Settings</CardTitle>
+                <CardDescription>Configure payment gateway details for your agency</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent>
                 {paymentSettingsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-sm text-muted-foreground">Loading payment settings...</p>
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   </div>
-                ) : isEditingPayments ? (
-                  <div className="space-y-6">
+                ) : (
+                  <form onSubmit={handleSavePaymentSettings} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="upiDetails" className="flex items-center gap-2">
-                        <Smartphone className="h-4 w-4" />
-                        UPI ID / VPA
-                      </Label>
+                      <Label htmlFor="upiDetails">UPI Details</Label>
                       <Input
                         id="upiDetails"
-                        value={paymentFormData.upiDetails}
-                        onChange={(e) => setPaymentFormData({ ...paymentFormData, upiDetails: e.target.value })}
-                        placeholder="yourname@upi or 9876543210@paytm"
+                        value={upiDetails}
+                        onChange={(e) => setUpiDetails(e.target.value)}
+                        placeholder="yourname@upi"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Enter your UPI ID for receiving payments via Google Pay, PhonePe, Paytm, etc.
+                        Your UPI ID for receiving payments
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="razorpayLink" className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" />
-                        Razorpay Payment Link
-                      </Label>
+                      <Label htmlFor="razorpayLink">Razorpay Payment Link</Label>
                       <Input
                         id="razorpayLink"
-                        value={paymentFormData.razorpayLink}
-                        onChange={(e) => setPaymentFormData({ ...paymentFormData, razorpayLink: e.target.value })}
+                        value={razorpayLink}
+                        onChange={(e) => setRazorpayLink(e.target.value)}
                         placeholder="https://razorpay.me/@yourhandle"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Enter your Razorpay payment link for accepting cards, UPI, net banking, and wallets
+                        Your Razorpay payment link for Indian payments
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="stripeLink" className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
-                        Stripe Payment Link
-                      </Label>
+                      <Label htmlFor="stripeLink">Stripe Payment Link</Label>
                       <Input
                         id="stripeLink"
-                        value={paymentFormData.stripeLink}
-                        onChange={(e) => setPaymentFormData({ ...paymentFormData, stripeLink: e.target.value })}
+                        value={stripeLink}
+                        onChange={(e) => setStripeLink(e.target.value)}
                         placeholder="https://buy.stripe.com/..."
                       />
                       <p className="text-xs text-muted-foreground">
-                        Enter your Stripe payment link for accepting international credit/debit cards
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <Smartphone className="h-4 w-4" />
-                        UPI ID / VPA
-                      </Label>
-                      <p className="text-sm font-mono bg-muted p-2 rounded">
-                        {paymentSettings?.upiDetails || 'Not configured'}
+                        Your Stripe payment link for international payments
                       </p>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" />
-                        Razorpay Payment Link
-                      </Label>
-                      <p className="text-sm font-mono bg-muted p-2 rounded break-all">
-                        {paymentSettings?.razorpayLink || 'Not configured'}
-                      </p>
-                    </div>
+                    <Separator />
 
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
-                        Stripe Payment Link
-                      </Label>
-                      <p className="text-sm font-mono bg-muted p-2 rounded break-all">
-                        {paymentSettings?.stripeLink || 'Not configured'}
-                      </p>
+                    <div className="flex justify-end">
+                      <Button type="submit" disabled={updatePaymentSettings.isPending}>
+                        {updatePaymentSettings.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          'Save Payment Settings'
+                        )}
+                      </Button>
                     </div>
-                  </div>
-                )}
-
-                {isEditingPayments && (
-                  <div className="flex gap-3 justify-end pt-4 border-t">
-                    <Button variant="outline" onClick={handleCancelPayments} disabled={updatePaymentSettings.isPending}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSavePayments} disabled={updatePaymentSettings.isPending}>
-                      {updatePaymentSettings.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Settings
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                  </form>
                 )}
               </CardContent>
             </Card>

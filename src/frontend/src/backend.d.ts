@@ -22,6 +22,15 @@ export interface ClientServiceRequest {
     details?: string;
     serviceId: string;
 }
+export interface OutreachActivity {
+    createdAt: bigint;
+    sent: boolean;
+    platform: string;
+    leadId: string;
+    message: string;
+    replied: boolean;
+    followUpDate: bigint;
+}
 export interface Service {
     id: string;
     serviceType: string;
@@ -78,6 +87,15 @@ export interface PaymentSettings {
     razorpayLink: string;
     stripeLink: string;
 }
+export interface Deal {
+    id: string;
+    status: string;
+    closeDate?: bigint;
+    value: bigint;
+    createdAt: bigint;
+    agency: string;
+    leadId: string;
+}
 export interface Project {
     id: string;
     files: Array<ExternalBlob>;
@@ -94,12 +112,18 @@ export interface UserProfile {
     revenueGoal: bigint;
     principal: string;
     name: string;
-    role: string;
+    role: AppRole;
     subscriptionPlan: string;
     agency: string;
     mobileNumber?: string;
     email: string;
     totalRevenue: bigint;
+}
+export enum AppRole {
+    Demo = "Demo",
+    Client = "Client",
+    Admin = "Admin",
+    Manager = "Manager"
 }
 export enum PaymentMethod {
     upi = "upi",
@@ -120,17 +144,24 @@ export enum UserRole {
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createClientServiceRequest(request: ClientServiceRequest): Promise<void>;
+    createDeal(deal: Deal): Promise<void>;
     createLead(lead: Lead): Promise<void>;
+    createOutreachActivity(activity: OutreachActivity): Promise<void>;
     createPayment(serviceId: string, amount: bigint, paymentMethod: PaymentMethod): Promise<string>;
     createProject(project: Project): Promise<void>;
     createService(service: Service): Promise<void>;
+    deleteDeal(dealId: string): Promise<void>;
     deleteLead(leadId: string): Promise<void>;
+    deleteProject(projectId: string): Promise<void>;
     deleteService(serviceId: string): Promise<void>;
+    endDemoSession(): Promise<void>;
     getAllPayments(): Promise<Array<Payment>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getClientServiceRequests(): Promise<Array<ClientServiceRequest>>;
+    getDeals(): Promise<Array<Deal>>;
     getLeadsPaginated(offset: bigint, limit: bigint): Promise<Array<Lead>>;
+    getOutreachActivities(): Promise<Array<OutreachActivity>>;
     getPayment(paymentId: string): Promise<Payment | null>;
     getPaymentSettings(): Promise<PaymentSettings>;
     getProjects(): Promise<Array<Project>>;
@@ -139,8 +170,12 @@ export interface backendInterface {
     getSettings(): Promise<Settings>;
     getUserPayments(): Promise<Array<Payment>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    getUserRole(): Promise<AppRole>;
     isCallerAdmin(): Promise<boolean>;
+    isDemoSession(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    startDemoSession(): Promise<void>;
+    updateDeal(dealId: string, deal: Deal): Promise<void>;
     updateLead(leadId: string, lead: Lead): Promise<void>;
     updatePaymentSettings(newSettings: PaymentSettings): Promise<void>;
     updatePaymentStatus(paymentId: string, newStatus: PaymentStatus): Promise<void>;

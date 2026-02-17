@@ -3,44 +3,44 @@ import { useActor } from './useActor';
 import { useDemoSession } from './useDemoSession';
 import { useGetUserRole } from './useQueries';
 import { isAdminRole } from '../utils/rbac';
-import type { PaymentSettings } from '../backend';
+import type { Settings } from '../backend';
 import { toast } from 'sonner';
 
-export function useGetPaymentSettings() {
+export function useGetSettings() {
   const { actor, isFetching: actorFetching } = useActor();
 
-  return useQuery<PaymentSettings>({
-    queryKey: ['paymentSettings'],
+  return useQuery<Settings>({
+    queryKey: ['settings'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return await actor.getPaymentSettings();
+      return await actor.getSettings();
     },
     enabled: !!actor && !actorFetching,
   });
 }
 
-export function useUpdatePaymentSettings() {
+export function useUpdateSettings() {
   const { actor } = useActor();
   const { isDemoActive } = useDemoSession();
   const { data: role } = useGetUserRole();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (settings: PaymentSettings) => {
+    mutationFn: async (settings: Settings) => {
       if (isDemoActive) {
-        throw new Error('Cannot update payment settings in demo mode');
+        throw new Error('Cannot update settings in demo mode');
       }
       if (!isAdminRole(role)) {
         throw new Error('Unauthorized: Admin access required');
       }
       if (!actor) throw new Error('Actor not available');
-      return await actor.updatePaymentSettings(settings);
+      return await actor.updateSettings(settings);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['paymentSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to update payment settings');
+      toast.error(error.message || 'Failed to update settings');
     },
   });
 }

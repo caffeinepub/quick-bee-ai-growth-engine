@@ -1,155 +1,160 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "3D service/niche icons across UI + checkout auto-scroll to payment options",
+  "title": "Services & Pricing: full 30-item catalog, gradient theme, and 3D category icons",
   "requirements": [
     {
-      "id": "REQ-85",
-      "summary": "Introduce a mapped 3D icon system for services and niches, render it consistently in required views, and provide a SafeImage-backed default fallback.",
+      "id": "REQ-93",
+      "summary": "Expand Services & Pricing page to render the complete 30-item pricing catalog grouped into English sections with exact INR prices and provided bullet features.",
       "acceptanceCriteria": [
-        "Services page cards show a 3D icon alongside each service (or a default 3D icon when no mapping exists).",
-        "ServiceDetailsDialog shows a 3D icon for the selected service in the header area (or default).",
-        "ServicesPricingPage shows a 3D icon for each of the 5 service categories and for Monthly Maintenance (or default).",
-        "Niche labels/filters (wherever they appear) display a mapped 3D icon (or default) without breaking layout on mobile.",
-        "All new icons are served as frontend static assets and rendered via the existing SafeImage component (or equivalent graceful fallback), so broken images do not show a browser broken-image icon."
+        "The Services & Pricing page shows all 30 offerings, each with its name, INR price formatted with the ₹ symbol, and the exact bullet list items provided by the user.",
+        "Offerings are grouped under clear English section headers that correspond to the user’s groupings (e.g., “Website Packages”, “WhatsApp Automation”, “Lead Generation Systems”, “Personal Brand Services”, “SEO Services”, “AI & Automation”, “Business Systems”, “Outreach Systems”, “E-commerce”, “Student Special Packages”, “Complete Low-Ticket Growth Engine”).",
+        "No offerings from the user list are missing or merged; each appears as its own card/listing."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/generated/svc-3d-website.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D Website service icon at frontend/public/assets/generated/svc-3d-website.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-whatsapp-automation.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D WhatsApp automation service icon at frontend/public/assets/generated/svc-3d-whatsapp-automation.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-lead-machine.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D Lead Machine service icon at frontend/public/assets/generated/svc-3d-lead-machine.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-personal-brand.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D Personal Brand service icon at frontend/public/assets/generated/svc-3d-personal-brand.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-ai-growth.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D AI Growth service icon at frontend/public/assets/generated/svc-3d-ai-growth.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-maintenance.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D Maintenance service icon at frontend/public/assets/generated/svc-3d-maintenance.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-default.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the default 3D service fallback icon at frontend/public/assets/generated/svc-3d-default.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-default.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the default 3D niche fallback icon at frontend/public/assets/generated/niche-3d-default.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-ecommerce.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D e-commerce niche icon at frontend/public/assets/generated/niche-3d-ecommerce.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-real-estate.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D real estate niche icon at frontend/public/assets/generated/niche-3d-real-estate.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-education.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D education niche icon at frontend/public/assets/generated/niche-3d-education.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-healthcare.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D healthcare niche icon at frontend/public/assets/generated/niche-3d-healthcare.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-restaurant.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D restaurant niche icon at frontend/public/assets/generated/niche-3d-restaurant.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-fitness.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D fitness niche icon at frontend/public/assets/generated/niche-3d-fitness.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-saas.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D SaaS niche icon at frontend/public/assets/generated/niche-3d-saas.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/niche-3d-local-business.dim_256x256.png",
-          "operation": "create",
-          "description": "Add generated static asset for the 3D local business niche icon at frontend/public/assets/generated/niche-3d-local-business.dim_256x256.png."
-        },
-        {
-          "path": "frontend/src/utils/icons/serviceNiche3dIcons.ts",
-          "operation": "create",
-          "description": "Create centralized mapping utilities that resolve a service/niche value (serviceType/serviceSubType/name/niche) to a 3D icon static asset URL (using publicAssetUrl), including safe default fallbacks for service and niche icons."
-        },
-        {
-          "path": "frontend/src/components/common/ServiceNiche3dIcon.tsx",
-          "operation": "create",
-          "description": "Create a small reusable UI component that renders the resolved 3D icon via the existing SafeImage component (graceful fallback), supporting variants for service vs niche and consistent sizing for mobile layouts."
-        },
-        {
-          "path": "frontend/src/pages/ServicesPage.tsx",
-          "operation": "modify",
-          "description": "Render a 3D service icon on each service card (next to title/header area) using the new ServiceNiche3dIcon component and mapping utilities; also add a niche icon alongside the niche row when present, ensuring responsive layout."
-        },
-        {
-          "path": "frontend/src/components/services/ServiceDetailsDialog.tsx",
-          "operation": "modify",
-          "description": "Add a 3D service icon in the dialog header area (near the DialogTitle/description) using ServiceNiche3dIcon + mapping with fallback, keeping header layout stable on mobile."
-        },
-        {
           "path": "frontend/src/pages/ServicesPricingPage.tsx",
           "operation": "modify",
-          "description": "Add 3D icons for each of the 5 service categories and for Monthly Maintenance (using category id/name mapping) in the relevant card/header areas via ServiceNiche3dIcon with default fallback."
-        },
-        {
-          "path": "frontend/src/pages/LeadsPage.tsx",
-          "operation": "modify",
-          "description": "Update niche filter UI to display a mapped niche 3D icon (or default) for the currently selected niche and/or within the niche dropdown list without breaking the existing mobile layout."
-        },
-        {
-          "path": "frontend/src/components/common/LeadCard.tsx",
-          "operation": "modify",
-          "description": "Wherever the lead niche is displayed as a label/badge, render the mapped niche 3D icon (or default) alongside it using ServiceNiche3dIcon, keeping spacing compact for mobile."
-        },
-        {
-          "path": "frontend/src/components/common/SafeImage.tsx",
-          "operation": "modify",
-          "description": "If needed to support the new 3D icon usage, adjust SafeImage to better handle tiny icon-sized placeholders (e.g., loading skeleton sizing), while preserving existing graceful fallback behavior and avoiding browser broken-image icons."
+          "description": "Replace the current small tier list with a static, in-code catalog that includes ALL 30 offerings from msg-8, grouped into the requested English section headings. Ensure each offering card renders: offering name, exact INR price with ₹, and the exact bullet features text provided by the user (no merging or paraphrasing). Keep the existing CheckoutDialog wiring pattern (selected item -> dialog props)."
         }
       ]
     },
     {
-      "id": "REQ-86",
-      "summary": "Improve CheckoutDialog UX by automatically bringing payment options into view on open and payment instructions into view after order creation, for all entry points.",
+      "id": "REQ-94",
+      "summary": "Apply premium gradient-themed styling (background accents, card highlights, spacing, typography hierarchy) to the Services & Pricing page with responsive layout and English-only UI text.",
       "acceptanceCriteria": [
-        "Opening CheckoutDialog automatically scrolls/focuses to the “Select Payment Method” section (payment options) without requiring manual scrolling.",
-        "After a successful “Create Order”, the dialog automatically scrolls/focuses to the payment instructions section for the currently selected method.",
-        "The behavior works for both ServicesPage checkout entry and ServicesPricingPage checkout entry, without changing backend APIs.",
-        "No user-facing text related to checkout becomes non-English as part of these changes."
+        "The pricing page uses visible gradient styling (e.g., subtle gradient background and/or gradient borders/highlights on cards) consistently across sections and cards.",
+        "The page remains mobile-first and responsive (single-column on small screens, multi-column grids on larger screens).",
+        "All headings, buttons, and helper text displayed to users are English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/payments/CheckoutDialog.tsx",
+          "path": "frontend/src/pages/ServicesPricingPage.tsx",
           "operation": "modify",
-          "description": "Add refs/anchors for the payment method section and the method-specific instructions section; on dialog open, automatically scroll/focus into the payment method section, and after successful order creation (and when switching payment method post-order), scroll/focus the relevant instructions into view, without changing any backend calls or user-facing copy."
+          "description": "Update layout to be mobile-first with responsive grids per section, and apply consistent gradient-themed styling (e.g., subtle gradient page background, gradient borders/accents on cards, premium spacing and typography hierarchy). Ensure all user-facing headings/helper text remain English."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add or refine app-wide utility classes (within existing @layer utilities) that support the pricing page’s premium gradient look (e.g., reusable gradient border/accent helpers) without modifying any shadcn/ui source files."
+        }
+      ]
+    },
+    {
+      "id": "REQ-95",
+      "summary": "Render gradient-styled 3D icons for categories/offerings on the pricing page using ServiceNiche3dIcon and existing base-path-safe asset URL mapping with fallback behavior.",
+      "acceptanceCriteria": [
+        "Each pricing section (or each offering card) displays a 3D icon near the title area.",
+        "Icons load via static frontend assets (no backend image serving) and are base-path safe.",
+        "If an icon fails to load, the existing SafeImage fallback renders a non-technical fallback (e.g., initials) and the page remains usable."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/svc-3d-website-packages.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-whatsapp-automation-packages.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-lead-generation-systems.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-personal-brand-services.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-seo-services.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-ai-automation.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-business-systems.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-outreach-systems.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-ecommerce.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-student-packages.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-all-in-one-growth-kit.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-maintenance-plans.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/public/assets/generated/svc-3d-default.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated static default icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
+        },
+        {
+          "path": "frontend/src/utils/icons/serviceNiche3dIcons.ts",
+          "operation": "modify",
+          "description": "Extend/adjust the service/category icon mapping to include the new category keys used by the updated pricing catalog (e.g., website packages, WhatsApp automation, lead generation systems, personal brand services, SEO services, AI & automation, business systems, outreach systems, e-commerce, student packages, all-in-one growth kit, maintenance plans) and map them to the new required static assets under frontend/public/assets/generated via publicAssetUrl. Ensure an explicit default mapping points to frontend/public/assets/generated/svc-3d-default.dim_256x256.png."
+        },
+        {
+          "path": "frontend/src/pages/ServicesPricingPage.tsx",
+          "operation": "modify",
+          "description": "Use the existing ServiceNiche3dIcon component to render a gradient-styled 3D icon for each pricing section header (and/or each offering card) by passing a suitable serviceType/category key that resolves via the icon mapping. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-96",
+      "summary": "Replace the single Monthly Maintenance card with a Monthly Maintenance Plans section containing exactly three plans and the provided included bullets.",
+      "acceptanceCriteria": [
+        "The pricing page shows a “Monthly Maintenance Plans” section containing exactly three plan cards/entries: Student, Business, Pro, with the exact monthly prices provided.",
+        "Each maintenance plan displays the included bullets: “Minor updates”, “Basic support”, “Monitoring”.",
+        "The previous single maintenanceTier presentation is no longer shown on the page."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ServicesPricingPage.tsx",
+          "operation": "modify",
+          "description": "Remove the existing single maintenanceTier UI and replace it with a “Monthly Maintenance Plans” section containing exactly three plans: Student ₹499/month, Business ₹999/month, Pro ₹1,999/month. Each plan must display the included bullets exactly: Minor updates, Basic support, Monitoring. Include a section-level (or plan-level) 3D icon keyed to the new maintenance plans mapping."
+        }
+      ]
+    },
+    {
+      "id": "REQ-97",
+      "summary": "Ensure every offering and maintenance plan has two English CTAs (Select Plan, Get Started) and that at least one CTA per card opens the existing CheckoutDialog with correct service name and amount.",
+      "acceptanceCriteria": [
+        "Every offering card includes two visible buttons labeled “Select Plan” and “Get Started”.",
+        "Clicking at least one of the CTAs per offering opens the existing CheckoutDialog with the correct service name and amount for that offering.",
+        "Buttons are English-labeled and remain readable/accessible on mobile."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ServicesPricingPage.tsx",
+          "operation": "modify",
+          "description": "Update offering cards and maintenance plan cards to display two visible English-labeled buttons: “Select Plan” and “Get Started”. Wire at least one button per card to the existing handleCheckout logic so CheckoutDialog opens with the correct serviceName and amount for that offering/plan. Keep button layout responsive and accessible on mobile."
         }
       ]
     }

@@ -55,14 +55,40 @@ export default {
                     3: 'oklch(var(--chart-3))',
                     4: 'oklch(var(--chart-4))',
                     5: 'oklch(var(--chart-5))'
+                },
+                gradient: {
+                    from: 'oklch(var(--gradient-from))',
+                    via: 'oklch(var(--gradient-via))',
+                    to: 'oklch(var(--gradient-to))'
                 }
             },
             borderRadius: {
                 lg: 'var(--radius)',
                 md: 'calc(var(--radius) - 2px)',
                 sm: 'calc(var(--radius) - 4px)'
+            },
+            fontFamily: {
+                sans: [
+                    '-apple-system',
+                    'BlinkMacSystemFont',
+                    '"Segoe UI"',
+                    'Roboto',
+                    'Oxygen',
+                    'Ubuntu',
+                    'Cantarell',
+                    'sans-serif'
+                ]
+            },
+            boxShadow: {
+                'gradient-sm': '0 2px 8px -2px oklch(var(--gradient-via) / 0.2)',
+                'gradient-md': '0 4px 16px -4px oklch(var(--gradient-via) / 0.3)',
+                'gradient-lg': '0 10px 25px -5px oklch(var(--gradient-via) / 0.4)',
+            },
+            backgroundImage: {
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
             }
         }
     },
-    plugins: [typography, containerQueries, animate]
+    plugins: [animate, typography, containerQueries]
 };

@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
+import { useDemoSession } from './useDemoSession';
+import { useGetUserRole } from './useQueries';
+import { isAdminRole } from '../utils/rbac';
 import type { Service } from '../backend';
+import { toast } from 'sonner';
 
 export function useGetAllServices() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -22,10 +26,18 @@ export function useGetAllServices() {
 
 export function useAddService() {
   const { actor } = useActor();
+  const { isDemoActive } = useDemoSession();
+  const { data: role } = useGetUserRole();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (service: Service) => {
+      if (isDemoActive) {
+        throw new Error('Cannot create services in demo mode');
+      }
+      if (!isAdminRole(role)) {
+        throw new Error('Unauthorized: Admin access required');
+      }
       if (!actor) throw new Error('Actor not available');
       try {
         return await actor.createService(service);
@@ -39,17 +51,25 @@ export function useAddService() {
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
     onError: (error: any) => {
-      console.error('Service mutation error:', error);
+      toast.error(error.message || 'Failed to add service');
     },
   });
 }
 
 export function useUpdateServiceStatus() {
   const { actor } = useActor();
+  const { isDemoActive } = useDemoSession();
+  const { data: role } = useGetUserRole();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ serviceId, active }: { serviceId: string; active: boolean }) => {
+      if (isDemoActive) {
+        throw new Error('Cannot update services in demo mode');
+      }
+      if (!isAdminRole(role)) {
+        throw new Error('Unauthorized: Admin access required');
+      }
       if (!actor) throw new Error('Actor not available');
       try {
         const service = await actor.getService(serviceId);
@@ -65,19 +85,27 @@ export function useUpdateServiceStatus() {
       queryClient.invalidateQueries({ queryKey: ['services'] });
     },
     onError: (error: any) => {
-      console.error('Service status mutation error:', error);
+      toast.error(error.message || 'Failed to update service');
     },
   });
 }
 
 export function useSeedServices() {
   const { actor } = useActor();
+  const { isDemoActive } = useDemoSession();
+  const { data: role } = useGetUserRole();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (services: Service[]) => {
+      if (isDemoActive) {
+        throw new Error('Cannot seed services in demo mode');
+      }
+      if (!isAdminRole(role)) {
+        throw new Error('Unauthorized: Admin access required');
+      }
       if (!actor) throw new Error('Actor not available');
-      
+
       const results: Array<{ success: boolean; name: string; error?: string }> = [];
       for (const service of services) {
         try {
@@ -93,6 +121,9 @@ export function useSeedServices() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to seed services');
     },
   });
 }

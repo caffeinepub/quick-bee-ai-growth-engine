@@ -1,64 +1,67 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T19:01:11.104Z",
-  "summary": "Implemented a new 3D icon mapping system for services/niches (with SafeImage rendering) and added auto-scroll behavior in CheckoutDialog to guide users to payment methods and instructions. Some additional UI changes were made outside the explicitly requested surfaces.",
+  "generatedAt": "2026-02-17T20:05:33.767Z",
+  "summary": "Diff adds global gradient-themed design tokens/utilities, starts expanding ServicesPricingPage with multiple grouped pricing sections, and extends 3D service icon mapping to include pricing-page category keys. However, the diff does not provide evidence that the full 30-offering catalog, the new 3-plan Monthly Maintenance Plans section, required CTAs per card, or the required static icon assets were fully implemented.",
   "missing_requirements": [
     {
-      "id": "REQ-85",
-      "requirement": "Add the required 3D icon image assets as frontend static assets (the specified svc-3d-*.png and niche-3d-*.png files).",
-      "reason": "The diff shows code referencing these asset paths via publicAssetUrl('assets/generated/...png'), but no image/static asset files are shown as added in the diff summary.",
+      "id": "REQ-93",
+      "requirement": "Render the complete pricing catalog as grouped sections with all 30 offerings, each showing name, ₹ INR price, and the exact bullet features.",
+      "reason": "The pricing page content shown is truncated and only evidences a subset of offerings (e.g., a few offerings under Website Packages, WhatsApp Automation, Lead Generation Systems, and the beginning of Personal Brand Services). There is no evidence in the diff summary that all 30 offerings and their exact bullet lists were added.",
       "evidence": [
-        "frontend/src/utils/icons/serviceNiche3dIcons.ts"
+        "frontend/src/pages/ServicesPricingPage.tsx"
       ]
     },
     {
-      "id": "REQ-86",
-      "requirement": "Opening CheckoutDialog automatically scrolls/focuses to the “Select Payment Method” section, and after order creation it scrolls/focuses to the payment instructions section.",
-      "reason": "The implementation clearly scrolls via scrollIntoView, but there is no evidence of setting keyboard focus (e.g., calling .focus() on an element) to satisfy the \"focuses\" portion of the requirement/AC.",
+      "id": "REQ-95",
+      "requirement": "Serve and render the required gradient 3D icons as static frontend assets under frontend/public/assets/generated and load them via publicAssetUrl with safe fallback behavior.",
+      "reason": "The icon map references files under assets/generated via publicAssetUrl, but the diff shows no new files added (no static PNGs under frontend/public/assets/generated). Also, the diff does not show the pricing page actually rendering the icons per section/offering nor demonstrate the fallback behavior.",
       "evidence": [
-        "frontend/src/components/payments/CheckoutDialog.tsx"
+        "frontend/src/utils/icons/serviceNiche3dIcons.ts",
+        "frontend/src/pages/ServicesPricingPage.tsx",
+        "<file-diff>: Added: 0"
+      ]
+    },
+    {
+      "id": "REQ-96",
+      "requirement": "Replace the single Monthly Maintenance card with a Monthly Maintenance Plans section showing exactly 3 plans (Student ₹499/month, Business ₹999/month, Pro ₹1,999/month) and bullets (Minor updates, Basic support, Monitoring).",
+      "reason": "No evidence of a \"Monthly Maintenance Plans\" section or the three required plans/prices/bullets appears in the provided (truncated) ServicesPricingPage diff.",
+      "evidence": [
+        "frontend/src/pages/ServicesPricingPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-97",
+      "requirement": "Every offering/plan must show two visible CTAs (“Select Plan” and “Get Started”) and at least one CTA must open the existing CheckoutDialog with correct service name and amount.",
+      "reason": "ServicesPricingPage imports Button and CheckoutDialog, but the provided diff snippet does not show any rendered “Select Plan”/“Get Started” buttons or the wiring that opens CheckoutDialog with the correct amount/name per offering/plan.",
+      "evidence": [
+        "frontend/src/pages/ServicesPricingPage.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added 3D niche icon rendering in Leads UI (lead cards and leads page niche filter/dropdown).",
-      "reason": "REQ-85 explicitly calls out service/niche icons across service-related UI surfaces (Services page, Service Details dialog, Services & Pricing page, and niche labels/filters where present in that context). The diff adds niche icon usage in the Leads module, which is not explicitly requested.",
+      "description": "Added/extended service icon mappings for additional non-requested service keys and asset filenames (e.g., 'lead-machine', 'ai-growth', 'svc-3d-website.dim_256x256.png', 'svc-3d-lead-machine.dim_256x256.png', etc.).",
+      "reason": "BuildRequest only specifies certain pricing-category icon assets plus a generic default; the diff introduces several other service icon keys and asset paths not listed in the request.",
       "evidence": [
-        "frontend/src/components/common/LeadCard.tsx",
-        "frontend/src/pages/LeadsPage.tsx"
+        "frontend/src/utils/icons/serviceNiche3dIcons.ts"
       ]
     },
     {
-      "description": "Broader SafeImage adoption and visual tweaks in AppShell/Sidebar/Dashboard/Planner beyond the requested icon/checkout changes.",
-      "reason": "REQ-85 only requires new icons to be rendered via SafeImage (or equivalent) to avoid broken-image icons. The diff additionally refactors other areas to use SafeImage and adjusts loading/fallback behavior, which is not directly requested by REQ-85/REQ-86.",
+      "description": "Global design-system updates (new gradient tokens and many general-purpose utility classes) beyond the Services & Pricing page.",
+      "reason": "REQ-94 asks for gradient-themed styling on the Services & Pricing page; the diff modifies global CSS variables/utilities in frontend/src/index.css (and Tailwind config already contains gradient color hooks) which may be broader in scope than strictly necessary for the page-only change.",
       "evidence": [
-        "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/components/nav/SidebarNav.tsx",
-        "frontend/src/pages/DashboardPage.tsx",
-        "frontend/src/pages/PlannerPage.tsx",
-        "frontend/src/components/common/SafeImage.tsx"
+        "frontend/src/index.css"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.66,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/common/LeadCard.tsx",
-    "frontend/src/components/common/SafeImage.tsx",
-    "frontend/src/components/common/ServiceNiche3dIcon.tsx",
-    "frontend/src/components/layout/AppShell.tsx",
-    "frontend/src/components/nav/SidebarNav.tsx",
-    "frontend/src/components/payments/CheckoutDialog.tsx",
-    "frontend/src/components/services/ServiceDetailsDialog.tsx",
-    "frontend/src/hooks/usePayments.ts",
-    "frontend/src/pages/DashboardPage.tsx",
-    "frontend/src/pages/LeadsPage.tsx",
-    "frontend/src/pages/PlannerPage.tsx",
-    "frontend/src/pages/ServicesPage.tsx",
+    "frontend/src/index.css",
     "frontend/src/pages/ServicesPricingPage.tsx",
     "frontend/src/utils/icons/serviceNiche3dIcons.ts",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

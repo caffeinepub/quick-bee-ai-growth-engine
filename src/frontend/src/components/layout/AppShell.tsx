@@ -3,11 +3,14 @@ import { SidebarNav } from '../nav/SidebarNav';
 import { FollowUpBadge } from '../nav/FollowUpBadge';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { UPLOADED_IMAGES } from '../../constants/uploadedImages';
 import { SafeImage } from '../common/SafeImage';
+import { useDemoSession } from '../../hooks/useDemoSession';
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isDemoActive } = useDemoSession();
 
   return (
     <div className="min-h-screen bg-background">
@@ -15,12 +18,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border z-50 flex items-center justify-between px-4 shadow-sm">
         <div className="flex items-center gap-3">
           <SafeImage
-            src={UPLOADED_IMAGES.qbLogo} 
-            alt="Quick Bee" 
+            src={UPLOADED_IMAGES.qbLogo}
+            alt="Quick Bee"
             className="w-8 h-8 object-contain rounded"
             fallback="QB"
           />
           <span className="font-bold text-lg">Quick Bee</span>
+          {isDemoActive && (
+            <Badge variant="outline" className="text-xs">
+              Demo Mode
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <FollowUpBadge />

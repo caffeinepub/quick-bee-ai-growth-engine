@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
-import type { UserProfile } from '../backend';
+import type { UserProfile, AppRole } from '../backend';
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
 
   const query = useQuery<UserProfile | null>({
     queryKey: ['currentUserProfile'],
@@ -12,7 +13,7 @@ export function useGetCallerUserProfile() {
       if (!actor) throw new Error('Actor not available');
       return actor.getCallerUserProfile();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !actorFetching && !!identity,
     retry: false,
   });
 
@@ -34,6 +35,7 @@ export function useSaveCallerUserProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['userRole'] });
     },
   });
 }
@@ -49,12 +51,12 @@ export function useRegisterUser() {
       email: string;
       mobileNumber?: string;
       agency: string;
-      role: string;
+      role: AppRole;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      
+
       const principal = identity?.getPrincipal().toString() || 'anonymous';
-      
+
       const profile: UserProfile = {
         principal,
         name: params.name,
@@ -66,12 +68,12 @@ export function useRegisterUser() {
         subscriptionPlan: 'Free',
         totalRevenue: BigInt(0),
       };
-      
-      // Use saveCallerUserProfile instead of registerUser
+
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['userRole'] });
     },
   });
 }

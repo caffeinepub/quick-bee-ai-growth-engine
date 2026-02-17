@@ -15,6 +15,20 @@ const SERVICE_ICON_MAP: Record<string, string> = {
   'ai-growth': publicAssetUrl('assets/generated/svc-3d-ai-growth.dim_256x256.png'),
   'maintenance': publicAssetUrl('assets/generated/svc-3d-maintenance.dim_256x256.png'),
   
+  // New pricing page categories
+  'website-packages': publicAssetUrl('assets/generated/svc-3d-website-packages.dim_256x256.png'),
+  'whatsapp-automation-packages': publicAssetUrl('assets/generated/svc-3d-whatsapp-automation-packages.dim_256x256.png'),
+  'lead-generation-systems': publicAssetUrl('assets/generated/svc-3d-lead-generation-systems.dim_256x256.png'),
+  'personal-brand-services': publicAssetUrl('assets/generated/svc-3d-personal-brand-services.dim_256x256.png'),
+  'seo-services': publicAssetUrl('assets/generated/svc-3d-seo-services.dim_256x256.png'),
+  'ai-automation': publicAssetUrl('assets/generated/svc-3d-ai-automation.dim_256x256.png'),
+  'business-systems': publicAssetUrl('assets/generated/svc-3d-business-systems.dim_256x256.png'),
+  'outreach-systems': publicAssetUrl('assets/generated/svc-3d-outreach-systems.dim_256x256.png'),
+  'ecommerce': publicAssetUrl('assets/generated/svc-3d-ecommerce.dim_256x256.png'),
+  'student-packages': publicAssetUrl('assets/generated/svc-3d-student-packages.dim_256x256.png'),
+  'all-in-one-growth-kit': publicAssetUrl('assets/generated/svc-3d-all-in-one-growth-kit.dim_256x256.png'),
+  'maintenance-plans': publicAssetUrl('assets/generated/svc-3d-maintenance-plans.dim_256x256.png'),
+  
   // Alternative keys for matching
   'web': publicAssetUrl('assets/generated/svc-3d-website.dim_256x256.png'),
   'whatsapp': publicAssetUrl('assets/generated/svc-3d-whatsapp-automation.dim_256x256.png'),
@@ -22,6 +36,11 @@ const SERVICE_ICON_MAP: Record<string, string> = {
   'brand': publicAssetUrl('assets/generated/svc-3d-personal-brand.dim_256x256.png'),
   'ai': publicAssetUrl('assets/generated/svc-3d-ai-growth.dim_256x256.png'),
   'monthly': publicAssetUrl('assets/generated/svc-3d-maintenance.dim_256x256.png'),
+  'seo': publicAssetUrl('assets/generated/svc-3d-seo-services.dim_256x256.png'),
+  'crm': publicAssetUrl('assets/generated/svc-3d-business-systems.dim_256x256.png'),
+  'outreach': publicAssetUrl('assets/generated/svc-3d-outreach-systems.dim_256x256.png'),
+  'store': publicAssetUrl('assets/generated/svc-3d-ecommerce.dim_256x256.png'),
+  'student': publicAssetUrl('assets/generated/svc-3d-student-packages.dim_256x256.png'),
 };
 
 // Niche icon mapping

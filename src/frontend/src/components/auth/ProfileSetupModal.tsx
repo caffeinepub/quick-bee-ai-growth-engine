@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
-import { UserRole } from '../../backend';
+import { AppRole } from '../../backend';
 import { getSignInIdentifier, prefillFromIdentifier } from '../../utils/signInIdentifier';
 
 interface ProfileSetupModalProps {
@@ -23,9 +23,7 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [agency, setAgency] = useState('');
-  const [role, setRole] = useState<'admin' | 'user'>('user');
-  const [revenueGoal, setRevenueGoal] = useState('10000');
-  const [subscriptionPlan, setSubscriptionPlan] = useState('Starter');
+  const [role, setRole] = useState<AppRole>(AppRole.Client);
 
   // Prefill email or mobile from stored sign-in identifier
   useEffect(() => {
@@ -50,15 +48,12 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
     e.preventDefault();
     if (!identity) return;
 
-    const principal = identity.getPrincipal().toString();
-    const userRole: UserRole = role === 'admin' ? UserRole.admin : UserRole.user;
-
     await registerUser.mutateAsync({
       name,
       email,
       mobileNumber: mobileNumber.trim() || undefined,
       agency,
-      role: userRole,
+      role,
     });
 
     if (onClose) {
@@ -128,31 +123,23 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
 
           <div className="space-y-2">
             <Label htmlFor="role">Role *</Label>
-            <Select value={role} onValueChange={(value) => setRole(value as 'admin' | 'user')}>
+            <Select value={role} onValueChange={(value) => setRole(value as AppRole)}>
               <SelectTrigger id="role">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="user">User</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value={AppRole.Client}>Client</SelectItem>
+                <SelectItem value={AppRole.Manager}>Manager</SelectItem>
+                <SelectItem value={AppRole.Admin}>Admin</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              className="flex-1"
-            >
+            <Button type="button" variant="outline" onClick={handleCancel} className="flex-1">
               Skip for now
             </Button>
-            <Button
-              type="submit"
-              disabled={registerUser.isPending}
-              className="flex-1"
-            >
+            <Button type="submit" disabled={registerUser.isPending} className="flex-1">
               {registerUser.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

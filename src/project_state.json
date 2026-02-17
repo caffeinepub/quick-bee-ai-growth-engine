@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 33,
-  "summary": "Shift scope to include implementing a complete payment system across services (including the Services & Pricing page) in addition to the existing no-sign-in single-experience app direction; also address performance improvements to make Leads data load faster.",
+  "projectStateVersion": 37,
+  "summary": "Scope change: add a secure multi-role authentication system (Admin/Manager/Client) with role-based access control and a fixed demo username/password for limited-access testing, alongside the ongoing goal of implementing a complete in-app payment/checkout system and improving Leads performance.",
   "architectural_notes": [
     "Bubble app with SaaS multi-tenant privacy rules: users restricted to their agency/leads; role-based access (Admin vs Team).",
     "Core data types to implement in Bubble: User, Lead, Outreach Activity, Deal, Daily Task (plus later Service/Project for Agency OS upgrades).",
@@ -18,10 +18,11 @@
     "OTP sign-in cannot be completed until an email sending method is enabled and/or an SMS provider/plugin is configured for the Bubble app.",
     "Uploaded frontend static assets/images are not currently visible in the app UI; investigate asset bundling/paths/references and ensure they render in production.",
     "Static images are still not visible in the app UI (user reports issue persists after build).",
-    "Payment gateway offerings are not visible in the UI as expected (user cannot see payment gateway)."
+    "Payment gateway offerings are not visible in the UI as expected (user cannot see payment gateway).",
+    "User reports they are not able to log in with the current role-based login flow; login UX/flow likely too complex or broken."
   ],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- 3D isometric website/landing-page icon (svc-3d-website.dim_256x256.png)\n- 3D isometric WhatsApp automation/chatbot icon (svc-3d-whatsapp-automation.dim_256x256.png)\n- 3D isometric lead funnel/CRM pipeline icon (svc-3d-lead-machine.dim_256x256.png)\n- 3D isometric personal brand/social profile icon (svc-3d-personal-brand.dim_256x256.png)\n- 3D isometric AI growth/robot + graph icon (svc-3d-ai-growth.dim_256x256.png)\n- 3D isometric maintenance/gear + shield icon (svc-3d-maintenance.dim_256x256.png)\n- 3D isometric generic service/package box icon (svc-3d-default.dim_256x256.png)\n- 3D isometric generic niche tag/badge icon (niche-3d-default.dim_256x256.png)\n- 3D isometric e-commerce/storefront icon (niche-3d-ecommerce.dim_256x256.png)\n- 3D isometric real estate/house icon (niche-3d-real-estate.dim_256x256.png)\n- 3D isometric education/book icon (niche-3d-education.dim_256x256.png)\n- 3D isometric healthcare/medical cross icon (niche-3d-healthcare.dim_256x256.png)\n- 3D isometric restaurant/food icon (niche-3d-restaurant.dim_256x256.png)\n- 3D isometric fitness/dumbbell icon (niche-3d-fitness.dim_256x256.png)\n- 3D isometric SaaS/cloud app icon (niche-3d-saas.dim_256x256.png)\n- 3D isometric local business/shop icon (niche-3d-local-business.dim_256x256.png)",
+  "isFixRequest": true,
+  "imageRequirements": "## Required Images\n- Gradient 3D icon of a website/page symbol (svc-3d-website-packages.dim_256x256.png)\n- Gradient 3D icon of a WhatsApp/chat bubble (svc-3d-whatsapp-automation-packages.dim_256x256.png)\n- Gradient 3D icon of a funnel/target/lead magnet (svc-3d-lead-generation-systems.dim_256x256.png)\n- Gradient 3D icon of an Instagram/profile avatar (svc-3d-personal-brand-services.dim_256x256.png)\n- Gradient 3D icon of a magnifier/SEO graph (svc-3d-seo-services.dim_256x256.png)\n- Gradient 3D icon of an AI chip/robot (svc-3d-ai-automation.dim_256x256.png)\n- Gradient 3D icon of a CRM/pipeline board (svc-3d-business-systems.dim_256x256.png)\n- Gradient 3D icon of an email/megaphone outreach symbol (svc-3d-outreach-systems.dim_256x256.png)\n- Gradient 3D icon of a shopping cart/store (svc-3d-ecommerce.dim_256x256.png)\n- Gradient 3D icon of a graduation cap/student badge (svc-3d-student-packages.dim_256x256.png)\n- Gradient 3D icon of an all-in-one bundle/stacked layers (svc-3d-all-in-one-growth-kit.dim_256x256.png)\n- Gradient 3D icon of a shield/wrench maintenance symbol (svc-3d-maintenance-plans.dim_256x256.png)\n- Gradient 3D generic default service icon (svc-3d-default.dim_256x256.png)",
   "existing_features": [
     {
       "id": "feature-implement-authentication-using-internet-identity-and-create-an-app-level-user-profile-record-on-first-sign-in-capturing-name-email-optional-role-admin-team-agency-name-monthly-revenue-goal-subscription-plan-total-revenue",
@@ -598,6 +599,78 @@
         "REQ-86"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-login-screen-that-supports-selecting-a-role-admin-manager-client-at-login-time-and-provides-two-login-options-1-internet-identity-login-for-real-authenticated-accounts-and-2-a-fixed-demo-username-password-login-that-creates-a-limited-access-demo-session",
+      "title": "Add a dedicated Login screen that supports selecting a role (Admin, Manager, Client) at login time, and provides two login options: (1) Internet Identity login for real authenticated accounts, and (2) a fixed demo username/password login that creates a limited-access demo session.",
+      "reqIds": [
+        "REQ-87"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-reintroduce-authentication-required-routing-for-non-demo-usage-if-the-user-is-not-in-a-demo-session-and-is-not-authenticated-via-internet-identity-redirect-them-to-the-login-screen-instead-of-loading-the-main-appshell-routes",
+      "title": "Reintroduce authentication-required routing for non-demo usage: if the user is not in a demo session and is not authenticated via Internet Identity, redirect them to the Login screen instead of loading the main AppShell routes.",
+      "reqIds": [
+        "REQ-88"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-and-enforce-strict-role-based-navigation-and-route-access-so-each-role-only-sees-and-can-access-permitted-modules-admin-full-access-manager-operational-access-client-purchase-dashboard-and-project-tracking-only-ensure-both-sidebar-navigation-and-direct-url-navigation-are-blocked-for-disallowed-routes-with-a-clear-english-message",
+      "title": "Implement and enforce strict role-based navigation and route access so each role only sees and can access permitted modules: Admin = full access; Manager = operational access; Client = purchase, dashboard, and project tracking only. Ensure both Sidebar navigation and direct URL navigation are blocked for disallowed routes with a clear English message.",
+      "reqIds": [
+        "REQ-89"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-fixed-demo-login-behavior-as-a-limited-access-mode-that-does-not-grant-backend-admin-capabilities-demo-sessions-must-be-clearly-marked-in-the-ui-must-not-allow-privileged-backend-mutations-and-must-only-expose-the-limited-features-permitted-for-the-demo-role",
+      "title": "Implement the fixed Demo Login behavior as a limited-access mode that does not grant backend-admin capabilities: demo sessions must be clearly marked in the UI, must not allow privileged backend mutations, and must only expose the limited features permitted for the demo role.",
+      "reqIds": [
+        "REQ-92"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-existing-services-pricing-page-to-render-the-provided-complete-pricing-catalog-as-grouped-sections-with-all-30-offerings-and-their-exact-inr-prices-and-bullet-features-using-english-section-headings-no-emoji-only-headings",
+      "title": "Update the existing Services & Pricing page to render the provided complete pricing catalog as grouped sections with all 30 offerings and their exact INR prices and bullet features, using English section headings (no emoji-only headings).",
+      "reqIds": [
+        "REQ-93"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-gradient-themed-visual-style-to-the-services-pricing-page-including-gradient-card-accents-backgrounds-and-consistent-premium-styling-spacing-typography-hierarchy-while-keeping-all-user-facing-text-in-english",
+      "title": "Apply a gradient-themed visual style to the Services & Pricing page, including gradient card accents/backgrounds and consistent premium styling (spacing, typography hierarchy), while keeping all user-facing text in English.",
+      "reqIds": [
+        "REQ-94"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-and-render-gradient-styled-3d-icons-for-the-pricing-catalog-categories-offerings-on-the-services-pricing-page-using-the-existing-serviceniche3dicon-component-and-icon-mapping-with-a-safe-fallback-if-an-icon-asset-is-missing",
+      "title": "Add and render gradient-styled 3D icons for the pricing catalog categories/offerings on the Services & Pricing page, using the existing ServiceNiche3dIcon component and icon mapping, with a safe fallback if an icon asset is missing.",
+      "reqIds": [
+        "REQ-95"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-single-monthly-maintenance-card-on-the-services-pricing-page-with-a-monthly-maintenance-plans-section-that-shows-exactly-3-plans-student-499-month-business-999-month-pro-1-999-month-and-the-included-bullets-minor-updates-basic-support-monitoring",
+      "title": "Replace the current single “Monthly Maintenance” card on the Services & Pricing page with a “Monthly Maintenance Plans” section that shows exactly 3 plans (Student ₹499/month, Business ₹999/month, Pro ₹1,999/month) and the included bullets: Minor updates, Basic support, Monitoring.",
+      "reqIds": [
+        "REQ-96"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-each-offering-and-maintenance-plan-displays-clear-ctas-consistent-with-the-app-s-pricing-flow-at-minimum-a-visible-select-plan-and-a-visible-get-started-action-per-offering-plan-and-keep-the-existing-checkoutdialog-integration-working-when-a-cta-triggers-checkout",
+      "title": "Ensure each offering and maintenance plan displays clear CTAs consistent with the app’s pricing flow (at minimum: a visible “Select Plan” and a visible “Get Started” action per offering/plan), and keep the existing CheckoutDialog integration working when a CTA triggers checkout.",
+      "reqIds": [
+        "REQ-97"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -918,6 +991,40 @@
     {
       "id": "AR-99",
       "summary": "Update checkout flow so selecting a service redirects users to the payment options section/page in checkout (UPI/Razorpay/Stripe) to complete payments.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-100",
+      "summary": "Implement secure multi-role login (Admin/Manager/Client) with role selection at login, a fixed demo username/password for limited-access testing, and strict role-based access control (Admin full; Manager operational; Client purchase + dashboard + project tracking only).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-104",
+      "summary": "Add backend role support for authenticated users (Internet Identity) by persisting a caller role of Admin/Manager/Client in the existing UserProfile record, and expose backend APIs to read the caller’s role for frontend gating.",
+      "reqIds": [
+        "REQ-90"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-105",
+      "summary": "Enforce role-based access control in backend endpoints so that: Admin has full permissions; Manager has operational permissions; Client is limited to purchase, dashboard, and project tracking operations. Backend must reject disallowed operations even if the UI is bypassed.",
+      "reqIds": [
+        "REQ-91"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-106",
+      "summary": "Simplify the login flow as much as possible because the user is not able to log in with the current role-based login screen.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-107",
+      "summary": "Update the Services & Pricing page to include the provided full pricing catalog (30 items + Monthly Maintenance Plans) with a gradient theme and gradient 3D icons for the offerings/categories.",
       "reqIds": [],
       "status": "pending"
     }
