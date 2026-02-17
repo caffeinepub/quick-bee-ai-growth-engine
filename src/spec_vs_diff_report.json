@@ -1,57 +1,64 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T17:56:13.553Z",
-  "summary": "Guest-facing frontend behavior was improved (profile hooks handle unauthorized as guest; Services dialog no longer blocks on missing profile; a services catalog seeding utility and UI flow were added). However, backend authorization for profile and service APIs still appears to trap for guest callers, and the seeded catalog completeness (including the two payment-gateway offerings and all specified categories/items) cannot be fully verified from the truncated diff.",
+  "generatedAt": "2026-02-17T19:01:11.104Z",
+  "summary": "Implemented a new 3D icon mapping system for services/niches (with SafeImage rendering) and added auto-scroll behavior in CheckoutDialog to guide users to payment methods and instructions. Some additional UI changes were made outside the explicitly requested surfaces.",
   "missing_requirements": [
     {
-      "id": "REQ-73",
-      "requirement": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably (via backend get/save profile methods).",
-      "reason": "Backend profile APIs shown still Runtime.trap unless caller has #user permission, which will fail for guests/anonymous callers; frontend catches the error but this does not satisfy the requirement that backend methods used by Settings do not trap and that guest saves persist reliably.",
+      "id": "REQ-85",
+      "requirement": "Add the required 3D icon image assets as frontend static assets (the specified svc-3d-*.png and niche-3d-*.png files).",
+      "reason": "The diff shows code referencing these asset paths via publicAssetUrl('assets/generated/...png'), but no image/static asset files are shown as added in the diff summary.",
       "evidence": [
-        "backend/main.mo (getCallerUserProfile traps: \"Unauthorized: Only users can view profiles\")",
-        "backend/main.mo (saveCallerUserProfile traps: \"Unauthorized: Only users can save profiles\")",
-        "frontend/src/hooks/useCurrentUserProfile.ts (query catches unauthorized and returns null, implying backend still throws)"
+        "frontend/src/utils/icons/serviceNiche3dIcons.ts"
       ]
     },
     {
-      "id": "REQ-75",
-      "requirement": "Relax backend authorization checks for service creation and service updates so they work in public/no-sign-in mode (guests), without trapping.",
-      "reason": "The diff summary does not show changes to backend addService/updateServiceStatus authorization behavior; given the backend still uses AccessControl checks (and traps for profiles), guest calls to addService/updateServiceStatus are not evidenced as supported and may still trap.",
+      "id": "REQ-86",
+      "requirement": "Opening CheckoutDialog automatically scrolls/focuses to the “Select Payment Method” section, and after order creation it scrolls/focuses to the payment instructions section.",
+      "reason": "The implementation clearly scrolls via scrollIntoView, but there is no evidence of setting keyboard focus (e.g., calling .focus() on an element) to satisfy the \"focuses\" portion of the requirement/AC.",
       "evidence": [
-        "backend/main.mo (still contains AccessControl/Runtime.trap patterns; addService/updateServiceStatus changes not shown in provided truncation)",
-        "frontend/src/hooks/useServices.ts (calls actor.addService and actor.updateServiceStatus, but this does not prove backend guest access is relaxed)"
-      ]
-    },
-    {
-      "id": "REQ-76",
-      "requirement": "Add the provided services catalog entries into the app as Service records grouped under the specified serviceType categories, including the two payment-gateway items.",
-      "reason": "A catalog file was added and seeding logic exists, but the catalog contents are truncated and do not show all required items/categories nor the two required payment-gateway offerings, so the requirement cannot be verified as complete from the diff summary.",
-      "evidence": [
-        "frontend/src/utils/services/seedCatalog.ts (truncated; shows some categories/items but not the full list)",
-        "frontend/src/pages/ServicesPage.tsx (uses generateCatalogServices and a seed flow, but does not demonstrate the full required catalog contents)"
+        "frontend/src/components/payments/CheckoutDialog.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added unauthenticated system settings endpoints (getSettings/updateSettings) unrelated to the requested guest profile-based Settings persistence.",
-      "reason": "REQ-73 concerns guest access to Settings via get/save profile without authorization traps; the diff introduces separate systemSettings storage and APIs, which were not requested and do not address the specific profile authorization traps shown.",
+      "description": "Added 3D niche icon rendering in Leads UI (lead cards and leads page niche filter/dropdown).",
+      "reason": "REQ-85 explicitly calls out service/niche icons across service-related UI surfaces (Services page, Service Details dialog, Services & Pricing page, and niche labels/filters where present in that context). The diff adds niche icon usage in the Leads module, which is not explicitly requested.",
       "evidence": [
-        "backend/main.mo (\"Settings - No authorization required\" with updateSettings/getSettings and systemSettings var)"
+        "frontend/src/components/common/LeadCard.tsx",
+        "frontend/src/pages/LeadsPage.tsx"
+      ]
+    },
+    {
+      "description": "Broader SafeImage adoption and visual tweaks in AppShell/Sidebar/Dashboard/Planner beyond the requested icon/checkout changes.",
+      "reason": "REQ-85 only requires new icons to be rendered via SafeImage (or equivalent) to avoid broken-image icons. The diff additionally refactors other areas to use SafeImage and adjusts loading/fallback behavior, which is not directly requested by REQ-85/REQ-86.",
+      "evidence": [
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/components/nav/SidebarNav.tsx",
+        "frontend/src/pages/DashboardPage.tsx",
+        "frontend/src/pages/PlannerPage.tsx",
+        "frontend/src/components/common/SafeImage.tsx"
       ]
     }
   ],
-  "confidence": 0.64,
+  "confidence": 0.62,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/services/ServiceDialog.tsx",
-    "frontend/src/hooks/useCurrentUserProfile.ts",
-    "frontend/src/hooks/useServices.ts",
+    "frontend/src/components/common/LeadCard.tsx",
+    "frontend/src/components/common/SafeImage.tsx",
+    "frontend/src/components/common/ServiceNiche3dIcon.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
+    "frontend/src/components/nav/SidebarNav.tsx",
+    "frontend/src/components/payments/CheckoutDialog.tsx",
+    "frontend/src/components/services/ServiceDetailsDialog.tsx",
+    "frontend/src/hooks/usePayments.ts",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/LeadsPage.tsx",
+    "frontend/src/pages/PlannerPage.tsx",
     "frontend/src/pages/ServicesPage.tsx",
-    "frontend/src/pages/SettingsPage.tsx",
-    "frontend/src/utils/services/seedCatalog.ts",
+    "frontend/src/pages/ServicesPricingPage.tsx",
+    "frontend/src/utils/icons/serviceNiche3dIcons.ts",
     "project_state.json"
   ]
 }

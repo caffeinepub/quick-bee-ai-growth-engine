@@ -1,35 +1,23 @@
 import { useState } from 'react';
-import { useGetUserDeals, useUpdateDealStatus } from '../hooks/useDeals';
-import { useGetAllLeads } from '../hooks/useLeads';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { useGetUserDeals } from '../hooks/useDeals';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { DealCard } from '../components/deals/DealCard';
 import { DealDialog } from '../components/deals/DealDialog';
-import type { Deal } from '../backend';
-
-const statusColumns = [
-  { id: 'open', label: 'Open', color: 'bg-blue-500' },
-  { id: 'proposalSent', label: 'Proposal Sent', color: 'bg-yellow-500' },
-  { id: 'won', label: 'Won', color: 'bg-green-600' },
-  { id: 'lost', label: 'Lost', color: 'bg-red-500' },
-];
+import { useGetCallerUserProfile } from '../hooks/useCurrentUserProfile';
+import type { Deal } from '../types/local';
 
 export default function DealsPage() {
   const { data: deals = [], isLoading } = useGetUserDeals();
-  const { data: leads = [] } = useGetAllLeads();
+  const { data: profile } = useGetCallerUserProfile();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
 
-  const handleDealClick = (deal: Deal) => {
-    setSelectedDeal(deal);
-    setDialogOpen(true);
-  };
-
-  const handleAddDeal = () => {
-    setSelectedDeal(null);
-    setDialogOpen(true);
+  const dealsByStatus = {
+    Open: deals.filter((d) => d.status === 'Open'),
+    'Proposal Sent': deals.filter((d) => d.status === 'Proposal Sent'),
+    Won: deals.filter((d) => d.status === 'Won'),
+    Lost: deals.filter((d) => d.status === 'Lost'),
   };
 
   if (isLoading) {
@@ -50,53 +38,38 @@ export default function DealsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Deals</h1>
           <p className="text-muted-foreground">Track your sales pipeline</p>
         </div>
-        <Button onClick={handleAddDeal}>
+        <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          New Deal
+          Add Deal
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        {statusColumns.map(column => {
-          const columnDeals = deals.filter(d => d.status === column.id);
-          const totalValue = columnDeals.reduce((sum, d) => sum + Number(d.value), 0);
-
-          return (
-            <div key={column.id} className="space-y-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center justify-between">
-                    <span>{column.label}</span>
-                    <Badge variant="secondary">{columnDeals.length}</Badge>
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground">
-                    ${totalValue.toLocaleString()}
-                  </p>
-                </CardHeader>
-              </Card>
-
-              <div className="space-y-2">
-                {columnDeals.map(deal => {
-                  const lead = leads.find(l => l.id === deal.leadId);
-                  return (
-                    <DealCard 
-                      key={deal.id} 
-                      deal={deal} 
-                      leadName={lead?.name}
-                      onClick={() => handleDealClick(deal)}
-                    />
-                  );
-                })}
-              </div>
+      <div className="grid gap-6 md:grid-cols-4">
+        {Object.entries(dealsByStatus).map(([status, statusDeals]) => (
+          <div key={status} className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">{status}</h2>
+              <span className="text-sm text-muted-foreground">{statusDeals.length}</span>
             </div>
-          );
-        })}
+            <div className="space-y-3">
+              {statusDeals.length === 0 ? (
+                <Card>
+                  <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                    No {status.toLowerCase()} deals
+                  </CardContent>
+                </Card>
+              ) : (
+                statusDeals.map((deal) => <DealCard key={deal.id} deal={deal} />)
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
-      <DealDialog 
-        open={dialogOpen} 
+      <DealDialog
+        open={dialogOpen}
         onOpenChange={setDialogOpen}
-        deal={selectedDeal}
+        agency={profile?.agency || 'Default Agency'}
       />
     </div>
   );

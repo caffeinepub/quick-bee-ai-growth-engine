@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Let guest (no-sign-in) users edit and persist Settings and manage Services, and seed the Services catalog with the provided expanded offerings (including payment gateway service entries).
+**Goal:** Add a consistent 3D icon system for services/niches across the UI, and improve the checkout dialog flow by automatically guiding users to payment options and payment instructions.
 
 **Planned changes:**
-- Update Settings flow to allow guest users to view/edit/save profile fields (Name, Email, Mobile Number, Agency, Monthly Goal, Subscription Plan) without authorization errors and persist them for the anonymous principal.
-- Remove guest-only frontend restrictions on the Services management page so guests can add/edit services and see updates reflected in the list (English UI text only).
-- Relax backend authorization checks for Settings (get/save profile) and Services (addService/updateServiceStatus) so guest calls don’t trap in public/no-sign-in mode.
-- Seed the Services catalog with all provided service entries, each as an individual Service record, grouped under the specified English serviceType categories (including the two payment-gateway offerings as catalog entries only).
+- Add a frontend 3D icon mapping system for service categories/types and niche values, with safe default fallback icons when no mapping exists.
+- Render the mapped 3D icons (via the existing SafeImage component or equivalent fallback behavior) in key UI locations: Services page cards, Service Details dialog header, Services & Pricing page category/tier cards (including Monthly Maintenance), and niche labels/filters where present.
+- Update CheckoutDialog behavior so opening the dialog automatically scrolls/focuses to the “Select Payment Method” section.
+- After “Create Order”, automatically scroll/focus the dialog to the payment instructions section for the currently selected payment method, for checkout entry from both Services page and Services & Pricing page.
 
-**User-visible outcome:** Guests can open Settings and save their details, reload and see the saved values, and can add/edit Services; the Services page shows the full seeded catalog including payment gateway setup offerings (as non-processing service listings).
+**User-visible outcome:** Users see consistent 3D icons for services and niches throughout the app (with a default icon if unavailable), and checkout reliably jumps to payment method selection and then to the relevant payment instructions after creating an order.

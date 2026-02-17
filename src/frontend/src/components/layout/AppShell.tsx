@@ -17,8 +17,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <SafeImage
             src={UPLOADED_IMAGES.qbLogo} 
             alt="Quick Bee" 
-            className="w-8 h-8 object-contain"
-            fallbackClassName="w-8 h-8 rounded"
+            className="w-8 h-8 object-contain rounded"
+            fallback="QB"
           />
           <span className="font-bold text-lg">Quick Bee</span>
         </div>

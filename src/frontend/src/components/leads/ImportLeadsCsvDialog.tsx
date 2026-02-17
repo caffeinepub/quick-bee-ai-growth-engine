@@ -54,7 +54,7 @@ export function ImportLeadsCsvDialog({ open, onOpenChange }: ImportLeadsCsvDialo
         return;
       }
 
-      await importLeads.mutateAsync({ leads, agency: profile.agency });
+      await importLeads.mutateAsync({ leads });
       
       setResult({ created: leads.length, failed: errors.length, errors });
       toast.success(`Successfully imported ${leads.length} leads`);

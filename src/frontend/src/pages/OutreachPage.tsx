@@ -1,53 +1,32 @@
 import { useState } from 'react';
-import { useGetAllOutreachActivities, useUpdateOutreachStatus } from '../hooks/useOutreach';
-import { useGetAllLeads } from '../hooks/useLeads';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
+import { useGetAllOutreachActivities } from '../hooks/useOutreach';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Linkedin, Instagram, MessageCircle, Smartphone, Plus } from 'lucide-react';
-import { UPLOADED_IMAGES } from '../constants/uploadedImages';
-import { SafeImage } from '../components/common/SafeImage';
+import { Plus, Mail, MessageSquare, Phone, Linkedin } from 'lucide-react';
 import { StartOutreachDialog } from '../components/outreach/StartOutreachDialog';
-import { toast } from 'sonner';
-import type { OutreachActivity } from '../backend';
+import { SafeImage } from '../components/common/SafeImage';
+import type { OutreachActivity } from '../types/local';
 
 const platforms = [
-  { id: 'Email', label: 'Email', icon: Mail, image: UPLOADED_IMAGES.email },
-  { id: 'LinkedIn', label: 'LinkedIn', icon: Linkedin, image: null },
-  { id: 'Instagram', label: 'Instagram', icon: Instagram, image: UPLOADED_IMAGES.instagram },
-  { id: 'WhatsApp', label: 'WhatsApp', icon: MessageCircle, image: UPLOADED_IMAGES.whatsapp },
-  { id: 'SMS', label: 'SMS', icon: Smartphone, image: UPLOADED_IMAGES.phone },
+  { id: 'email', name: 'Email', icon: Mail },
+  { id: 'whatsapp', name: 'WhatsApp', icon: MessageSquare },
+  { id: 'call', name: 'Call', icon: Phone },
+  { id: 'linkedin', name: 'LinkedIn', icon: Linkedin },
 ];
 
 export default function OutreachPage() {
-  const { data: outreach = [], isLoading: outreachLoading } = useGetAllOutreachActivities();
-  const { data: leads = [], isLoading: leadsLoading } = useGetAllLeads();
-  const updateStatus = useUpdateOutreachStatus();
-  const [activePlatform, setActivePlatform] = useState('Email');
-  const [startDialogOpen, setStartDialogOpen] = useState(false);
+  const { data: activities = [], isLoading } = useGetAllOutreachActivities();
+  const [selectedPlatform, setSelectedPlatform] = useState('email');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string>('');
 
-  const isLoading = outreachLoading || leadsLoading;
+  const activitiesByPlatform = activities.filter((a) => a.platform === selectedPlatform);
 
-  const platformOutreach = outreach.filter(o => o.platform === activePlatform);
-  const activePlatformData = platforms.find(p => p.id === activePlatform);
-
-  const handleMarkSent = async (activity: OutreachActivity) => {
-    try {
-      await updateStatus.mutateAsync({ activity, updates: { sent: true } });
-      toast.success('Marked as sent');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update status');
-    }
-  };
-
-  const handleMarkReplied = async (activity: OutreachActivity) => {
-    try {
-      await updateStatus.mutateAsync({ activity, updates: { replied: true } });
-      toast.success('Marked as replied');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update status');
-    }
+  const handleStartOutreach = (leadId: string) => {
+    setSelectedLeadId(leadId);
+    setDialogOpen(true);
   };
 
   if (isLoading) {
@@ -55,124 +34,72 @@ export default function OutreachPage() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading outreach...</p>
+          <p className="text-muted-foreground">Loading outreach activities...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="page-header">
-        <h1 className="page-title">Outreach</h1>
-        <p className="page-description">Track multi-channel outreach activities</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Outreach</h1>
+          <p className="text-muted-foreground">Multi-channel outreach tracking</p>
+        </div>
       </div>
 
-      <Tabs value={activePlatform} onValueChange={setActivePlatform}>
-        <TabsList className="grid w-full grid-cols-5 h-auto">
-          {platforms.map(platform => {
+      <Tabs value={selectedPlatform} onValueChange={setSelectedPlatform}>
+        <TabsList className="grid w-full grid-cols-4">
+          {platforms.map((platform) => {
             const Icon = platform.icon;
-            const count = outreach.filter(o => o.platform === platform.id).length;
             return (
-              <TabsTrigger 
-                key={platform.id} 
-                value={platform.id} 
-                className="flex flex-col sm:flex-row items-center gap-2 py-3 px-2 focus-ring"
-              >
-                <Icon className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">{platform.label}</span>
-                <Badge variant="secondary" className="text-xs">{count}</Badge>
+              <TabsTrigger key={platform.id} value={platform.id}>
+                <Icon className="mr-2 h-4 w-4" />
+                {platform.name}
               </TabsTrigger>
             );
           })}
         </TabsList>
 
-        {platforms.map(platform => (
-          <TabsContent key={platform.id} value={platform.id} className="space-y-5 mt-6">
-            {platformOutreach.length === 0 ? (
-              <Card className="interactive-card">
-                <CardContent className="py-16 text-center space-y-6">
-                  {platform.image ? (
-                    <div className="flex justify-center">
-                      <SafeImage
-                        src={platform.image} 
-                        alt={platform.label}
-                        className="w-32 h-32 object-cover rounded-2xl shadow-lg"
-                        fallbackClassName="w-32 h-32 rounded-2xl"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex justify-center">
-                      <div className="w-32 h-32 rounded-2xl bg-muted flex items-center justify-center">
-                        <platform.icon className="h-16 w-16 text-muted-foreground" />
-                      </div>
-                    </div>
-                  )}
-                  <div className="space-y-3">
-                    <h3 className="text-xl font-semibold">No {platform.label} outreach yet</h3>
-                    <p className="text-muted-foreground max-w-md mx-auto">
-                      Start reaching out to your leads via {platform.label} to track engagement and replies.
-                    </p>
-                  </div>
-                  <Button size="lg" className="focus-ring" onClick={() => setStartDialogOpen(true)}>
-                    Start Outreach
-                  </Button>
+        {platforms.map((platform) => (
+          <TabsContent key={platform.id} value={platform.id} className="space-y-4">
+            {activitiesByPlatform.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center space-y-4">
+                  <SafeImage
+                    src={`/assets/${platform.name.toLowerCase()}-icon.png`}
+                    alt={platform.name}
+                    className="h-16 w-16 mx-auto opacity-50"
+                    fallback={platform.name.charAt(0)}
+                  />
+                  <p className="text-muted-foreground">No {platform.name} outreach activities yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Start reaching out to leads via {platform.name}
+                  </p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
-                <div className="flex justify-end">
-                  <Button onClick={() => setStartDialogOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Outreach
-                  </Button>
-                </div>
-                {platformOutreach.map((activity, idx) => {
-                  const lead = leads.find(l => l.id === activity.leadId);
-                  return (
-                    <Card key={idx} className="interactive-card">
-                      <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="font-semibold">{lead?.name || 'Unknown Lead'}</h3>
-                              {activity.sent && (
-                                <Badge variant="outline" className="text-xs">Sent</Badge>
-                              )}
-                              {activity.replied && (
-                                <Badge variant="default" className="text-xs">Replied</Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {activity.message}
-                            </p>
-                          </div>
-                          <div className="flex gap-2 flex-shrink-0">
-                            {!activity.sent && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleMarkSent(activity)}
-                                disabled={updateStatus.isPending}
-                              >
-                                Mark Sent
-                              </Button>
-                            )}
-                            {activity.sent && !activity.replied && (
-                              <Button
-                                size="sm"
-                                onClick={() => handleMarkReplied(activity)}
-                                disabled={updateStatus.isPending}
-                              >
-                                Mark Replied
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {activitiesByPlatform.map((activity, index) => (
+                  <Card key={index}>
+                    <CardHeader>
+                      <CardTitle className="text-base">Lead: {activity.leadId.slice(0, 12)}...</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-sm">{activity.message}</p>
+                      <div className="flex gap-2">
+                        <Badge variant={activity.sent ? 'default' : 'secondary'}>
+                          {activity.sent ? 'Sent' : 'Draft'}
+                        </Badge>
+                        {activity.replied && <Badge className="bg-green-600">Replied</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Follow-up: {new Date(activity.followUpDate).toLocaleDateString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </TabsContent>
@@ -180,9 +107,10 @@ export default function OutreachPage() {
       </Tabs>
 
       <StartOutreachDialog
-        open={startDialogOpen}
-        onOpenChange={setStartDialogOpen}
-        platform={activePlatform}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        leadId={selectedLeadId}
+        platform={selectedPlatform}
       />
     </div>
   );

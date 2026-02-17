@@ -1,107 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Enable guest settings edits and seed expanded services catalog (including payment gateway offerings)",
+  "title": "Add 3D service/niche icons and improve checkout redirect to payment options",
   "projectName": "Quick Bee AI Growth Engine",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-73",
-      "text": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "give access even for guest role to change settings"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Opening the Settings page as a guest does not trap or show an authorization error.",
-        "Guest users can edit at least: Name, Email, Mobile Number, Agency, Monthly Goal, Subscription Plan, and save successfully.",
-        "After saving, reloading the app shows the saved Settings values for the same caller principal (including the anonymous principal).",
-        "Backend methods used by Settings (get/save profile) do not Runtime.trap for guest callers in the current public/no-sign-in mode."
-      ]
-    },
-    {
-      "id": "REQ-74",
-      "text": "Remove guest-only UI restrictions that prevent guests from managing services, so guest users can add and edit services from the Services management page.",
+      "id": "REQ-85",
+      "text": "Add a 3D icon system for Services and Niches, and render the appropriate 3D icon consistently across the UI wherever a service or niche is shown (at minimum: Services page service cards, Service Details dialog header area, Services & Pricing page category/tier cards, and any niche labels/filters where present). Include a safe fallback icon when no specific icon exists for a given service/niche value.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-1"
         ],
         "quotes": [
-          "give access even for guest role to change settings & add these services & payment gateways"
+          "add 3D icons for every service & niche"
         ]
       },
       "acceptanceCriteria": [
-        "As a guest, clicking “Add Service” on the Services page opens the service dialog and allows submitting a new service without being blocked by a “You must have a profile to manage services” error.",
-        "The Services list refreshes after a successful guest-created service and shows the new entry.",
-        "All user-facing text related to guest service management is in English."
+        "Services page cards show a 3D icon alongside each service (or a default 3D icon when no mapping exists).",
+        "ServiceDetailsDialog shows a 3D icon for the selected service in the header area (or default).",
+        "ServicesPricingPage shows a 3D icon for each of the 5 service categories and for Monthly Maintenance (or default).",
+        "Niche labels/filters (wherever they appear) display a mapped 3D icon (or default) without breaking layout on mobile.",
+        "All new icons are served as frontend static assets and rendered via the existing SafeImage component (or equivalent graceful fallback), so broken images do not show a browser broken-image icon."
       ]
     },
     {
-      "id": "REQ-75",
-      "text": "Relax backend authorization checks for service creation and service updates so they work in public/no-sign-in mode (guests), without trapping.",
-      "target": "backend",
+      "id": "REQ-86",
+      "text": "Update the checkout flow so that when the Checkout dialog opens from any entry point (Services page or Services & Pricing page), the user is immediately guided/redirected to the payment options area, and after an order is created the dialog automatically brings the payment instructions (UPI/Razorpay/Stripe) into view for the selected payment method.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-1"
         ],
         "quotes": [
-          "give access even for guest role to change settings & add these services & payment gateways"
+          "redirect to payment options in checkout page for payments"
         ]
       },
       "acceptanceCriteria": [
-        "Calling backend addService and updateServiceStatus as a guest does not Runtime.trap.",
-        "Services created/updated by a guest are returned by getAllServices and appear in the Services page UI.",
-        "No payment processing is implemented; services are only stored as catalog entries."
-      ]
-    },
-    {
-      "id": "REQ-76",
-      "text": "Add the provided services catalog entries into the app as Services records, grouped under the following serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "add these services & payment gateways Website & Funnel Services\n\nCustom Business Website Development\n\nHigh-Converting Landing Page Design\n\nSales Funnel Strategy & Build\n\nE-commerce Store Development\n\nWebsite Redesign & Optimization\n\nConversion Rate Optimization (CRO)\n\nSpeed Optimization & Technical Fixes\n\nWebsite Maintenance & Support\n\n🤖 AI & Automation Services\n\nWhatsApp Automation & Lead Response System\n\nAI Chatbot Development (Website + WhatsApp)\n\nCRM Setup & Workflow Automation\n\nAI Lead Qualification System\n\nAutomated Follow-up Sequences (Email/SMS/WhatsApp)\n\nAI Personalized Outreach System\n\nAppointment Booking Automation\n\nNo-Code Internal Business Automation\n\n📈 Marketing & Growth Systems\n\nSEO Setup & Local SEO Optimization\n\nGoogle Business Profile Optimization\n\nLinkedIn Lead Generation System\n\nInstagram Growth & Automation System\n\nCold Email Lead Generation System\n\nPaid Ads Funnel Setup (Meta + Google)\n\nRetargeting Funnel Setup\n\nReview & Reputation Management System\n\n💼 High-Ticket Business Solutions\n\nComplete AI Growth Engine Setup (All-in-One Package)\n\nSaaS Development for Agencies\n\nMulti-Channel Outreach System (3000-touch plan)\n\nRevenue Dashboard & Funnel Analytics Setup\n\nProposal Generator & Sales Automation System\n\nFull Business Digitization & Automation Package\n\n💎 Bonus High-Value Add-ons (Optional Upsells)\n\n• International Payment Gateway Setup (Stripe, PayPal)\n• Indian Payment Gateway Integration (Razorpay, UPI)\n• White-label CRM for Agencies\n• Subscription SaaS Monetization Setup\n• Client Portal Development\n• Funnel Audit & Strategy Consultation"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All listed items exist as individual Service records and are visible in the Services management list.",
-        "Each created Service uses the correct serviceType category (exact English category names as specified).",
-        "The two payment-gateway items are present as Service records: “International Payment Gateway Setup (Stripe, PayPal)” and “Indian Payment Gateway Integration (Razorpay, UPI)”.",
-        "No external payment gateway integration is added; these are catalog/service offering entries only."
+        "Opening CheckoutDialog automatically scrolls/focuses to the “Select Payment Method” section (payment options) without requiring manual scrolling.",
+        "After a successful “Create Order”, the dialog automatically scrolls/focuses to the payment instructions section for the currently selected method.",
+        "The behavior works for both ServicesPage checkout entry and ServicesPricingPage checkout entry, without changing backend APIs.",
+        "No user-facing text related to checkout becomes non-English as part of these changes."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single-actor Motoko canister (all logic in backend/main.mo).",
-    "Only create/modify backend/migration.mo if a state migration is required by schema/state changes (do not add migration if not needed).",
-    "Do not edit any frontend files under frontend/src/components/ui or other paths listed as immutable in SYSTEM_CONTEXT.",
-    "Use English for all user-facing text."
+    "Do not edit files under frontend/src/components/ui (shadcn UI components are read-only and must be composed).",
+    "Do not change authentication approach or add new auth providers (Internet Identity remains as-is; app already supports no-sign-in mode).",
+    "Do not introduce new backend canisters or external databases; keep the single-actor Motoko backend unchanged unless strictly required."
   ],
   "nonGoals": [
-    "Implementing real payment collection or payment gateway API integrations (Stripe/PayPal/Razorpay/UPI).",
-    "Re-introducing authentication/sign-in gating or role-based restrictions.",
-    "Adding third-party authentication providers beyond Internet Identity."
+    "Implementing real-time payment confirmation (webhooks, polling gateways, or automatic status reconciliation) is out of scope.",
+    "Creating unique bespoke 3D artwork for every individual custom service record name is out of scope; icons should be mapped by service category/type/subtype and niche, with a robust default fallback."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "3D isometric website/landing-page icon (svc-3d-website.dim_256x256.png)",
+      "3D isometric WhatsApp automation/chatbot icon (svc-3d-whatsapp-automation.dim_256x256.png)",
+      "3D isometric lead funnel/CRM pipeline icon (svc-3d-lead-machine.dim_256x256.png)",
+      "3D isometric personal brand/social profile icon (svc-3d-personal-brand.dim_256x256.png)",
+      "3D isometric AI growth/robot + graph icon (svc-3d-ai-growth.dim_256x256.png)",
+      "3D isometric maintenance/gear + shield icon (svc-3d-maintenance.dim_256x256.png)",
+      "3D isometric generic service/package box icon (svc-3d-default.dim_256x256.png)",
+      "3D isometric generic niche tag/badge icon (niche-3d-default.dim_256x256.png)",
+      "3D isometric e-commerce/storefront icon (niche-3d-ecommerce.dim_256x256.png)",
+      "3D isometric real estate/house icon (niche-3d-real-estate.dim_256x256.png)",
+      "3D isometric education/book icon (niche-3d-education.dim_256x256.png)",
+      "3D isometric healthcare/medical cross icon (niche-3d-healthcare.dim_256x256.png)",
+      "3D isometric restaurant/food icon (niche-3d-restaurant.dim_256x256.png)",
+      "3D isometric fitness/dumbbell icon (niche-3d-fitness.dim_256x256.png)",
+      "3D isometric SaaS/cloud app icon (niche-3d-saas.dim_256x256.png)",
+      "3D isometric local business/shop icon (niche-3d-local-business.dim_256x256.png)"
+    ],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

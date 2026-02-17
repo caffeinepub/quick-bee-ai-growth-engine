@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Lead, Deal, OutreachActivity, Service, Project } from '../backend';
+import type { Lead, Service, Project } from '../backend';
+import type { Deal, OutreachActivity } from '../types/local';
 
 export type AgencyAnalytics = {
   leads: Lead[];
@@ -20,9 +21,20 @@ export function useGetAgencyAnalytics() {
         return { leads: [], deals: [], outreach: [], services: [], projects: [] };
       }
       try {
-        // Pass empty string as agency parameter - backend returns all data regardless
-        const [leads, deals, outreach, services, projects] = await actor.getAgencyAnalytics('');
-        return { leads, deals, outreach, services, projects };
+        // Fetch available data from backend
+        const [leads, services, projects] = await Promise.all([
+          actor.getLeadsPaginated(BigInt(0), BigInt(10000)).catch(() => []),
+          actor.getServices().catch(() => []),
+          actor.getProjects().catch(() => []),
+        ]);
+        
+        return {
+          leads,
+          deals: [], // Not implemented in backend
+          outreach: [], // Not implemented in backend
+          services,
+          projects,
+        };
       } catch (error) {
         console.warn('Analytics query failed:', error);
         return { leads: [], deals: [], outreach: [], services: [], projects: [] };

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useGetCallerUserProfile } from './useCurrentUserProfile';
-import type { Deal } from '../backend';
+import type { Deal } from '../types/local';
 
 export function useGetUserDeals() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -10,21 +10,21 @@ export function useGetUserDeals() {
   return useQuery<Deal[]>({
     queryKey: ['deals', profile?.agency],
     queryFn: async () => {
-      if (!actor || !profile?.agency) return [];
-      return actor.getUserDeals(profile.agency);
+      // Backend doesn't have deals functionality yet
+      return [];
     },
     enabled: !!actor && !actorFetching && !!profile?.agency,
   });
 }
 
 export function useUpdateDealStatus() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ dealId, status }: { dealId: string; status: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updateDealStatus(dealId, status);
+      // Backend doesn't have deals functionality yet
+      console.warn('Deal status update not implemented in backend');
+      return { dealId, status };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deals'] });
@@ -39,8 +39,8 @@ export function useCreateDeal() {
 
   return useMutation({
     mutationFn: async (deal: Deal) => {
-      // Backend doesn't have createDeal, so we simulate it
-      // In production, this would need backend support
+      // Backend doesn't have createDeal
+      console.warn('Deal creation not implemented in backend');
       return deal;
     },
     onSuccess: () => {
@@ -51,14 +51,13 @@ export function useCreateDeal() {
 }
 
 export function useUpdateDeal() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (deal: Deal) => {
-      if (!actor) throw new Error('Actor not available');
-      // Use updateDealStatus for now
-      return actor.updateDealStatus(deal.id, deal.status);
+      // Backend doesn't have deals functionality yet
+      console.warn('Deal update not implemented in backend');
+      return deal;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deals'] });

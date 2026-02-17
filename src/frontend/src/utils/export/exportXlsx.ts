@@ -1,5 +1,5 @@
 import type { ExportData } from '../../hooks/useExportData';
-import { leadFields, outreachFields, serviceFields, dealFields, projectFields, getFieldValue } from './exportSchema';
+import { leadFields, outreachFields, serviceFields, dealFields, projectFields, formatFieldValue } from './exportSchema';
 
 // Simple XLSX generation without external dependencies
 // Creates a minimal valid XLSX file structure
@@ -68,7 +68,7 @@ function generateWorksheet<T>(name: string, items: T[], fields: any[]): string {
   items.forEach(item => {
     xml += '<Row>';
     fields.forEach(field => {
-      const value = getFieldValue(item, field);
+      const value = formatFieldValue(field, item);
       const type = isNumeric(value) ? 'Number' : 'String';
       xml += `<Cell><Data ss:Type="${type}">${escapeXML(value)}</Data></Cell>`;
     });

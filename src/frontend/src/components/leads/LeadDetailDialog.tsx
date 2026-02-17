@@ -7,17 +7,16 @@ import { Badge } from '@/components/ui/badge';
 import { useUpdateLeadStatus } from '../../hooks/useLeads';
 import { toast } from 'sonner';
 import type { Lead } from '../../backend';
-import { Mail, MapPin, DollarSign, User } from 'lucide-react';
 
 interface LeadDetailDialogProps {
-  lead: Lead | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  lead: Lead | null;
 }
 
-export function LeadDetailDialog({ lead, open, onOpenChange }: LeadDetailDialogProps) {
+export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogProps) {
   const updateStatus = useUpdateLeadStatus();
-  const [selectedStatus, setSelectedStatus] = useState(lead?.status || 'cold');
+  const [selectedStatus, setSelectedStatus] = useState(lead?.status || '');
 
   if (!lead) return null;
 
@@ -28,92 +27,76 @@ export function LeadDetailDialog({ lead, open, onOpenChange }: LeadDetailDialogP
     }
 
     try {
-      await updateStatus.mutateAsync({ leadId: lead.id, status: selectedStatus });
-      toast.success('Lead status updated successfully');
+      const updatedLead = { ...lead, status: selectedStatus };
+      await updateStatus.mutateAsync({ leadId: lead.id, lead: updatedLead });
+      toast.success('Lead status updated');
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update lead status');
+      toast.error(error.message || 'Failed to update status');
     }
   };
 
-  const statusColors: Record<string, string> = {
-    cold: 'bg-gray-500',
-    contacted: 'bg-blue-500',
-    interested: 'bg-yellow-500',
-    qualified: 'bg-green-500',
-    proposalSent: 'bg-purple-500',
-    won: 'bg-emerald-600',
-    lost: 'bg-red-500',
+  const formatINR = (amount: bigint) => {
+    return `₹${Number(amount).toLocaleString('en-IN')}`;
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>{lead.name}</span>
-            <Badge className={statusColors[lead.status] || 'bg-gray-500'}>
-              {lead.status}
-            </Badge>
-          </DialogTitle>
-          <DialogDescription>
-            Lead details and status management
-          </DialogDescription>
+          <DialogTitle>{lead.name}</DialogTitle>
+          <DialogDescription>Lead details and status management</DialogDescription>
         </DialogHeader>
-        
+
         <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">Contact:</span>
-              <span>{lead.contact}</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-muted-foreground">Contact</Label>
+              <p className="font-medium">{lead.contact}</p>
+            </div>
+            <div>
+              <Label className="text-muted-foreground">City</Label>
+              <p className="font-medium">{lead.city}</p>
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">City:</span>
-              <span>{lead.city}</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-muted-foreground">Niche</Label>
+              <p className="font-medium">{lead.niche}</p>
+            </div>
+            <div>
+              <Label className="text-muted-foreground">Owner</Label>
+              <p className="font-medium">{lead.owner}</p>
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Badge variant="outline">{lead.niche}</Badge>
+          <div>
+            <Label className="text-muted-foreground">Revenue Potential</Label>
+            <p className="text-xl font-bold text-green-600">{formatINR(lead.revenuePotential)}</p>
+          </div>
+
+          <div>
+            <Label className="text-muted-foreground">Current Status</Label>
+            <div className="mt-2">
+              <Badge>{lead.status}</Badge>
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 text-sm">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">Revenue Potential:</span>
-              <span>${Number(lead.revenuePotential).toLocaleString()}</span>
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">Owner:</span>
-              <span>{lead.owner}</span>
-            </div>
-          </div>
-
-          <div className="border-t pt-4 mt-2">
-            <Label htmlFor="status" className="mb-2 block">Update Status</Label>
+          <div className="space-y-2">
+            <Label htmlFor="status">Update Status</Label>
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger>
+              <SelectTrigger id="status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cold">Cold</SelectItem>
-                <SelectItem value="contacted">Contacted</SelectItem>
-                <SelectItem value="interested">Interested</SelectItem>
-                <SelectItem value="qualified">Qualified</SelectItem>
-                <SelectItem value="proposalSent">Proposal Sent</SelectItem>
-                <SelectItem value="won">Won</SelectItem>
-                <SelectItem value="lost">Lost</SelectItem>
+                <SelectItem value="New">New</SelectItem>
+                <SelectItem value="Contacted">Contacted</SelectItem>
+                <SelectItem value="Qualified">Qualified</SelectItem>
+                <SelectItem value="Proposal Sent">Proposal Sent</SelectItem>
+                <SelectItem value="Negotiation">Negotiation</SelectItem>
+                <SelectItem value="Won">Won</SelectItem>
+                <SelectItem value="Lost">Lost</SelectItem>
               </SelectContent>
             </Select>
           </div>

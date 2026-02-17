@@ -54,14 +54,11 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
     const userRole: UserRole = role === 'admin' ? UserRole.admin : UserRole.user;
 
     await registerUser.mutateAsync({
-      principal,
       name,
       email,
-      mobileNumber: mobileNumber.trim() || null,
+      mobileNumber: mobileNumber.trim() || undefined,
       agency,
       role: userRole,
-      revenueGoal: BigInt(Math.floor(parseFloat(revenueGoal) || 0)),
-      subscriptionPlan,
     });
 
     if (onClose) {
@@ -138,33 +135,6 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
               <SelectContent>
                 <SelectItem value="user">User</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="revenueGoal">Monthly Revenue Goal ($) *</Label>
-            <Input
-              id="revenueGoal"
-              type="number"
-              value={revenueGoal}
-              onChange={(e) => setRevenueGoal(e.target.value)}
-              placeholder="10000"
-              required
-              min="0"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="subscriptionPlan">Subscription Plan *</Label>
-            <Select value={subscriptionPlan} onValueChange={setSubscriptionPlan}>
-              <SelectTrigger id="subscriptionPlan">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Starter">Starter</SelectItem>
-                <SelectItem value="Professional">Professional</SelectItem>
-                <SelectItem value="Enterprise">Enterprise</SelectItem>
               </SelectContent>
             </Select>
           </div>

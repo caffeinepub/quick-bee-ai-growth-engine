@@ -1,34 +1,46 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, Calendar } from 'lucide-react';
-import type { Deal } from '../../backend';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import type { Deal } from '../../types/local';
 
 interface DealCardProps {
   deal: Deal;
-  leadName?: string;
-  onClick?: () => void;
+  onStatusChange?: (dealId: string, newStatus: string) => void;
 }
 
-export function DealCard({ deal, leadName, onClick }: DealCardProps) {
-  const formatDate = (timestamp: bigint) => {
-    const date = new Date(Number(timestamp) / 1000000);
-    return date.toLocaleDateString();
+export function DealCard({ deal, onStatusChange }: DealCardProps) {
+  const formatINR = (amount: number) => {
+    return `₹${amount.toLocaleString('en-IN')}`;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'won':
+        return 'bg-green-600';
+      case 'lost':
+        return 'bg-red-600';
+      case 'proposal sent':
+        return 'bg-blue-600';
+      default:
+        return 'bg-gray-600';
+    }
   };
 
   return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
-      <CardContent className="p-4">
+    <Card className="cursor-pointer hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="font-medium">{leadName || `Lead #${deal.leadId.slice(0, 8)}`}</p>
-            <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
-              <DollarSign className="h-3 w-3" />
-              <span>${Number(deal.value).toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              <span>{formatDate(deal.createdAt)}</span>
-            </div>
-          </div>
+          <CardTitle className="text-base">Deal #{deal.id.slice(0, 8)}</CardTitle>
+          <Badge className={getStatusColor(deal.status)}>{deal.status}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <div>
+          <p className="text-sm text-muted-foreground">Value</p>
+          <p className="text-xl font-bold">{formatINR(deal.value)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Lead ID</p>
+          <p className="text-sm font-mono">{deal.leadId.slice(0, 12)}...</p>
         </div>
       </CardContent>
     </Card>

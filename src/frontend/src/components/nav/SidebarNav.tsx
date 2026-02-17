@@ -56,8 +56,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           <SafeImage
             src={UPLOADED_IMAGES.qbLogo}
             alt="Quick Bee"
-            className="w-10 h-10 object-contain"
-            fallbackClassName="w-10 h-10 rounded"
+            className="w-10 h-10 object-contain rounded"
+            fallback="QB"
           />
           <div>
             <h2 className="text-xl font-bold tracking-tight">Quick Bee</h2>

@@ -18,15 +18,6 @@ export interface ClientServiceRequest {
   'details' : [] | [string],
   'serviceId' : string,
 }
-export interface Deal {
-  'id' : string,
-  'status' : string,
-  'closeDate' : [] | [bigint],
-  'value' : bigint,
-  'createdAt' : bigint,
-  'agency' : string,
-  'leadId' : string,
-}
 export type ExternalBlob = Uint8Array;
 export interface Lead {
   'id' : string,
@@ -40,15 +31,28 @@ export interface Lead {
   'agency' : string,
   'niche' : string,
 }
-export interface OutreachActivity {
+export interface Payment {
+  'id' : string,
+  'status' : PaymentStatus,
+  'paymentMethod' : PaymentMethod,
+  'userId' : Principal,
   'createdAt' : bigint,
-  'sent' : boolean,
-  'platform' : string,
-  'leadId' : string,
-  'message' : string,
-  'replied' : boolean,
-  'followUpDate' : bigint,
+  'updatedAt' : bigint,
+  'serviceId' : string,
+  'amount' : bigint,
 }
+export type PaymentMethod = { 'upi' : null } |
+  { 'stripe' : null } |
+  { 'razorpay' : null };
+export interface PaymentSettings {
+  'upiDetails' : string,
+  'razorpayLink' : string,
+  'stripeLink' : string,
+}
+export type PaymentStatus = { 'cancelled' : null } |
+  { 'pending' : null } |
+  { 'paid' : null } |
+  { 'failed' : null };
 export interface Project {
   'id' : string,
   'files' : Array<ExternalBlob>,
@@ -72,10 +76,15 @@ export interface Service {
   'time' : string,
   'agency' : string,
   'deliveryTime' : string,
+  'shortDescription' : string,
   'serviceSubType' : string,
   'niche' : string,
+  'deliverables' : Array<string>,
   'salesCount' : bigint,
+  'detailedDescription' : string,
   'price' : bigint,
+  'requirements' : Array<string>,
+  'supportedProviders' : Array<string>,
 }
 export interface Settings {
   'defaultSort' : string,
@@ -127,74 +136,34 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'addLead' : ActorMethod<
-    [
-      {
-        'id' : string,
-        'status' : string,
-        'contact' : string,
-        'owner' : string,
-        'city' : string,
-        'name' : string,
-        'revenuePotential' : bigint,
-        'agency' : string,
-        'niche' : string,
-      },
-    ],
-    undefined
-  >,
-  'addOutreach' : ActorMethod<[OutreachActivity], undefined>,
-  'addProject' : ActorMethod<[Project], undefined>,
-  'addService' : ActorMethod<[Service], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'completeProject' : ActorMethod<[string], undefined>,
-  'createClientServiceRequest' : ActorMethod<
-    [string, string, [] | [string]],
-    undefined
-  >,
-  'getAgencyAnalytics' : ActorMethod<
-    [string],
-    [
-      Array<Lead>,
-      Array<Deal>,
-      Array<OutreachActivity>,
-      Array<Service>,
-      Array<Project>,
-    ]
-  >,
-  'getAllClientServiceRequests' : ActorMethod<[], Array<ClientServiceRequest>>,
-  'getAllLeads' : ActorMethod<[], Array<Lead>>,
-  'getAllOutreachActivities' : ActorMethod<[], Array<OutreachActivity>>,
-  'getAllServices' : ActorMethod<[], Array<Service>>,
+  'createClientServiceRequest' : ActorMethod<[ClientServiceRequest], undefined>,
+  'createLead' : ActorMethod<[Lead], undefined>,
+  'createPayment' : ActorMethod<[string, bigint, PaymentMethod], string>,
+  'createProject' : ActorMethod<[Project], undefined>,
+  'createService' : ActorMethod<[Service], undefined>,
+  'deleteLead' : ActorMethod<[string], undefined>,
+  'deleteService' : ActorMethod<[string], undefined>,
+  'getAllPayments' : ActorMethod<[], Array<Payment>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getClientServiceRequest' : ActorMethod<
-    [string],
-    [] | [ClientServiceRequest]
-  >,
-  'getClientServiceRequestsByAgency' : ActorMethod<
-    [string],
-    Array<ClientServiceRequest>
-  >,
-  'getDealsForExport' : ActorMethod<[], Array<Deal>>,
-  'getLeadsForExport' : ActorMethod<[], Array<Lead>>,
-  'getOutreachActivitiesForExport' : ActorMethod<[], Array<OutreachActivity>>,
-  'getProjectsForExport' : ActorMethod<[], Array<Project>>,
-  'getServiceById' : ActorMethod<[string], [] | [Service]>,
-  'getServicesForExport' : ActorMethod<[], Array<Service>>,
+  'getClientServiceRequests' : ActorMethod<[], Array<ClientServiceRequest>>,
+  'getLeadsPaginated' : ActorMethod<[bigint, bigint], Array<Lead>>,
+  'getPayment' : ActorMethod<[string], [] | [Payment]>,
+  'getPaymentSettings' : ActorMethod<[], PaymentSettings>,
+  'getProjects' : ActorMethod<[], Array<Project>>,
+  'getService' : ActorMethod<[string], [] | [Service]>,
+  'getServices' : ActorMethod<[], Array<Service>>,
   'getSettings' : ActorMethod<[], Settings>,
-  'getUserDeals' : ActorMethod<[string], Array<Deal>>,
+  'getUserPayments' : ActorMethod<[], Array<Payment>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'importLeads' : ActorMethod<[Array<Lead>, string], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'registerUser' : ActorMethod<
-    [string, string, string, [] | [string], string, string, bigint, string],
-    undefined
-  >,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'updateDealStatus' : ActorMethod<[string, string], undefined>,
-  'updateLeadStatus' : ActorMethod<[string, string], undefined>,
-  'updateServiceStatus' : ActorMethod<[string, boolean], undefined>,
+  'updateLead' : ActorMethod<[string, Lead], undefined>,
+  'updatePaymentSettings' : ActorMethod<[PaymentSettings], undefined>,
+  'updatePaymentStatus' : ActorMethod<[string, PaymentStatus], undefined>,
+  'updateProject' : ActorMethod<[string, Project], undefined>,
+  'updateService' : ActorMethod<[string, Service], undefined>,
   'updateSettings' : ActorMethod<[Settings], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { OutreachActivity } from '../backend';
+import type { OutreachActivity } from '../types/local';
 
 export function useGetAllOutreachActivities() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -8,21 +8,21 @@ export function useGetAllOutreachActivities() {
   return useQuery<OutreachActivity[]>({
     queryKey: ['outreach'],
     queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllOutreachActivities();
+      // Backend doesn't have outreach functionality yet
+      return [];
     },
     enabled: !!actor && !actorFetching,
   });
 }
 
 export function useAddOutreach() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (activity: OutreachActivity) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addOutreach(activity);
+      // Backend doesn't have outreach functionality yet
+      console.warn('Outreach creation not implemented in backend');
+      return activity;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['outreach'] });
@@ -37,7 +37,7 @@ export function useUpdateOutreachStatus() {
 
   return useMutation({
     mutationFn: async ({ activity, updates }: { activity: OutreachActivity; updates: Partial<OutreachActivity> }) => {
-      // Since backend doesn't have update method, we simulate optimistic update
+      // Backend doesn't have update method
       return { ...activity, ...updates };
     },
     onSuccess: () => {

@@ -60,7 +60,7 @@ export default function PlannerPage() {
                   src={UPLOADED_IMAGES.strategy} 
                   alt="Strategy Planning"
                   className="w-48 h-48 object-cover rounded-2xl shadow-lg"
-                  fallbackClassName="w-48 h-48 rounded-2xl"
+                  fallback="ST"
                 />
               </div>
               <div className="flex-1 text-center md:text-left space-y-4">
@@ -88,15 +88,19 @@ export default function PlannerPage() {
                   src={UPLOADED_IMAGES.aiAutomation} 
                   alt="AI Automation"
                   className="w-16 h-16 object-cover rounded-xl"
-                  fallbackClassName="w-16 h-16 rounded-xl"
+                  fallback="AI"
                 />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">AI-Powered Automation</h3>
                 <p className="text-sm text-muted-foreground">
-                  Automate your outreach with intelligent message generation
+                  Automate your outreach with AI-generated messages and smart scheduling
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-2 text-primary">
+              <Target className="h-5 w-5" />
+              <span className="text-sm font-medium">100 messages per day</span>
             </div>
           </CardContent>
         </Card>
@@ -106,18 +110,22 @@ export default function PlannerPage() {
             <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
                 <SafeImage
-                  src={UPLOADED_IMAGES.deployment} 
-                  alt="Deployment"
+                  src={UPLOADED_IMAGES.digitalMarketing} 
+                  alt="Digital Marketing"
                   className="w-16 h-16 object-cover rounded-xl"
-                  fallbackClassName="w-16 h-16 rounded-xl"
+                  fallback="DM"
                 />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg">Quick Deployment</h3>
+                <h3 className="font-semibold text-lg">Multi-Channel Strategy</h3>
                 <p className="text-sm text-muted-foreground">
-                  Launch your campaigns across multiple channels instantly
+                  Reach leads across email, LinkedIn, Instagram, WhatsApp, and SMS
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-2 text-primary">
+              <TrendingUp className="h-5 w-5" />
+              <span className="text-sm font-medium">5 channels integrated</span>
             </div>
           </CardContent>
         </Card>

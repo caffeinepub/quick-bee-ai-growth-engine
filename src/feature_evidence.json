@@ -2,55 +2,17 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-allow-guest-no-sign-in-no-profile-users-to-view-and-update-settings-without-encountering-authorization-traps-and-persist-those-updates-reliably",
-      "featureTitle": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably.",
+      "featureId": "feature-add-a-3d-icon-system-for-services-and-niches-and-render-the-appropriate-3d-icon-consistently-across-the-ui-wherever-a-service-or-niche-is-shown-at-minimum-services-page-service-cards-service-details-dialog-header-area-services-pricing-page-category-tier-cards-and-any-niche-labels-filters-where-present-include-a-safe-fallback-icon-when-no-specific-icon-exists-for-a-given-service-niche-value",
+      "featureTitle": "Add a 3D icon system for Services and Niches, and render the appropriate 3D icon consistently across the UI wherever a service or niche is shown (at minimum: Services page service cards, Service Details dialog header area, Services & Pricing page category/tier cards, and any niche labels/filters where present). Include a safe fallback icon when no specific icon exists for a given service/niche value.",
       "files": [
-        "frontend/src/hooks/useCurrentUserProfile.ts",
-        "frontend/src/pages/SettingsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-73"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-guest-only-ui-restrictions-that-prevent-guests-from-managing-services-so-guest-users-can-add-and-edit-services-from-the-services-management-page",
-      "featureTitle": "Remove guest-only UI restrictions that prevent guests from managing services, so guest users can add and edit services from the Services management page.",
-      "files": [
-        "frontend/src/components/services/ServiceDialog.tsx",
-        "frontend/src/hooks/useServices.ts",
-        "frontend/src/pages/ServicesPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-74"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-the-provided-services-catalog-entries-into-the-app-as-services-records-grouped-under-the-following-servicetype-categories-website-funnel-services-ai-automation-services-marketing-growth-systems-high-ticket-business-solutions-and-bonus-high-value-add-ons-optional-upsells",
-      "featureTitle": "Add the provided services catalog entries into the app as Services records, grouped under the following serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”.",
-      "files": [
-        "frontend/src/hooks/useServices.ts",
+        "frontend/src/components/common/LeadCard.tsx",
+        "frontend/src/components/common/SafeImage.tsx",
+        "frontend/src/components/common/ServiceNiche3dIcon.tsx",
+        "frontend/src/components/services/ServiceDetailsDialog.tsx",
+        "frontend/src/pages/LeadsPage.tsx",
         "frontend/src/pages/ServicesPage.tsx",
-        "frontend/src/utils/services/seedCatalog.ts"
+        "frontend/src/pages/ServicesPricingPage.tsx",
+        "frontend/src/utils/icons/serviceNiche3dIcons.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -62,7 +24,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-76"
+        "REQ-85"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-checkout-flow-so-that-when-the-checkout-dialog-opens-from-any-entry-point-services-page-or-services-pricing-page-the-user-is-immediately-guided-redirected-to-the-payment-options-area-and-after-an-order-is-created-the-dialog-automatically-brings-the-payment-instructions-upi-razorpay-stripe-into-view-for-the-selected-payment-method",
+      "featureTitle": "Update the checkout flow so that when the Checkout dialog opens from any entry point (Services page or Services & Pricing page), the user is immediately guided/redirected to the payment options area, and after an order is created the dialog automatically brings the payment instructions (UPI/Razorpay/Stripe) into view for the selected payment method.",
+      "files": [
+        "frontend/src/components/payments/CheckoutDialog.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-86"
       ],
       "confidence": "high"
     }

@@ -89,6 +89,52 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface ClientServiceRequest {
+    id: string;
+    principal: string;
+    createdAt: bigint;
+    agency: string;
+    details?: string;
+    serviceId: string;
+}
+export interface _CaffeineStorageRefillInformation {
+    proposed_top_up_amount?: bigint;
+}
+export interface Service {
+    id: string;
+    serviceType: string;
+    active: boolean;
+    revenue: bigint;
+    cost: bigint;
+    date: string;
+    name: string;
+    time: string;
+    agency: string;
+    deliveryTime: string;
+    shortDescription: string;
+    serviceSubType: string;
+    niche: string;
+    deliverables: Array<string>;
+    salesCount: bigint;
+    detailedDescription: string;
+    price: bigint;
+    requirements: Array<string>;
+    supportedProviders: Array<string>;
+}
+export interface _CaffeineStorageCreateCertificateResult {
+    method: string;
+    blob_hash: string;
+}
+export interface Payment {
+    id: string;
+    status: PaymentStatus;
+    paymentMethod: PaymentMethod;
+    userId: Principal;
+    createdAt: bigint;
+    updatedAt: bigint;
+    serviceId: string;
+    amount: bigint;
+}
 export interface Lead {
     id: string;
     status: string;
@@ -109,54 +155,10 @@ export interface Settings {
     tutorialStage: bigint;
     timeZone: string;
 }
-export interface ClientServiceRequest {
-    id: string;
-    principal: string;
-    createdAt: bigint;
-    agency: string;
-    details?: string;
-    serviceId: string;
-}
-export interface OutreachActivity {
-    createdAt: bigint;
-    sent: boolean;
-    platform: string;
-    leadId: string;
-    message: string;
-    replied: boolean;
-    followUpDate: bigint;
-}
-export interface _CaffeineStorageRefillInformation {
-    proposed_top_up_amount?: bigint;
-}
-export interface Service {
-    id: string;
-    serviceType: string;
-    active: boolean;
-    revenue: bigint;
-    cost: bigint;
-    date: string;
-    name: string;
-    time: string;
-    agency: string;
-    deliveryTime: string;
-    serviceSubType: string;
-    niche: string;
-    salesCount: bigint;
-    price: bigint;
-}
-export interface Deal {
-    id: string;
-    status: string;
-    closeDate?: bigint;
-    value: bigint;
-    createdAt: bigint;
-    agency: string;
-    leadId: string;
-}
-export interface _CaffeineStorageCreateCertificateResult {
-    method: string;
-    blob_hash: string;
+export interface PaymentSettings {
+    upiDetails: string;
+    razorpayLink: string;
+    stripeLink: string;
 }
 export interface Project {
     id: string;
@@ -185,6 +187,17 @@ export interface _CaffeineStorageRefillResult {
     success?: boolean;
     topped_up_amount?: bigint;
 }
+export enum PaymentMethod {
+    upi = "upi",
+    stripe = "stripe",
+    razorpay = "razorpay"
+}
+export enum PaymentStatus {
+    cancelled = "cancelled",
+    pending = "pending",
+    paid = "paid",
+    failed = "failed"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -198,51 +211,37 @@ export interface backendInterface {
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
-    addLead(request: {
-        id: string;
-        status: string;
-        contact: string;
-        owner: string;
-        city: string;
-        name: string;
-        revenuePotential: bigint;
-        agency: string;
-        niche: string;
-    }): Promise<void>;
-    addOutreach(activity: OutreachActivity): Promise<void>;
-    addProject(project: Project): Promise<void>;
-    addService(service: Service): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    completeProject(projectId: string): Promise<void>;
-    createClientServiceRequest(serviceId: string, agency: string, details: string | null): Promise<void>;
-    getAgencyAnalytics(agency: string): Promise<[Array<Lead>, Array<Deal>, Array<OutreachActivity>, Array<Service>, Array<Project>]>;
-    getAllClientServiceRequests(): Promise<Array<ClientServiceRequest>>;
-    getAllLeads(): Promise<Array<Lead>>;
-    getAllOutreachActivities(): Promise<Array<OutreachActivity>>;
-    getAllServices(): Promise<Array<Service>>;
+    createClientServiceRequest(request: ClientServiceRequest): Promise<void>;
+    createLead(lead: Lead): Promise<void>;
+    createPayment(serviceId: string, amount: bigint, paymentMethod: PaymentMethod): Promise<string>;
+    createProject(project: Project): Promise<void>;
+    createService(service: Service): Promise<void>;
+    deleteLead(leadId: string): Promise<void>;
+    deleteService(serviceId: string): Promise<void>;
+    getAllPayments(): Promise<Array<Payment>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getClientServiceRequest(requestId: string): Promise<ClientServiceRequest | null>;
-    getClientServiceRequestsByAgency(agency: string): Promise<Array<ClientServiceRequest>>;
-    getDealsForExport(): Promise<Array<Deal>>;
-    getLeadsForExport(): Promise<Array<Lead>>;
-    getOutreachActivitiesForExport(): Promise<Array<OutreachActivity>>;
-    getProjectsForExport(): Promise<Array<Project>>;
-    getServiceById(serviceId: string): Promise<Service | null>;
-    getServicesForExport(): Promise<Array<Service>>;
+    getClientServiceRequests(): Promise<Array<ClientServiceRequest>>;
+    getLeadsPaginated(offset: bigint, limit: bigint): Promise<Array<Lead>>;
+    getPayment(paymentId: string): Promise<Payment | null>;
+    getPaymentSettings(): Promise<PaymentSettings>;
+    getProjects(): Promise<Array<Project>>;
+    getService(serviceId: string): Promise<Service | null>;
+    getServices(): Promise<Array<Service>>;
     getSettings(): Promise<Settings>;
-    getUserDeals(agency: string): Promise<Array<Deal>>;
+    getUserPayments(): Promise<Array<Payment>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    importLeads(leadList: Array<Lead>, agency: string): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    registerUser(principal: string, name: string, email: string, mobileNumber: string | null, agency: string, role: string, revenueGoal: bigint, subscriptionPlan: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateDealStatus(dealId: string, status: string): Promise<void>;
-    updateLeadStatus(leadId: string, status: string): Promise<void>;
-    updateServiceStatus(serviceId: string, active: boolean): Promise<void>;
+    updateLead(leadId: string, lead: Lead): Promise<void>;
+    updatePaymentSettings(newSettings: PaymentSettings): Promise<void>;
+    updatePaymentStatus(paymentId: string, newStatus: PaymentStatus): Promise<void>;
+    updateProject(projectId: string, project: Project): Promise<void>;
+    updateService(serviceId: string, service: Service): Promise<void>;
     updateSettings(newSettings: Settings): Promise<void>;
 }
-import type { ClientServiceRequest as _ClientServiceRequest, Deal as _Deal, ExternalBlob as _ExternalBlob, Project as _Project, Service as _Service, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ClientServiceRequest as _ClientServiceRequest, ExternalBlob as _ExternalBlob, Payment as _Payment, PaymentMethod as _PaymentMethod, PaymentStatus as _PaymentStatus, Project as _Project, Service as _Service, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -343,333 +342,255 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addLead(arg0: {
-        id: string;
-        status: string;
-        contact: string;
-        owner: string;
-        city: string;
-        name: string;
-        revenuePotential: bigint;
-        agency: string;
-        niche: string;
-    }): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.addLead(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.addLead(arg0);
-            return result;
-        }
-    }
-    async addOutreach(arg0: OutreachActivity): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.addOutreach(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.addOutreach(arg0);
-            return result;
-        }
-    }
-    async addProject(arg0: Project): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.addProject(await to_candid_Project_n8(this._uploadFile, this._downloadFile, arg0));
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.addProject(await to_candid_Project_n8(this._uploadFile, this._downloadFile, arg0));
-            return result;
-        }
-    }
-    async addService(arg0: Service): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.addService(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.addService(arg0);
-            return result;
-        }
-    }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n12(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n12(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
-    async completeProject(arg0: string): Promise<void> {
+    async createClientServiceRequest(arg0: ClientServiceRequest): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.completeProject(arg0);
+                const result = await this.actor.createClientServiceRequest(to_candid_ClientServiceRequest_n10(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.completeProject(arg0);
+            const result = await this.actor.createClientServiceRequest(to_candid_ClientServiceRequest_n10(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
-    async createClientServiceRequest(arg0: string, arg1: string, arg2: string | null): Promise<void> {
+    async createLead(arg0: Lead): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.createClientServiceRequest(arg0, arg1, to_candid_opt_n14(this._uploadFile, this._downloadFile, arg2));
+                const result = await this.actor.createLead(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createClientServiceRequest(arg0, arg1, to_candid_opt_n14(this._uploadFile, this._downloadFile, arg2));
+            const result = await this.actor.createLead(arg0);
             return result;
         }
     }
-    async getAgencyAnalytics(arg0: string): Promise<[Array<Lead>, Array<Deal>, Array<OutreachActivity>, Array<Service>, Array<Project>]> {
+    async createPayment(arg0: string, arg1: bigint, arg2: PaymentMethod): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAgencyAnalytics(arg0);
-                return [
-                    result[0],
-                    from_candid_vec_n15(this._uploadFile, this._downloadFile, result[1]),
-                    result[2],
-                    result[3],
-                    from_candid_vec_n19(this._uploadFile, this._downloadFile, result[4])
-                ];
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getAgencyAnalytics(arg0);
-            return [
-                result[0],
-                from_candid_vec_n15(this._uploadFile, this._downloadFile, result[1]),
-                result[2],
-                result[3],
-                from_candid_vec_n19(this._uploadFile, this._downloadFile, result[4])
-            ];
-        }
-    }
-    async getAllClientServiceRequests(): Promise<Array<ClientServiceRequest>> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getAllClientServiceRequests();
-                return from_candid_vec_n24(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getAllClientServiceRequests();
-            return from_candid_vec_n24(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getAllLeads(): Promise<Array<Lead>> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getAllLeads();
+                const result = await this.actor.createPayment(arg0, arg1, to_candid_PaymentMethod_n12(this._uploadFile, this._downloadFile, arg2));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllLeads();
+            const result = await this.actor.createPayment(arg0, arg1, to_candid_PaymentMethod_n12(this._uploadFile, this._downloadFile, arg2));
             return result;
         }
     }
-    async getAllOutreachActivities(): Promise<Array<OutreachActivity>> {
+    async createProject(arg0: Project): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllOutreachActivities();
+                const result = await this.actor.createProject(await to_candid_Project_n14(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllOutreachActivities();
+            const result = await this.actor.createProject(await to_candid_Project_n14(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
-    async getAllServices(): Promise<Array<Service>> {
+    async createService(arg0: Service): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllServices();
+                const result = await this.actor.createService(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllServices();
+            const result = await this.actor.createService(arg0);
             return result;
+        }
+    }
+    async deleteLead(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteLead(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteLead(arg0);
+            return result;
+        }
+    }
+    async deleteService(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteService(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteService(arg0);
+            return result;
+        }
+    }
+    async getAllPayments(): Promise<Array<Payment>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllPayments();
+                return from_candid_vec_n18(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllPayments();
+            return from_candid_vec_n18(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserProfile(): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n31(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n29(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n31(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n29(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getClientServiceRequest(arg0: string): Promise<ClientServiceRequest | null> {
+    async getClientServiceRequests(): Promise<Array<ClientServiceRequest>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getClientServiceRequest(arg0);
-                return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.getClientServiceRequests();
+                return from_candid_vec_n31(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getClientServiceRequest(arg0);
-            return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.getClientServiceRequests();
+            return from_candid_vec_n31(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getClientServiceRequestsByAgency(arg0: string): Promise<Array<ClientServiceRequest>> {
+    async getLeadsPaginated(arg0: bigint, arg1: bigint): Promise<Array<Lead>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getClientServiceRequestsByAgency(arg0);
-                return from_candid_vec_n24(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getClientServiceRequestsByAgency(arg0);
-            return from_candid_vec_n24(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getDealsForExport(): Promise<Array<Deal>> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getDealsForExport();
-                return from_candid_vec_n15(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getDealsForExport();
-            return from_candid_vec_n15(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getLeadsForExport(): Promise<Array<Lead>> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getLeadsForExport();
+                const result = await this.actor.getLeadsPaginated(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getLeadsForExport();
+            const result = await this.actor.getLeadsPaginated(arg0, arg1);
             return result;
         }
     }
-    async getOutreachActivitiesForExport(): Promise<Array<OutreachActivity>> {
+    async getPayment(arg0: string): Promise<Payment | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.getOutreachActivitiesForExport();
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getOutreachActivitiesForExport();
-            return result;
-        }
-    }
-    async getProjectsForExport(): Promise<Array<Project>> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getProjectsForExport();
-                return from_candid_vec_n19(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getProjectsForExport();
-            return from_candid_vec_n19(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getServiceById(arg0: string): Promise<Service | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getServiceById(arg0);
+                const result = await this.actor.getPayment(arg0);
                 return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getServiceById(arg0);
+            const result = await this.actor.getPayment(arg0);
             return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getServicesForExport(): Promise<Array<Service>> {
+    async getPaymentSettings(): Promise<PaymentSettings> {
         if (this.processError) {
             try {
-                const result = await this.actor.getServicesForExport();
+                const result = await this.actor.getPaymentSettings();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getServicesForExport();
+            const result = await this.actor.getPaymentSettings();
+            return result;
+        }
+    }
+    async getProjects(): Promise<Array<Project>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProjects();
+                return from_candid_vec_n35(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProjects();
+            return from_candid_vec_n35(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getService(arg0: string): Promise<Service | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getService(arg0);
+                return from_candid_opt_n40(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getService(arg0);
+            return from_candid_opt_n40(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getServices(): Promise<Array<Service>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getServices();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getServices();
             return result;
         }
     }
@@ -687,46 +608,32 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getUserDeals(arg0: string): Promise<Array<Deal>> {
+    async getUserPayments(): Promise<Array<Payment>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getUserDeals(arg0);
-                return from_candid_vec_n15(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.getUserPayments();
+                return from_candid_vec_n18(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getUserDeals(arg0);
-            return from_candid_vec_n15(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.getUserPayments();
+            return from_candid_vec_n18(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async importLeads(arg0: Array<Lead>, arg1: string): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.importLeads(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.importLeads(arg0, arg1);
-            return result;
+            return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -743,73 +650,87 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async registerUser(arg0: string, arg1: string, arg2: string, arg3: string | null, arg4: string, arg5: string, arg6: bigint, arg7: string): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.registerUser(arg0, arg1, arg2, to_candid_opt_n14(this._uploadFile, this._downloadFile, arg3), arg4, arg5, arg6, arg7);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.registerUser(arg0, arg1, arg2, to_candid_opt_n14(this._uploadFile, this._downloadFile, arg3), arg4, arg5, arg6, arg7);
-            return result;
-        }
-    }
     async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n35(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n41(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n35(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n41(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
-    async updateDealStatus(arg0: string, arg1: string): Promise<void> {
+    async updateLead(arg0: string, arg1: Lead): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateDealStatus(arg0, arg1);
+                const result = await this.actor.updateLead(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateDealStatus(arg0, arg1);
+            const result = await this.actor.updateLead(arg0, arg1);
             return result;
         }
     }
-    async updateLeadStatus(arg0: string, arg1: string): Promise<void> {
+    async updatePaymentSettings(arg0: PaymentSettings): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateLeadStatus(arg0, arg1);
+                const result = await this.actor.updatePaymentSettings(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateLeadStatus(arg0, arg1);
+            const result = await this.actor.updatePaymentSettings(arg0);
             return result;
         }
     }
-    async updateServiceStatus(arg0: string, arg1: boolean): Promise<void> {
+    async updatePaymentStatus(arg0: string, arg1: PaymentStatus): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateServiceStatus(arg0, arg1);
+                const result = await this.actor.updatePaymentStatus(arg0, to_candid_PaymentStatus_n43(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateServiceStatus(arg0, arg1);
+            const result = await this.actor.updatePaymentStatus(arg0, to_candid_PaymentStatus_n43(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async updateProject(arg0: string, arg1: Project): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateProject(arg0, await to_candid_Project_n14(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateProject(arg0, await to_candid_Project_n14(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async updateService(arg0: string, arg1: Service): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateService(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateService(arg0, arg1);
             return result;
         }
     }
@@ -828,40 +749,43 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_ClientServiceRequest_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ClientServiceRequest): ClientServiceRequest {
-    return from_candid_record_n26(_uploadFile, _downloadFile, value);
+function from_candid_ClientServiceRequest_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ClientServiceRequest): ClientServiceRequest {
+    return from_candid_record_n33(_uploadFile, _downloadFile, value);
 }
-function from_candid_Deal_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Deal): Deal {
-    return from_candid_record_n17(_uploadFile, _downloadFile, value);
-}
-async function from_candid_ExternalBlob_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
+async function from_candid_ExternalBlob_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
     return await _downloadFile(value);
 }
-async function from_candid_Project_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Project): Promise<Project> {
-    return await from_candid_record_n21(_uploadFile, _downloadFile, value);
+function from_candid_PaymentMethod_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PaymentMethod): PaymentMethod {
+    return from_candid_variant_n24(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserProfile_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserProfile): UserProfile {
-    return from_candid_record_n30(_uploadFile, _downloadFile, value);
+function from_candid_PaymentStatus_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PaymentStatus): PaymentStatus {
+    return from_candid_variant_n22(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserRole_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n32(_uploadFile, _downloadFile, value);
+function from_candid_Payment_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Payment): Payment {
+    return from_candid_record_n20(_uploadFile, _downloadFile, value);
+}
+async function from_candid_Project_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Project): Promise<Project> {
+    return await from_candid_record_n37(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserProfile_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserProfile): UserProfile {
+    return from_candid_record_n27(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n30(_uploadFile, _downloadFile, value);
 }
 function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
     return from_candid_record_n5(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+function from_candid_opt_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+    return value.length === 0 ? null : from_candid_UserProfile_n26(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
-    return value.length === 0 ? null : value[0];
+function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Payment]): Payment | null {
+    return value.length === 0 ? null : from_candid_Payment_n19(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
-    return value.length === 0 ? null : from_candid_UserProfile_n29(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ClientServiceRequest]): ClientServiceRequest | null {
-    return value.length === 0 ? null : from_candid_ClientServiceRequest_n25(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Service]): Service | null {
+function from_candid_opt_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Service]): Service | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
@@ -870,94 +794,37 @@ function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: string;
-    status: string;
-    closeDate: [] | [bigint];
-    value: bigint;
+    status: _PaymentStatus;
+    paymentMethod: _PaymentMethod;
+    userId: Principal;
     createdAt: bigint;
-    agency: string;
-    leadId: string;
+    updatedAt: bigint;
+    serviceId: string;
+    amount: bigint;
 }): {
     id: string;
-    status: string;
-    closeDate?: bigint;
-    value: bigint;
+    status: PaymentStatus;
+    paymentMethod: PaymentMethod;
+    userId: Principal;
     createdAt: bigint;
-    agency: string;
-    leadId: string;
+    updatedAt: bigint;
+    serviceId: string;
+    amount: bigint;
 } {
     return {
         id: value.id,
-        status: value.status,
-        closeDate: record_opt_to_undefined(from_candid_opt_n18(_uploadFile, _downloadFile, value.closeDate)),
-        value: value.value,
+        status: from_candid_PaymentStatus_n21(_uploadFile, _downloadFile, value.status),
+        paymentMethod: from_candid_PaymentMethod_n23(_uploadFile, _downloadFile, value.paymentMethod),
+        userId: value.userId,
         createdAt: value.createdAt,
-        agency: value.agency,
-        leadId: value.leadId
-    };
-}
-async function from_candid_record_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    id: string;
-    files: Array<_ExternalBlob>;
-    completion: bigint;
-    status: string;
-    clientId: string;
-    agency: string;
-    notes: string;
-    serviceId: string;
-    startDate: bigint;
-    milestones: Array<string>;
-}): Promise<{
-    id: string;
-    files: Array<ExternalBlob>;
-    completion: bigint;
-    status: string;
-    clientId: string;
-    agency: string;
-    notes: string;
-    serviceId: string;
-    startDate: bigint;
-    milestones: Array<string>;
-}> {
-    return {
-        id: value.id,
-        files: await from_candid_vec_n22(_uploadFile, _downloadFile, value.files),
-        completion: value.completion,
-        status: value.status,
-        clientId: value.clientId,
-        agency: value.agency,
-        notes: value.notes,
+        updatedAt: value.updatedAt,
         serviceId: value.serviceId,
-        startDate: value.startDate,
-        milestones: value.milestones
+        amount: value.amount
     };
 }
-function from_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    id: string;
-    principal: string;
-    createdAt: bigint;
-    agency: string;
-    details: [] | [string];
-    serviceId: string;
-}): {
-    id: string;
-    principal: string;
-    createdAt: bigint;
-    agency: string;
-    details?: string;
-    serviceId: string;
-} {
-    return {
-        id: value.id,
-        principal: value.principal,
-        createdAt: value.createdAt,
-        agency: value.agency,
-        details: record_opt_to_undefined(from_candid_opt_n27(_uploadFile, _downloadFile, value.details)),
-        serviceId: value.serviceId
-    };
-}
-function from_candid_record_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     revenueGoal: bigint;
     principal: string;
     name: string;
@@ -985,9 +852,69 @@ function from_candid_record_n30(_uploadFile: (file: ExternalBlob) => Promise<Uin
         role: value.role,
         subscriptionPlan: value.subscriptionPlan,
         agency: value.agency,
-        mobileNumber: record_opt_to_undefined(from_candid_opt_n27(_uploadFile, _downloadFile, value.mobileNumber)),
+        mobileNumber: record_opt_to_undefined(from_candid_opt_n28(_uploadFile, _downloadFile, value.mobileNumber)),
         email: value.email,
         totalRevenue: value.totalRevenue
+    };
+}
+function from_candid_record_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    principal: string;
+    createdAt: bigint;
+    agency: string;
+    details: [] | [string];
+    serviceId: string;
+}): {
+    id: string;
+    principal: string;
+    createdAt: bigint;
+    agency: string;
+    details?: string;
+    serviceId: string;
+} {
+    return {
+        id: value.id,
+        principal: value.principal,
+        createdAt: value.createdAt,
+        agency: value.agency,
+        details: record_opt_to_undefined(from_candid_opt_n28(_uploadFile, _downloadFile, value.details)),
+        serviceId: value.serviceId
+    };
+}
+async function from_candid_record_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    files: Array<_ExternalBlob>;
+    completion: bigint;
+    status: string;
+    clientId: string;
+    agency: string;
+    notes: string;
+    serviceId: string;
+    startDate: bigint;
+    milestones: Array<string>;
+}): Promise<{
+    id: string;
+    files: Array<ExternalBlob>;
+    completion: bigint;
+    status: string;
+    clientId: string;
+    agency: string;
+    notes: string;
+    serviceId: string;
+    startDate: bigint;
+    milestones: Array<string>;
+}> {
+    return {
+        id: value.id,
+        files: await from_candid_vec_n38(_uploadFile, _downloadFile, value.files),
+        completion: value.completion,
+        status: value.status,
+        clientId: value.clientId,
+        agency: value.agency,
+        notes: value.notes,
+        serviceId: value.serviceId,
+        startDate: value.startDate,
+        milestones: value.milestones
     };
 }
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -1002,7 +929,27 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
         topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
     };
 }
-function from_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_variant_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    cancelled: null;
+} | {
+    pending: null;
+} | {
+    paid: null;
+} | {
+    failed: null;
+}): PaymentStatus {
+    return "cancelled" in value ? PaymentStatus.cancelled : "pending" in value ? PaymentStatus.pending : "paid" in value ? PaymentStatus.paid : "failed" in value ? PaymentStatus.failed : value;
+}
+function from_candid_variant_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    upi: null;
+} | {
+    stripe: null;
+} | {
+    razorpay: null;
+}): PaymentMethod {
+    return "upi" in value ? PaymentMethod.upi : "stripe" in value ? PaymentMethod.stripe : "razorpay" in value ? PaymentMethod.razorpay : value;
+}
+function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -1011,29 +958,38 @@ function from_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
-function from_candid_vec_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Deal>): Array<Deal> {
-    return value.map((x)=>from_candid_Deal_n16(_uploadFile, _downloadFile, x));
+function from_candid_vec_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Payment>): Array<Payment> {
+    return value.map((x)=>from_candid_Payment_n19(_uploadFile, _downloadFile, x));
 }
-async function from_candid_vec_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Project>): Promise<Array<Project>> {
-    return await Promise.all(value.map(async (x)=>await from_candid_Project_n20(_uploadFile, _downloadFile, x)));
+function from_candid_vec_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ClientServiceRequest>): Array<ClientServiceRequest> {
+    return value.map((x)=>from_candid_ClientServiceRequest_n32(_uploadFile, _downloadFile, x));
 }
-async function from_candid_vec_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ExternalBlob>): Promise<Array<ExternalBlob>> {
-    return await Promise.all(value.map(async (x)=>await from_candid_ExternalBlob_n23(_uploadFile, _downloadFile, x)));
+async function from_candid_vec_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Project>): Promise<Array<Project>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_Project_n36(_uploadFile, _downloadFile, x)));
 }
-function from_candid_vec_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ClientServiceRequest>): Array<ClientServiceRequest> {
-    return value.map((x)=>from_candid_ClientServiceRequest_n25(_uploadFile, _downloadFile, x));
+async function from_candid_vec_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ExternalBlob>): Promise<Array<ExternalBlob>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_ExternalBlob_n39(_uploadFile, _downloadFile, x)));
 }
-async function to_candid_ExternalBlob_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+function to_candid_ClientServiceRequest_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ClientServiceRequest): _ClientServiceRequest {
+    return to_candid_record_n11(_uploadFile, _downloadFile, value);
+}
+async function to_candid_ExternalBlob_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);
 }
-async function to_candid_Project_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Project): Promise<_Project> {
-    return await to_candid_record_n9(_uploadFile, _downloadFile, value);
-}
-function to_candid_UserProfile_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
-    return to_candid_record_n36(_uploadFile, _downloadFile, value);
-}
-function to_candid_UserRole_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+function to_candid_PaymentMethod_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PaymentMethod): _PaymentMethod {
     return to_candid_variant_n13(_uploadFile, _downloadFile, value);
+}
+function to_candid_PaymentStatus_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PaymentStatus): _PaymentStatus {
+    return to_candid_variant_n44(_uploadFile, _downloadFile, value);
+}
+async function to_candid_Project_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Project): Promise<_Project> {
+    return await to_candid_record_n15(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserProfile_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
+    return to_candid_record_n42(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n9(_uploadFile, _downloadFile, value);
 }
 function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
     return to_candid_record_n3(_uploadFile, _downloadFile, value);
@@ -1041,8 +997,65 @@ function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: Exte
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
 }
-function to_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
-    return value === null ? candid_none() : candid_some(value);
+function to_candid_record_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    principal: string;
+    createdAt: bigint;
+    agency: string;
+    details?: string;
+    serviceId: string;
+}): {
+    id: string;
+    principal: string;
+    createdAt: bigint;
+    agency: string;
+    details: [] | [string];
+    serviceId: string;
+} {
+    return {
+        id: value.id,
+        principal: value.principal,
+        createdAt: value.createdAt,
+        agency: value.agency,
+        details: value.details ? candid_some(value.details) : candid_none(),
+        serviceId: value.serviceId
+    };
+}
+async function to_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    files: Array<ExternalBlob>;
+    completion: bigint;
+    status: string;
+    clientId: string;
+    agency: string;
+    notes: string;
+    serviceId: string;
+    startDate: bigint;
+    milestones: Array<string>;
+}): Promise<{
+    id: string;
+    files: Array<_ExternalBlob>;
+    completion: bigint;
+    status: string;
+    clientId: string;
+    agency: string;
+    notes: string;
+    serviceId: string;
+    startDate: bigint;
+    milestones: Array<string>;
+}> {
+    return {
+        id: value.id,
+        files: await to_candid_vec_n16(_uploadFile, _downloadFile, value.files),
+        completion: value.completion,
+        status: value.status,
+        clientId: value.clientId,
+        agency: value.agency,
+        notes: value.notes,
+        serviceId: value.serviceId,
+        startDate: value.startDate,
+        milestones: value.milestones
+    };
 }
 function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     proposed_top_up_amount?: bigint;
@@ -1053,7 +1066,7 @@ function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
     };
 }
-function to_candid_record_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function to_candid_record_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     revenueGoal: bigint;
     principal: string;
     name: string;
@@ -1086,43 +1099,41 @@ function to_candid_record_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         totalRevenue: value.totalRevenue
     };
 }
-async function to_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    id: string;
-    files: Array<ExternalBlob>;
-    completion: bigint;
-    status: string;
-    clientId: string;
-    agency: string;
-    notes: string;
-    serviceId: string;
-    startDate: bigint;
-    milestones: Array<string>;
-}): Promise<{
-    id: string;
-    files: Array<_ExternalBlob>;
-    completion: bigint;
-    status: string;
-    clientId: string;
-    agency: string;
-    notes: string;
-    serviceId: string;
-    startDate: bigint;
-    milestones: Array<string>;
-}> {
-    return {
-        id: value.id,
-        files: await to_candid_vec_n10(_uploadFile, _downloadFile, value.files),
-        completion: value.completion,
-        status: value.status,
-        clientId: value.clientId,
-        agency: value.agency,
-        notes: value.notes,
-        serviceId: value.serviceId,
-        startDate: value.startDate,
-        milestones: value.milestones
-    };
+function to_candid_variant_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PaymentMethod): {
+    upi: null;
+} | {
+    stripe: null;
+} | {
+    razorpay: null;
+} {
+    return value == PaymentMethod.upi ? {
+        upi: null
+    } : value == PaymentMethod.stripe ? {
+        stripe: null
+    } : value == PaymentMethod.razorpay ? {
+        razorpay: null
+    } : value;
 }
-function to_candid_variant_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+function to_candid_variant_n44(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PaymentStatus): {
+    cancelled: null;
+} | {
+    pending: null;
+} | {
+    paid: null;
+} | {
+    failed: null;
+} {
+    return value == PaymentStatus.cancelled ? {
+        cancelled: null
+    } : value == PaymentStatus.pending ? {
+        pending: null
+    } : value == PaymentStatus.paid ? {
+        paid: null
+    } : value == PaymentStatus.failed ? {
+        failed: null
+    } : value;
+}
+function to_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;
 } | {
     user: null;
@@ -1137,8 +1148,8 @@ function to_candid_variant_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint
         guest: null
     } : value;
 }
-async function to_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<ExternalBlob>): Promise<Array<_ExternalBlob>> {
-    return await Promise.all(value.map(async (x)=>await to_candid_ExternalBlob_n11(_uploadFile, _downloadFile, x)));
+async function to_candid_vec_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<ExternalBlob>): Promise<Array<_ExternalBlob>> {
+    return await Promise.all(value.map(async (x)=>await to_candid_ExternalBlob_n17(_uploadFile, _downloadFile, x)));
 }
 export interface CreateActorOptions {
     agent?: Agent;

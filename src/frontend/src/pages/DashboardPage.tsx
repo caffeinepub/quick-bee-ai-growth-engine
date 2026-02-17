@@ -71,7 +71,7 @@ export default function DashboardPage() {
               src={UPLOADED_IMAGES.workspace1}
               alt="Welcome to Quick Bee"
               className="w-full h-full object-cover rounded-2xl shadow-lg"
-              fallbackClassName="w-full h-full rounded-2xl"
+              fallback="QB"
             />
           </div>
           <div className="text-center space-y-3 max-w-lg">

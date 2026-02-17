@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { UserProfile, UserRole } from '../backend';
-import { clearSignInIdentifier } from '../utils/signInIdentifier';
+import { useInternetIdentity } from './useInternetIdentity';
+import type { UserProfile } from '../backend';
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -9,14 +9,8 @@ export function useGetCallerUserProfile() {
   const query = useQuery<UserProfile | null>({
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
-      if (!actor) return null;
-      try {
-        return await actor.getCallerUserProfile();
-      } catch (error) {
-        // Gracefully handle unauthorized/guest errors
-        console.warn('Profile query failed (likely guest user):', error);
-        return null;
-      }
+      if (!actor) throw new Error('Actor not available');
+      return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
     retry: false,
@@ -36,66 +30,47 @@ export function useSaveCallerUserProfile() {
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      
-      // Ensure required fields have safe defaults
-      const normalizedProfile: UserProfile = {
-        principal: profile.principal || 'anonymous',
-        name: profile.name || 'Guest',
-        email: profile.email || '',
-        mobileNumber: profile.mobileNumber || undefined,
-        agency: profile.agency || 'Default Agency',
-        role: profile.role || 'guest',
-        revenueGoal: profile.revenueGoal || BigInt(0),
-        subscriptionPlan: profile.subscriptionPlan || 'Free',
-        totalRevenue: profile.totalRevenue || BigInt(0),
-      };
-      
-      try {
-        return await actor.saveCallerUserProfile(normalizedProfile);
-      } catch (error: any) {
-        console.error('Save profile error:', error);
-        throw new Error(error.message || 'Failed to save profile');
-      }
+      return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-    },
-    onError: (error: any) => {
-      console.error('Profile save mutation error:', error);
     },
   });
 }
 
 export function useRegisterUser() {
   const { actor } = useActor();
+  const { identity } = useInternetIdentity();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (params: {
-      principal: string;
       name: string;
       email: string;
-      mobileNumber: string | null;
+      mobileNumber?: string;
       agency: string;
-      role: UserRole;
-      revenueGoal: bigint;
-      subscriptionPlan: string;
+      role: string;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.registerUser(
-        params.principal,
-        params.name,
-        params.email,
-        params.mobileNumber,
-        params.agency,
-        params.role,
-        params.revenueGoal,
-        params.subscriptionPlan
-      );
+      
+      const principal = identity?.getPrincipal().toString() || 'anonymous';
+      
+      const profile: UserProfile = {
+        principal,
+        name: params.name,
+        email: params.email,
+        mobileNumber: params.mobileNumber,
+        agency: params.agency,
+        role: params.role,
+        revenueGoal: BigInt(0),
+        subscriptionPlan: 'Free',
+        totalRevenue: BigInt(0),
+      };
+      
+      // Use saveCallerUserProfile instead of registerUser
+      return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      // Clear the stored sign-in identifier after successful profile setup
-      clearSignInIdentifier();
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
   });

@@ -5,6 +5,11 @@ export interface CatalogService {
   serviceType: string;
   price: number;
   deliveryTime: string;
+  shortDescription?: string;
+  detailedDescription?: string;
+  deliverables?: string[];
+  requirements?: string[];
+  supportedProviders?: string[];
 }
 
 export const SERVICE_CATALOG: CatalogService[] = [
@@ -196,18 +201,69 @@ export const SERVICE_CATALOG: CatalogService[] = [
     deliveryTime: '45-60 days',
   },
 
-  // Bonus High-Value Add-ons (Optional Upsells)
+  // Bonus High-Value Add-ons (Optional Upsells) - WITH FULL DETAILS
   {
     name: 'International Payment Gateway Setup (Stripe, PayPal)',
     serviceType: 'Bonus High-Value Add-ons (Optional Upsells)',
     price: 40000,
     deliveryTime: '5-7 days',
+    shortDescription: 'Complete integration of international payment gateways including Stripe and PayPal for seamless global transactions.',
+    detailedDescription: 'We provide end-to-end setup and integration of leading international payment gateways. This service includes account creation assistance, API integration, webhook configuration, payment flow testing, and compliance setup. Perfect for businesses looking to accept payments from customers worldwide with secure, reliable payment processing infrastructure.',
+    deliverables: [
+      'Stripe account setup and API integration',
+      'PayPal business account configuration',
+      'Secure payment form implementation',
+      'Webhook integration for payment notifications',
+      'Test and live environment configuration',
+      'Payment success/failure page setup',
+      'Complete integration documentation',
+      '30 days post-launch support',
+    ],
+    requirements: [
+      'Active business registration documents',
+      'Business bank account details',
+      'Website or application with admin access',
+      'SSL certificate installed on domain',
+      'Business email address',
+      'Government-issued ID for verification',
+    ],
+    supportedProviders: [
+      'Stripe',
+      'PayPal',
+    ],
   },
   {
     name: 'Indian Payment Gateway Integration (Razorpay, UPI)',
     serviceType: 'Bonus High-Value Add-ons (Optional Upsells)',
     price: 35000,
     deliveryTime: '5-7 days',
+    shortDescription: 'Seamless integration of Indian payment solutions including Razorpay and UPI for accepting domestic payments efficiently.',
+    detailedDescription: 'Comprehensive setup of India-focused payment gateways optimized for local payment methods. This service covers Razorpay integration with support for UPI, cards, net banking, and wallets. We handle complete technical integration, KYC assistance, payment reconciliation setup, and ensure compliance with Indian payment regulations. Ideal for businesses targeting the Indian market.',
+    deliverables: [
+      'Razorpay merchant account setup',
+      'UPI payment integration',
+      'Support for cards, net banking, and wallets',
+      'Payment gateway API integration',
+      'Automated payment reconciliation',
+      'Invoice and receipt generation',
+      'GST-compliant payment flows',
+      'Mobile-responsive payment pages',
+      '30 days technical support',
+    ],
+    requirements: [
+      'GST registration certificate',
+      'Business PAN card',
+      'Bank account with IFSC code',
+      'Website or app with backend access',
+      'Business address proof',
+      'Authorized signatory KYC documents',
+    ],
+    supportedProviders: [
+      'Razorpay',
+      'UPI',
+      'Paytm',
+      'PhonePe',
+    ],
   },
   {
     name: 'White-label CRM for Agencies',
@@ -251,6 +307,11 @@ export function createServiceFromCatalog(catalogService: CatalogService, agency:
     niche: 'default',
     date: '',
     time: '',
+    shortDescription: catalogService.shortDescription || '',
+    detailedDescription: catalogService.detailedDescription || '',
+    deliverables: catalogService.deliverables || [],
+    requirements: catalogService.requirements || [],
+    supportedProviders: catalogService.supportedProviders || [],
   };
 }
 

@@ -50,6 +50,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
         niche: formData.niche,
         status: formData.status,
         revenuePotential: BigInt(formData.revenuePotential || 0),
+        createdAt: BigInt(Date.now() * 1000000),
         owner: formData.owner || profile.name,
       });
       

@@ -1,5 +1,5 @@
 import type { ExportData } from '../../hooks/useExportData';
-import { leadFields, outreachFields, serviceFields, dealFields, projectFields, getFieldValue } from './exportSchema';
+import { leadFields, outreachFields, serviceFields, dealFields, projectFields, formatFieldValue } from './exportSchema';
 import { formatTimestamp } from './filename';
 
 // Generate a simple RTF document that can be opened in Word
@@ -60,7 +60,7 @@ function generateRTFSection<T>(title: string, items: T[], fields: any[]): string
     
     // Data row
     fields.forEach((field, i) => {
-      rtf += escapeRTF(getFieldValue(item, field));
+      rtf += escapeRTF(formatFieldValue(field, item));
       if (i < fields.length - 1) rtf += ' | ';
     });
     rtf += '\\par';

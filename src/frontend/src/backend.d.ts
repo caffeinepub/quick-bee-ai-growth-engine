@@ -14,6 +14,45 @@ export class ExternalBlob {
     static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
+export interface ClientServiceRequest {
+    id: string;
+    principal: string;
+    createdAt: bigint;
+    agency: string;
+    details?: string;
+    serviceId: string;
+}
+export interface Service {
+    id: string;
+    serviceType: string;
+    active: boolean;
+    revenue: bigint;
+    cost: bigint;
+    date: string;
+    name: string;
+    time: string;
+    agency: string;
+    deliveryTime: string;
+    shortDescription: string;
+    serviceSubType: string;
+    niche: string;
+    deliverables: Array<string>;
+    salesCount: bigint;
+    detailedDescription: string;
+    price: bigint;
+    requirements: Array<string>;
+    supportedProviders: Array<string>;
+}
+export interface Payment {
+    id: string;
+    status: PaymentStatus;
+    paymentMethod: PaymentMethod;
+    userId: Principal;
+    createdAt: bigint;
+    updatedAt: bigint;
+    serviceId: string;
+    amount: bigint;
+}
 export interface Lead {
     id: string;
     status: string;
@@ -34,47 +73,10 @@ export interface Settings {
     tutorialStage: bigint;
     timeZone: string;
 }
-export interface ClientServiceRequest {
-    id: string;
-    principal: string;
-    createdAt: bigint;
-    agency: string;
-    details?: string;
-    serviceId: string;
-}
-export interface OutreachActivity {
-    createdAt: bigint;
-    sent: boolean;
-    platform: string;
-    leadId: string;
-    message: string;
-    replied: boolean;
-    followUpDate: bigint;
-}
-export interface Service {
-    id: string;
-    serviceType: string;
-    active: boolean;
-    revenue: bigint;
-    cost: bigint;
-    date: string;
-    name: string;
-    time: string;
-    agency: string;
-    deliveryTime: string;
-    serviceSubType: string;
-    niche: string;
-    salesCount: bigint;
-    price: bigint;
-}
-export interface Deal {
-    id: string;
-    status: string;
-    closeDate?: bigint;
-    value: bigint;
-    createdAt: bigint;
-    agency: string;
-    leadId: string;
+export interface PaymentSettings {
+    upiDetails: string;
+    razorpayLink: string;
+    stripeLink: string;
 }
 export interface Project {
     id: string;
@@ -99,53 +101,50 @@ export interface UserProfile {
     email: string;
     totalRevenue: bigint;
 }
+export enum PaymentMethod {
+    upi = "upi",
+    stripe = "stripe",
+    razorpay = "razorpay"
+}
+export enum PaymentStatus {
+    cancelled = "cancelled",
+    pending = "pending",
+    paid = "paid",
+    failed = "failed"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
 }
 export interface backendInterface {
-    addLead(request: {
-        id: string;
-        status: string;
-        contact: string;
-        owner: string;
-        city: string;
-        name: string;
-        revenuePotential: bigint;
-        agency: string;
-        niche: string;
-    }): Promise<void>;
-    addOutreach(activity: OutreachActivity): Promise<void>;
-    addProject(project: Project): Promise<void>;
-    addService(service: Service): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    completeProject(projectId: string): Promise<void>;
-    createClientServiceRequest(serviceId: string, agency: string, details: string | null): Promise<void>;
-    getAgencyAnalytics(agency: string): Promise<[Array<Lead>, Array<Deal>, Array<OutreachActivity>, Array<Service>, Array<Project>]>;
-    getAllClientServiceRequests(): Promise<Array<ClientServiceRequest>>;
-    getAllLeads(): Promise<Array<Lead>>;
-    getAllOutreachActivities(): Promise<Array<OutreachActivity>>;
-    getAllServices(): Promise<Array<Service>>;
+    createClientServiceRequest(request: ClientServiceRequest): Promise<void>;
+    createLead(lead: Lead): Promise<void>;
+    createPayment(serviceId: string, amount: bigint, paymentMethod: PaymentMethod): Promise<string>;
+    createProject(project: Project): Promise<void>;
+    createService(service: Service): Promise<void>;
+    deleteLead(leadId: string): Promise<void>;
+    deleteService(serviceId: string): Promise<void>;
+    getAllPayments(): Promise<Array<Payment>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getClientServiceRequest(requestId: string): Promise<ClientServiceRequest | null>;
-    getClientServiceRequestsByAgency(agency: string): Promise<Array<ClientServiceRequest>>;
-    getDealsForExport(): Promise<Array<Deal>>;
-    getLeadsForExport(): Promise<Array<Lead>>;
-    getOutreachActivitiesForExport(): Promise<Array<OutreachActivity>>;
-    getProjectsForExport(): Promise<Array<Project>>;
-    getServiceById(serviceId: string): Promise<Service | null>;
-    getServicesForExport(): Promise<Array<Service>>;
+    getClientServiceRequests(): Promise<Array<ClientServiceRequest>>;
+    getLeadsPaginated(offset: bigint, limit: bigint): Promise<Array<Lead>>;
+    getPayment(paymentId: string): Promise<Payment | null>;
+    getPaymentSettings(): Promise<PaymentSettings>;
+    getProjects(): Promise<Array<Project>>;
+    getService(serviceId: string): Promise<Service | null>;
+    getServices(): Promise<Array<Service>>;
     getSettings(): Promise<Settings>;
-    getUserDeals(agency: string): Promise<Array<Deal>>;
+    getUserPayments(): Promise<Array<Payment>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    importLeads(leadList: Array<Lead>, agency: string): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    registerUser(principal: string, name: string, email: string, mobileNumber: string | null, agency: string, role: string, revenueGoal: bigint, subscriptionPlan: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateDealStatus(dealId: string, status: string): Promise<void>;
-    updateLeadStatus(leadId: string, status: string): Promise<void>;
-    updateServiceStatus(serviceId: string, active: boolean): Promise<void>;
+    updateLead(leadId: string, lead: Lead): Promise<void>;
+    updatePaymentSettings(newSettings: PaymentSettings): Promise<void>;
+    updatePaymentStatus(paymentId: string, newStatus: PaymentStatus): Promise<void>;
+    updateProject(projectId: string, project: Project): Promise<void>;
+    updateService(serviceId: string, service: Service): Promise<void>;
     updateSettings(newSettings: Settings): Promise<void>;
 }

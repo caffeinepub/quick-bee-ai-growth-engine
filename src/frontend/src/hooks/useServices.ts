@@ -10,7 +10,7 @@ export function useGetAllServices() {
     queryFn: async () => {
       if (!actor) return [];
       try {
-        return await actor.getAllServices();
+        return await actor.getServices();
       } catch (error) {
         console.error('Failed to fetch services:', error);
         return [];
@@ -28,7 +28,7 @@ export function useAddService() {
     mutationFn: async (service: Service) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.addService(service);
+        return await actor.createService(service);
       } catch (error: any) {
         console.error('Add service error:', error);
         throw new Error(error.message || 'Failed to add service');
@@ -52,7 +52,10 @@ export function useUpdateServiceStatus() {
     mutationFn: async ({ serviceId, active }: { serviceId: string; active: boolean }) => {
       if (!actor) throw new Error('Actor not available');
       try {
-        return await actor.updateServiceStatus(serviceId, active);
+        const service = await actor.getService(serviceId);
+        if (!service) throw new Error('Service not found');
+        const updatedService = { ...service, active };
+        return await actor.updateService(serviceId, updatedService);
       } catch (error: any) {
         console.error('Update service status error:', error);
         throw new Error(error.message || 'Failed to update service status');
@@ -75,15 +78,17 @@ export function useSeedServices() {
     mutationFn: async (services: Service[]) => {
       if (!actor) throw new Error('Actor not available');
       
-      // Add services sequentially
+      const results: Array<{ success: boolean; name: string; error?: string }> = [];
       for (const service of services) {
         try {
-          await actor.addService(service);
-        } catch (error) {
+          await actor.createService(service);
+          results.push({ success: true, name: service.name });
+        } catch (error: any) {
           console.error(`Failed to seed service: ${service.name}`, error);
-          // Continue with other services even if one fails
+          results.push({ success: false, name: service.name, error: error.message });
         }
       }
+      return results;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });

@@ -9,7 +9,26 @@ export function useGetAllLeads() {
     queryKey: ['leads'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllLeads();
+      // Use paginated method with large limit to get all leads
+      try {
+        return await actor.getLeadsPaginated(BigInt(0), BigInt(10000));
+      } catch (error) {
+        console.error('Failed to fetch leads:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useGetLeadsPaginated(offset: number, limit: number) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<Lead[]>({
+    queryKey: ['leadsPaginated', offset, limit],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getLeadsPaginated(BigInt(offset), BigInt(limit));
     },
     enabled: !!actor && !actorFetching,
   });
@@ -20,22 +39,13 @@ export function useAddLead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (request: {
-      id: string;
-      agency: string;
-      name: string;
-      contact: string;
-      city: string;
-      niche: string;
-      status: string;
-      revenuePotential: bigint;
-      owner: string;
-    }) => {
+    mutationFn: async (lead: Lead) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addLead(request);
+      return actor.createLead(lead);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
+      queryClient.invalidateQueries({ queryKey: ['leadsPaginated'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
@@ -46,12 +56,13 @@ export function useUpdateLeadStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ leadId, status }: { leadId: string; status: string }) => {
+    mutationFn: async ({ leadId, lead }: { leadId: string; lead: Lead }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateLeadStatus(leadId, status);
+      return actor.updateLead(leadId, lead);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
+      queryClient.invalidateQueries({ queryKey: ['leadsPaginated'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });
@@ -62,12 +73,20 @@ export function useImportLeads() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ leads, agency }: { leads: Lead[]; agency: string }) => {
+    mutationFn: async ({ leads }: { leads: Lead[] }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.importLeads(leads, agency);
+      // Import leads one by one using createLead
+      for (const lead of leads) {
+        try {
+          await actor.createLead(lead);
+        } catch (error) {
+          console.error('Failed to import lead:', lead.name, error);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
+      queryClient.invalidateQueries({ queryKey: ['leadsPaginated'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });

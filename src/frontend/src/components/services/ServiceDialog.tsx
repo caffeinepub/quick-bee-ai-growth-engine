@@ -3,10 +3,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useAddService } from '../../hooks/useServices';
 import { useGetCallerUserProfile } from '../../hooks/useCurrentUserProfile';
 import { toast } from 'sonner';
 import type { Service } from '../../backend';
+import { parseListField, joinListField } from '../../utils/services/serviceDetails';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 
 interface ServiceDialogProps {
   open: boolean;
@@ -29,6 +33,11 @@ export function ServiceDialog({ open, onOpenChange, service }: ServiceDialogProp
     date: '',
     time: '',
     agency: '',
+    shortDescription: '',
+    detailedDescription: '',
+    deliverables: '',
+    requirements: '',
+    supportedProviders: '',
   });
 
   useEffect(() => {
@@ -44,6 +53,11 @@ export function ServiceDialog({ open, onOpenChange, service }: ServiceDialogProp
         date: service.date || '',
         time: service.time || '',
         agency: service.agency || '',
+        shortDescription: service.shortDescription || '',
+        detailedDescription: service.detailedDescription || '',
+        deliverables: joinListField(service.deliverables || []),
+        requirements: joinListField(service.requirements || []),
+        supportedProviders: joinListField(service.supportedProviders || []),
       });
     } else {
       setFormData({
@@ -57,6 +71,11 @@ export function ServiceDialog({ open, onOpenChange, service }: ServiceDialogProp
         date: '',
         time: '',
         agency: profile?.agency || '',
+        shortDescription: '',
+        detailedDescription: '',
+        deliverables: '',
+        requirements: '',
+        supportedProviders: '',
       });
     }
   }, [service, open, profile]);
@@ -88,6 +107,11 @@ export function ServiceDialog({ open, onOpenChange, service }: ServiceDialogProp
         niche: formData.niche || 'default',
         date: formData.date || '',
         time: formData.time || '',
+        shortDescription: formData.shortDescription.trim(),
+        detailedDescription: formData.detailedDescription.trim(),
+        deliverables: parseListField(formData.deliverables),
+        requirements: parseListField(formData.requirements),
+        supportedProviders: parseListField(formData.supportedProviders),
       };
 
       await addService.mutateAsync(serviceData);
@@ -102,142 +126,202 @@ export function ServiceDialog({ open, onOpenChange, service }: ServiceDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{service ? 'Edit Service' : 'Add New Service'}</DialogTitle>
           <DialogDescription>
-            {service ? 'Update service details' : 'Enter the details of your new service'}
+            {service ? 'Update service details and specifications' : 'Enter the details of your new service offering'}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Service Name *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Social Media Management"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="price">Price (INR) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="e.g., 50000"
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="cost">Cost (INR)</Label>
-                <Input
-                  id="cost"
-                  type="number"
-                  value={formData.cost}
-                  onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
-                  placeholder="e.g., 20000"
-                />
-              </div>
-            </div>
+        
+        <ScrollArea className="max-h-[calc(90vh-180px)] pr-4">
+          <form onSubmit={handleSubmit} id="service-form">
+            <div className="grid gap-6 py-4">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Basic Information</h3>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Service Name *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g., International Payment Gateway Setup"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="price">Price (INR) *</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      placeholder="e.g., 50000"
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="cost">Cost (INR)</Label>
+                    <Input
+                      id="cost"
+                      type="number"
+                      value={formData.cost}
+                      onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                      placeholder="e.g., 20000"
+                    />
+                  </div>
+                </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="deliveryTime">Delivery Time *</Label>
-              <Input
-                id="deliveryTime"
-                value={formData.deliveryTime}
-                onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
-                placeholder="e.g., 7 days"
-              />
-            </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="deliveryTime">Delivery Time *</Label>
+                  <Input
+                    id="deliveryTime"
+                    value={formData.deliveryTime}
+                    onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
+                    placeholder="e.g., 5-7 days"
+                  />
+                </div>
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="serviceType">Service Type</Label>
-                <Input
-                  id="serviceType"
-                  value={formData.serviceType}
-                  onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-                  placeholder="e.g., Website & Funnel Services"
-                />
+              <Separator />
+
+              {/* Service Details */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Service Details</h3>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="shortDescription">Short Description</Label>
+                  <Textarea
+                    id="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                    placeholder="Brief overview of the service (1-2 sentences)"
+                    rows={2}
+                  />
+                  <p className="text-xs text-muted-foreground">A concise summary that appears in service listings</p>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="detailedDescription">Detailed Description</Label>
+                  <Textarea
+                    id="detailedDescription"
+                    value={formData.detailedDescription}
+                    onChange={(e) => setFormData({ ...formData, detailedDescription: e.target.value })}
+                    placeholder="Comprehensive description of what this service includes, how it works, and its benefits"
+                    rows={4}
+                  />
+                  <p className="text-xs text-muted-foreground">Full details shown when viewing service information</p>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="deliverables">Deliverables</Label>
+                  <Textarea
+                    id="deliverables"
+                    value={formData.deliverables}
+                    onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
+                    placeholder="Enter each deliverable on a new line&#10;e.g.,&#10;Complete payment gateway integration&#10;Testing and documentation&#10;30 days support"
+                    rows={4}
+                  />
+                  <p className="text-xs text-muted-foreground">List what clients will receive (one item per line)</p>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="requirements">Requirements</Label>
+                  <Textarea
+                    id="requirements"
+                    value={formData.requirements}
+                    onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+                    placeholder="Enter each requirement on a new line&#10;e.g.,&#10;Active business registration&#10;Bank account details&#10;Website or app access"
+                    rows={4}
+                  />
+                  <p className="text-xs text-muted-foreground">What clients need to provide (one item per line)</p>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="supportedProviders">Supported Providers</Label>
+                  <Textarea
+                    id="supportedProviders"
+                    value={formData.supportedProviders}
+                    onChange={(e) => setFormData({ ...formData, supportedProviders: e.target.value })}
+                    placeholder="Enter each provider on a new line&#10;e.g.,&#10;Stripe&#10;PayPal&#10;Razorpay"
+                    rows={3}
+                  />
+                  <p className="text-xs text-muted-foreground">Payment gateways or platforms supported (one per line)</p>
+                </div>
               </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="serviceSubType">Service Sub-Type</Label>
-                <Input
-                  id="serviceSubType"
-                  value={formData.serviceSubType}
-                  onChange={(e) => setFormData({ ...formData, serviceSubType: e.target.value })}
-                  placeholder="e.g., Development"
-                />
+
+              <Separator />
+
+              {/* Classification */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">Classification</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="serviceType">Service Type</Label>
+                    <Input
+                      id="serviceType"
+                      value={formData.serviceType}
+                      onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
+                      placeholder="e.g., Payment Solutions"
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="serviceSubType">Service Sub-Type</Label>
+                    <Input
+                      id="serviceSubType"
+                      value={formData.serviceSubType}
+                      onChange={(e) => setFormData({ ...formData, serviceSubType: e.target.value })}
+                      placeholder="e.g., Gateway Integration"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="niche">Niche</Label>
+                  <Input
+                    id="niche"
+                    value={formData.niche}
+                    onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
+                    placeholder="e.g., E-commerce"
+                  />
+                </div>
+
+                {!profile?.agency && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="agency">Agency</Label>
+                    <Input
+                      id="agency"
+                      value={formData.agency}
+                      onChange={(e) => setFormData({ ...formData, agency: e.target.value })}
+                      placeholder="Enter agency name"
+                    />
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="niche">Niche</Label>
-              <Input
-                id="niche"
-                value={formData.niche}
-                onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
-                placeholder="e.g., E-commerce"
-              />
-            </div>
-
-            {!profile?.agency && (
-              <div className="grid gap-2">
-                <Label htmlFor="agency">Agency</Label>
-                <Input
-                  id="agency"
-                  value={formData.agency}
-                  onChange={(e) => setFormData({ ...formData, agency: e.target.value })}
-                  placeholder="Enter agency name"
-                />
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="date">Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="time">Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
+          </form>
+        </ScrollArea>
           
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={addService.isPending}>
-              {addService.isPending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Saving...
-                </>
-              ) : (
-                service ? 'Update Service' : 'Add Service'
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" form="service-form" disabled={addService.isPending}>
+            {addService.isPending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Saving...
+              </>
+            ) : (
+              service ? 'Update Service' : 'Add Service'
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

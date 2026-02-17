@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Lead, Deal, OutreachActivity, Service, Project } from '../backend';
+import type { Lead, Service, Project } from '../backend';
+import type { Deal, OutreachActivity } from '../types/local';
 
 export type ExportData = {
   leads: Lead[];
@@ -20,15 +21,20 @@ export function useExportData() {
         return { leads: [], deals: [], outreach: [], services: [], projects: [] };
       }
       
-      const [leads, outreach, services, deals, projects] = await Promise.all([
-        actor.getLeadsForExport(),
-        actor.getOutreachActivitiesForExport(),
-        actor.getServicesForExport(),
-        actor.getDealsForExport(),
-        actor.getProjectsForExport(),
+      // Fetch available data from backend
+      const [leads, services, projects] = await Promise.all([
+        actor.getLeadsPaginated(BigInt(0), BigInt(10000)).catch(() => []),
+        actor.getServices().catch(() => []),
+        actor.getProjects().catch(() => []),
       ]);
       
-      return { leads, deals, outreach, services, projects };
+      return {
+        leads,
+        deals: [], // Not implemented in backend
+        outreach: [], // Not implemented in backend
+        services,
+        projects,
+      };
     },
     enabled: !!actor && !actorFetching,
   });

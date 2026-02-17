@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 27,
-  "summary": "Remove authentication/sign-in gating so users can access the app directly without any sign-in screen; additionally remove Admin vs Client role distinctions and role-based onboarding so the app is a single shared experience for everyone.",
+  "projectStateVersion": 33,
+  "summary": "Shift scope to include implementing a complete payment system across services (including the Services & Pricing page) in addition to the existing no-sign-in single-experience app direction; also address performance improvements to make Leads data load faster.",
   "architectural_notes": [
     "Bubble app with SaaS multi-tenant privacy rules: users restricted to their agency/leads; role-based access (Admin vs Team).",
     "Core data types to implement in Bubble: User, Lead, Outreach Activity, Deal, Daily Task (plus later Service/Project for Agency OS upgrades).",
@@ -17,9 +17,11 @@
   "known_issues": [
     "OTP sign-in cannot be completed until an email sending method is enabled and/or an SMS provider/plugin is configured for the Bubble app.",
     "Uploaded frontend static assets/images are not currently visible in the app UI; investigate asset bundling/paths/references and ensure they render in production.",
-    "Static images are still not visible in the app UI (user reports issue persists after build)."
+    "Static images are still not visible in the app UI (user reports issue persists after build).",
+    "Payment gateway offerings are not visible in the UI as expected (user cannot see payment gateway)."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- 3D isometric website/landing-page icon (svc-3d-website.dim_256x256.png)\n- 3D isometric WhatsApp automation/chatbot icon (svc-3d-whatsapp-automation.dim_256x256.png)\n- 3D isometric lead funnel/CRM pipeline icon (svc-3d-lead-machine.dim_256x256.png)\n- 3D isometric personal brand/social profile icon (svc-3d-personal-brand.dim_256x256.png)\n- 3D isometric AI growth/robot + graph icon (svc-3d-ai-growth.dim_256x256.png)\n- 3D isometric maintenance/gear + shield icon (svc-3d-maintenance.dim_256x256.png)\n- 3D isometric generic service/package box icon (svc-3d-default.dim_256x256.png)\n- 3D isometric generic niche tag/badge icon (niche-3d-default.dim_256x256.png)\n- 3D isometric e-commerce/storefront icon (niche-3d-ecommerce.dim_256x256.png)\n- 3D isometric real estate/house icon (niche-3d-real-estate.dim_256x256.png)\n- 3D isometric education/book icon (niche-3d-education.dim_256x256.png)\n- 3D isometric healthcare/medical cross icon (niche-3d-healthcare.dim_256x256.png)\n- 3D isometric restaurant/food icon (niche-3d-restaurant.dim_256x256.png)\n- 3D isometric fitness/dumbbell icon (niche-3d-fitness.dim_256x256.png)\n- 3D isometric SaaS/cloud app icon (niche-3d-saas.dim_256x256.png)\n- 3D isometric local business/shop icon (niche-3d-local-business.dim_256x256.png)",
   "existing_features": [
     {
       "id": "feature-implement-authentication-using-internet-identity-and-create-an-app-level-user-profile-record-on-first-sign-in-capturing-name-email-optional-role-admin-team-agency-name-monthly-revenue-goal-subscription-plan-total-revenue",
@@ -524,6 +526,78 @@
         "REQ-76"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-services-management-ui-to-allow-viewing-and-editing-the-new-service-detail-fields-for-any-service-using-english-user-facing-labels-and-helper-text",
+      "title": "Update the Services Management UI to allow viewing and editing the new service detail fields for any service, using English user-facing labels and helper text.",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-service-catalog-seed-data-contains-detailed-user-readable-service-details-for-the-two-payment-gateway-offerings-international-payment-gateway-setup-stripe-paypal-and-indian-payment-gateway-integration-razorpay-upi",
+      "title": "Ensure the service catalog seed data contains detailed, user-readable service details for the two payment gateway offerings: “International Payment Gateway Setup (Stripe, PayPal)” and “Indian Payment Gateway Integration (Razorpay, UPI)”.",
+      "reqIds": [
+        "REQ-79"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-two-payment-gateway-services-international-payment-gateway-setup-stripe-paypal-and-indian-payment-gateway-integration-razorpay-upi-are-visible-and-discoverable-in-the-app-by-making-sure-they-are-seeded-into-services-and-not-hidden-by-ui-defaults-e-g-active-only-filtering-missing-catalog-seed-action-or-category-grouping",
+      "title": "Ensure the two payment gateway services (“International Payment Gateway Setup (Stripe, PayPal)” and “Indian Payment Gateway Integration (Razorpay, UPI)”) are visible and discoverable in the app by making sure they are seeded into Services and not hidden by UI defaults (e.g., active-only filtering, missing catalog seed action, or category grouping).",
+      "reqIds": [
+        "REQ-80"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-complete-in-app-payment-flow-for-purchasing-any-service-including-creating-a-payment-order-record-choosing-a-payment-method-upi-razorpay-stripe-showing-payment-instructions-links-and-tracking-payment-status-e-g-pending-paid-failed-cancelled-per-order",
+      "title": "Implement a complete in-app payment flow for purchasing any Service, including: creating a payment/order record, choosing a payment method (UPI, Razorpay, Stripe), showing payment instructions/links, and tracking payment status (e.g., Pending, Paid, Failed, Cancelled) per order.",
+      "reqIds": [
+        "REQ-81"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-pay-checkout-entry-points-for-every-service-in-both-the-services-management-experience-service-cards-and-or-service-details-dialog-and-the-services-pricing-page-so-users-can-pay-directly-from-pricing-tiers-and-from-seeded-custom-services",
+      "title": "Add “Pay / Checkout” entry points for every service in both the Services management experience (service cards and/or Service Details dialog) and the Services & Pricing page, so users can pay directly from pricing tiers and from seeded/custom services.",
+      "reqIds": [
+        "REQ-82"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-payment-settings-section-to-configure-payment-options-shown-in-checkout-upi-details-razorpay-payment-link-stripe-payment-link-checkout-url-template-and-persist-these-settings-in-the-backend-so-they-survive-refreshes-and-deployments",
+      "title": "Add a Payment Settings section to configure payment options shown in checkout (UPI details, Razorpay payment link, Stripe payment link/checkout URL template), and persist these settings in the backend so they survive refreshes and deployments.",
+      "reqIds": [
+        "REQ-83"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-leads-section-load-and-display-data-faster-by-reducing-unnecessary-re-renders-adding-debounced-search-filtering-and-introducing-a-paginated-or-incremental-leads-query-so-the-ui-does-not-need-to-load-filter-the-entire-leads-dataset-at-once",
+      "title": "Make the Leads section load and display data faster by reducing unnecessary re-renders, adding debounced search/filtering, and introducing a paginated (or incremental) leads query so the UI does not need to load/filter the entire leads dataset at once.",
+      "reqIds": [
+        "REQ-84"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-3d-icon-system-for-services-and-niches-and-render-the-appropriate-3d-icon-consistently-across-the-ui-wherever-a-service-or-niche-is-shown-at-minimum-services-page-service-cards-service-details-dialog-header-area-services-pricing-page-category-tier-cards-and-any-niche-labels-filters-where-present-include-a-safe-fallback-icon-when-no-specific-icon-exists-for-a-given-service-niche-value",
+      "title": "Add a 3D icon system for Services and Niches, and render the appropriate 3D icon consistently across the UI wherever a service or niche is shown (at minimum: Services page service cards, Service Details dialog header area, Services & Pricing page category/tier cards, and any niche labels/filters where present). Include a safe fallback icon when no specific icon exists for a given service/niche value.",
+      "reqIds": [
+        "REQ-85"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-checkout-flow-so-that-when-the-checkout-dialog-opens-from-any-entry-point-services-page-or-services-pricing-page-the-user-is-immediately-guided-redirected-to-the-payment-options-area-and-after-an-order-is-created-the-dialog-automatically-brings-the-payment-instructions-upi-razorpay-stripe-into-view-for-the-selected-payment-method",
+      "title": "Update the checkout flow so that when the Checkout dialog opens from any entry point (Services page or Services & Pricing page), the user is immediately guided/redirected to the payment options area, and after an order is created the dialog automatically brings the payment instructions (UPI/Razorpay/Stripe) into view for the selected payment method.",
+      "reqIds": [
+        "REQ-86"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -807,6 +881,44 @@
       "reqIds": [
         "REQ-75"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-94",
+      "summary": "Add detailed service listings for “International Payment Gateway Setup (Stripe, PayPal)” and “Indian Payment Gateway Integration (Razorpay, UPI)”, including full service details (scope/deliverables/pricing metadata fields) in the Services catalog.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-95",
+      "summary": "Add richer service detail fields to the Service data model so services can store and return full service details (at minimum: shortDescription, detailedDescription, deliverables list, requirements list, and supportedProviders list).",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-96",
+      "summary": "Implement a complete payment system so users can purchase/pay for every service (end-to-end payments, service-level checkout) and expose payment options within each service and on the Services & Pricing page.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-97",
+      "summary": "Performance: make the Leads section faster to view data (optimize loading/querying/rendering so lead lists/details appear quickly).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-98",
+      "summary": "Add 3D icons for every service and niche across the UI (service cards/details, pricing page, and any niche labels/filters where applicable).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-99",
+      "summary": "Update checkout flow so selecting a service redirects users to the payment options section/page in checkout (UPI/Razorpay/Stripe) to complete payments.",
+      "reqIds": [],
       "status": "pending"
     }
   ],

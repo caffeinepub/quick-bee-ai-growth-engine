@@ -1,5 +1,5 @@
 import type { ExportData } from '../../hooks/useExportData';
-import { leadFields, outreachFields, serviceFields, dealFields, projectFields, getFieldValue } from './exportSchema';
+import { leadFields, outreachFields, serviceFields, dealFields, projectFields, formatFieldValue } from './exportSchema';
 
 function escapeCSV(value: string): string {
   if (value.includes(',') || value.includes('"') || value.includes('\n')) {
@@ -16,7 +16,7 @@ function generateCSVSection<T>(title: string, items: T[], fields: any[]): string
   
   // Data rows
   items.forEach(item => {
-    const row = fields.map(field => escapeCSV(getFieldValue(item, field)));
+    const row = fields.map(field => escapeCSV(formatFieldValue(field, item)));
     csv += row.join(',') + '\n';
   });
   

@@ -11,8 +11,8 @@ export function useGetProjects() {
     queryKey: ['projects', profile?.agency],
     queryFn: async () => {
       if (!actor || !profile?.agency) return [];
-      const exportData = await actor.getProjectsForExport();
-      return exportData.filter(p => p.agency === profile.agency);
+      const allProjects = await actor.getProjects();
+      return allProjects.filter(p => p.agency === profile.agency);
     },
     enabled: !!actor && !actorFetching && !!profile?.agency,
   });
@@ -25,7 +25,7 @@ export function useAddProject() {
   return useMutation({
     mutationFn: async (project: Project) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addProject(project);
+      return actor.createProject(project);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
@@ -41,8 +41,7 @@ export function useUpdateProject() {
   return useMutation({
     mutationFn: async (project: Project) => {
       if (!actor) throw new Error('Actor not available');
-      // Re-add the project to update it
-      return actor.addProject(project);
+      return actor.updateProject(project.id, project);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
@@ -58,7 +57,13 @@ export function useCompleteProject() {
   return useMutation({
     mutationFn: async (projectId: string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.completeProject(projectId);
+      // Backend doesn't have completeProject, use updateProject with completed status
+      const projects = await actor.getProjects();
+      const project = projects.find(p => p.id === projectId);
+      if (!project) throw new Error('Project not found');
+      
+      const updatedProject = { ...project, status: 'Completed', completion: BigInt(100) };
+      return actor.updateProject(projectId, updatedProject);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });

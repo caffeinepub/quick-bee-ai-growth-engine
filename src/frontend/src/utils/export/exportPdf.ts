@@ -1,5 +1,5 @@
 import type { ExportData } from '../../hooks/useExportData';
-import { leadFields, outreachFields, serviceFields, dealFields, projectFields, getFieldValue } from './exportSchema';
+import { leadFields, outreachFields, serviceFields, dealFields, projectFields, formatFieldValue } from './exportSchema';
 import { formatTimestamp } from './filename';
 
 // Simple PDF generation using browser's print functionality
@@ -113,7 +113,7 @@ function generateTableHTML<T>(title: string, items: T[], fields: any[]): string 
   items.forEach(item => {
     html += '<tr>';
     fields.forEach(field => {
-      html += `<td>${escapeHTML(getFieldValue(item, field))}</td>`;
+      html += `<td>${escapeHTML(formatFieldValue(field, item))}</td>`;
     });
     html += '</tr>';
   });

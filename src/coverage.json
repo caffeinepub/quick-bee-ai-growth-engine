@@ -1,84 +1,118 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T17:56:13.558Z",
+  "generatedAt": "2026-02-17T19:01:11.109Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-73",
-        "summary": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably.",
+        "id": "REQ-85",
+        "summary": "Add a 3D icon system for Services and Niches, and render the appropriate 3D icon consistently across the UI wherever a service or niche is shown (at minimum: Services page service cards, Service Details dialog header area, Services & Pricing page category/tier cards, and any niche labels/filters where present). Include a safe fallback icon when no specific icon exists for a given service/niche value.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/SettingsPage.tsx",
-          "frontend/src/hooks/useCurrentUserProfile.ts",
-          "frontend/src/hooks/useAuthRole.ts"
+          "frontend/public/assets/generated/svc-3d-website.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-whatsapp-automation.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-lead-machine.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-personal-brand.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-ai-growth.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-maintenance.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-default.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-default.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-ecommerce.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-real-estate.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-education.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-healthcare.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-restaurant.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-fitness.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-saas.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-local-business.dim_256x256.png",
+          "frontend/src/utils/icons/serviceNiche3dIcons.ts",
+          "frontend/src/components/common/ServiceNiche3dIcon.tsx",
+          "frontend/src/pages/ServicesPage.tsx",
+          "frontend/src/components/services/ServiceDetailsDialog.tsx",
+          "frontend/src/pages/ServicesPricingPage.tsx",
+          "frontend/src/pages/LeadsPage.tsx",
+          "frontend/src/components/common/LeadCard.tsx",
+          "frontend/src/components/common/SafeImage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/SettingsPage.tsx",
-          "frontend/src/hooks/useCurrentUserProfile.ts"
+          "frontend/public/assets/generated/svc-3d-website.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-whatsapp-automation.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-lead-machine.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-personal-brand.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-ai-growth.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-maintenance.dim_256x256.png",
+          "frontend/public/assets/generated/svc-3d-default.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-default.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-ecommerce.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-real-estate.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-education.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-healthcare.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-restaurant.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-fitness.dim_256x256.png",
+          "frontend/public/assets/generated/niche-3d-saas.dim_256x256.png",
+          "frontend/src/utils/icons/serviceNiche3dIcons.ts",
+          "frontend/src/components/common/ServiceNiche3dIcon.tsx",
+          "frontend/src/pages/ServicesPage.tsx",
+          "frontend/src/components/services/ServiceDetailsDialog.tsx",
+          "frontend/src/pages/ServicesPricingPage.tsx",
+          "frontend/src/pages/LeadsPage.tsx",
+          "frontend/src/components/common/LeadCard.tsx",
+          "frontend/src/components/common/SafeImage.tsx"
         ]
       },
       {
-        "id": "REQ-74",
-        "summary": "Remove guest-only UI restrictions that prevent guests from managing services, so guest users can add and edit services from the Services management page.",
+        "id": "REQ-86",
+        "summary": "Update the checkout flow so that when the Checkout dialog opens from any entry point (Services page or Services & Pricing page), the user is immediately guided/redirected to the payment options area, and after an order is created the dialog automatically brings the payment instructions (UPI/Razorpay/Stripe) into view for the selected payment method.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/services/ServiceDialog.tsx",
-          "frontend/src/pages/ServicesPage.tsx",
-          "frontend/src/hooks/useServices.ts"
+          "frontend/src/components/payments/CheckoutDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/services/ServiceDialog.tsx",
-          "frontend/src/pages/ServicesPage.tsx",
-          "frontend/src/hooks/useServices.ts"
-        ]
-      },
-      {
-        "id": "REQ-75",
-        "summary": "Relax backend authorization checks for service creation and service updates so they work in public/no-sign-in mode (guests), without trapping.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-76",
-        "summary": "Add the provided services catalog entries into the app as Services records, grouped under the following serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/utils/services/seedCatalog.ts",
-          "frontend/src/pages/ServicesPage.tsx",
-          "frontend/src/hooks/useServices.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/utils/services/seedCatalog.ts",
-          "frontend/src/pages/ServicesPage.tsx",
-          "frontend/src/hooks/useServices.ts"
+          "frontend/src/components/payments/CheckoutDialog.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/services/ServiceDialog.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useCurrentUserProfile.ts",
-    "frontend/src/hooks/useServices.ts",
+    "frontend/public/assets/generated/niche-3d-default.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-ecommerce.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-education.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-fitness.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-healthcare.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-real-estate.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-restaurant.dim_256x256.png",
+    "frontend/public/assets/generated/niche-3d-saas.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-ai-growth.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-default.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-lead-machine.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-maintenance.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-personal-brand.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-website.dim_256x256.png",
+    "frontend/public/assets/generated/svc-3d-whatsapp-automation.dim_256x256.png",
+    "frontend/src/components/common/LeadCard.tsx",
+    "frontend/src/components/common/SafeImage.tsx",
+    "frontend/src/components/common/ServiceNiche3dIcon.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
+    "frontend/src/components/nav/SidebarNav.tsx",
+    "frontend/src/components/payments/CheckoutDialog.tsx",
+    "frontend/src/components/services/ServiceDetailsDialog.tsx",
+    "frontend/src/hooks/usePayments.ts",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/LeadsPage.tsx",
+    "frontend/src/pages/PlannerPage.tsx",
     "frontend/src/pages/ServicesPage.tsx",
-    "frontend/src/pages/SettingsPage.tsx",
-    "frontend/src/utils/services/seedCatalog.ts",
+    "frontend/src/pages/ServicesPricingPage.tsx",
+    "frontend/src/utils/icons/serviceNiche3dIcons.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
