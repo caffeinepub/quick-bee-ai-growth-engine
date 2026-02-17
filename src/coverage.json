@@ -1,0 +1,108 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-17T14:07:08.827Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 5,
+    "implemented": 4,
+    "items": [
+      {
+        "id": "REQ-24",
+        "summary": "Do not implement OTP sign-in (SMS/email/passwordless). Keep Internet Identity as the only authentication method, and ensure the sign-in UI communicates that authentication continues via Internet Identity after entering an email/phone identifier.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/SignInPage.tsx",
+          "frontend/src/utils/signInIdentifier.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/SignInPage.tsx",
+          "frontend/src/utils/signInIdentifier.ts"
+        ]
+      },
+      {
+        "id": "REQ-25",
+        "summary": "Implement an admin-only first-time profile setup path that is restricted to the allowlisted admin identity details: name \"Aryan Abhishek\", phone number \"+919182768591\", and email \"quickbeeagency@gmail.com\". If the stored sign-in identifier matches the allowlisted email or phone, prefill the profile setup form with these values and force the role to Admin (not editable). If it does not match, prevent selecting Admin during profile setup.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/adminAllowlist.ts",
+          "frontend/src/components/auth/ProfileSetupModal.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/adminAllowlist.ts",
+          "frontend/src/components/auth/ProfileSetupModal.tsx"
+        ]
+      },
+      {
+        "id": "REQ-26",
+        "summary": "Enforce the admin allowlist in backend profile registration so that a caller cannot self-register as Admin unless their provided email or mobile number matches the allowlisted admin details (email: quickbeeagency@gmail.com, phone: +919182768591). Ensure backend logic rejects unauthorized attempts to register/save an Admin profile.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-27",
+        "summary": "Add a client onboarding flow (for non-admin users after Internet Identity sign-in) that lets the client browse/select a service and view detailed service information and cost details, then submit their selection as a persisted “client service request” linked to their principal and agency.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useClientServiceRequests.ts",
+          "frontend/src/pages/ClientOnboardingPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/nav/SidebarNav.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useClientServiceRequests.ts",
+          "frontend/src/pages/ClientOnboardingPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/nav/SidebarNav.tsx"
+        ]
+      },
+      {
+        "id": "REQ-28",
+        "summary": "Provide an admin-facing view to review client service requests within the app (accessible only to Admin users), showing the client identifier (principal and/or submitted email/phone if present), selected service, and captured cost details.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/admin/AdminOnlySection.tsx",
+          "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
+          "frontend/src/pages/SettingsPage.tsx",
+          "frontend/src/components/nav/SidebarNav.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/AdminOnlySection.tsx",
+          "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
+          "frontend/src/pages/SettingsPage.tsx",
+          "frontend/src/components/nav/SidebarNav.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/admin/AdminOnlySection.tsx",
+    "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
+    "frontend/src/components/auth/ProfileSetupModal.tsx",
+    "frontend/src/components/nav/SidebarNav.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useClientServiceRequests.ts",
+    "frontend/src/pages/ClientOnboardingPage.tsx",
+    "frontend/src/pages/SettingsPage.tsx",
+    "frontend/src/pages/SignInPage.tsx",
+    "frontend/src/utils/adminAllowlist.ts",
+    "frontend/src/utils/signInIdentifier.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

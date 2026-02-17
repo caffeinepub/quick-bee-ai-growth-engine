@@ -1,0 +1,142 @@
+{
+  "kind": "build_request",
+  "title": "Admin-only signup allowlist and client service-selection onboarding (no OTP)",
+  "projectName": "Quick Bee AI Growth Engine",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-24",
+      "text": "Do not implement OTP sign-in (SMS/email/passwordless). Keep Internet Identity as the only authentication method, and ensure the sign-in UI communicates that authentication continues via Internet Identity after entering an email/phone identifier.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6",
+          "msg-8"
+        ],
+        "quotes": [
+          "add otp system to sign in",
+          "I can’t add an OTP login system in your app because the platform you are using does not support sending SMS or email OTP.",
+          "Tell me if you want me to implement those two flows without OTP."
+        ]
+      },
+      "acceptanceCriteria": [
+        "There is no UI, API, or backend logic that attempts to send or verify OTP codes.",
+        "Sign-in continues to use the existing Internet Identity login flow, with the identifier only used for prefill/onboarding context.",
+        "User-facing copy on the sign-in page remains in English and does not claim OTP delivery."
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "text": "Implement an admin-only first-time profile setup path that is restricted to the allowlisted admin identity details: name \"Aryan Abhishek\", phone number \"+919182768591\", and email \"quickbeeagency@gmail.com\". If the stored sign-in identifier matches the allowlisted email or phone, prefill the profile setup form with these values and force the role to Admin (not editable). If it does not match, prevent selecting Admin during profile setup.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-9"
+        ],
+        "quotes": [
+          "add otp system to sign in, & create two types of signup one is only for admin (Aryan Abhishek with phone number: +919182768591, email: quickbeeagency@gmail.com) second one is for clients to select service & cost details with in detail service info",
+          "Tell me if you want me to implement those two flows without OTP.",
+          "ok"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When the stored identifier equals \"+919182768591\" or \"quickbeeagency@gmail.com\" (case-insensitive for email), the profile setup modal prefills name/email/phone accordingly and the role is locked to Admin.",
+        "When the stored identifier does not match the allowlist, the profile setup modal does not allow choosing Admin (role is effectively Team/User-only).",
+        "All user-facing text related to this flow is in English."
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "text": "Enforce the admin allowlist in backend profile registration so that a caller cannot self-register as Admin unless their provided email or mobile number matches the allowlisted admin details (email: quickbeeagency@gmail.com, phone: +919182768591). Ensure backend logic rejects unauthorized attempts to register/save an Admin profile.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-9"
+        ],
+        "quotes": [
+          "create two types of signup one is only for admin (Aryan Abhishek with phone number: +919182768591, email: quickbeeagency@gmail.com)",
+          "If you want, I can still create: • A special “Admin” role tied to your name, phone, and email",
+          "ok"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend registration rejects attempts to register an Admin role unless the provided email or mobile number matches the allowlist.",
+        "Non-admin users cannot escalate themselves to Admin by calling backend methods directly.",
+        "Existing non-admin registration continues to work as before."
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "text": "Add a client onboarding flow (for non-admin users after Internet Identity sign-in) that lets the client browse/select a service and view detailed service information and cost details, then submit their selection as a persisted “client service request” linked to their principal and agency.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-9"
+        ],
+        "quotes": [
+          "second one is for clients to select service & cost details with in detail service info",
+          "ok"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After a non-admin user completes profile setup (or on next app entry if already registered), they can access a client onboarding screen to select a service.",
+        "The client onboarding UI shows service details and cost details for the selected service before submission.",
+        "Submitting creates a stored record in the backend that includes at least: client principal, agency, selected service identifier, captured cost/price details shown/accepted, and a timestamp.",
+        "Clients can see their submitted requests in-app (e.g., a “My Requests” list in the onboarding screen)."
+      ]
+    },
+    {
+      "id": "REQ-28",
+      "text": "Provide an admin-facing view to review client service requests within the app (accessible only to Admin users), showing the client identifier (principal and/or submitted email/phone if present), selected service, and captured cost details.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-9"
+        ],
+        "quotes": [
+          "create two types of signup... second one is for clients to select service & cost details with in detail service info",
+          "ok"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin users can access a page/section that lists client service requests for their agency.",
+        "Non-admin users cannot access this admin review UI (route/section hidden and guarded).",
+        "The list displays, per request: client identifier, service, cost details, and submission time."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not implement OTP via SMS, email, or third-party passwordless providers; the platform cannot send OTP codes.",
+    "Internet Identity must remain the only authentication method; do not add email/password auth or third-party auth providers.",
+    "Respect the single-actor backend architecture: all Motoko logic in backend/main.mo; add migration.mo only if existing stable state requires it.",
+    "Do not edit files under frontend/src/components/ui, frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (compose instead of modifying immutable paths).",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Sending SMS messages or emails for OTP verification.",
+    "Integrating Twilio/Sinch/MojoAuth or any external OTP delivery provider.",
+    "Replacing Internet Identity with an alternative authentication mechanism.",
+    "Implementing payments/Stripe checkout as part of client service selection."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

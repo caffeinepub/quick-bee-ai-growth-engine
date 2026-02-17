@@ -1,0 +1,396 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 7,
+  "summary": "Build “Quick Bee AI Growth Engine”: a scalable Bubble SaaS for digital agencies combining lead import/scraping, multi-channel outreach tracking, AI message generation, follow-up automation, deals + revenue analytics, 30-day execution planner, plus Agency OS upgrades (services catalog, AI service recommendations, proposal generator, and delivery/project tracking) with a minimal teal/black/white responsive dashboard UI.",
+  "architectural_notes": [
+    "Bubble app with SaaS multi-tenant privacy rules: users restricted to their agency/leads; role-based access (Admin vs Team).",
+    "Core data types to implement in Bubble: User, Lead, Outreach Activity, Deal, Daily Task (plus later Service/Project for Agency OS upgrades).",
+    "Outreach Activity events (Sent/Replied) should be the source of truth for analytics (reply rate, outreach counts by platform).",
+    "OpenAI API integration for AI message generation, service recommendation, and proposal generation; store API key per user/agency for scalability.",
+    "Workflow rules: Deal Won updates user Total Revenue; Follow-up Date triggers “due today” notifications; analytics update must be immediate/consistent.",
+    "UI architecture: reusable components (cards, chart blocks, progress bars) and responsive sidebar navigation in teal/black/white theme.",
+    "Authentication direction change: support sign-in via mobile number or email (e.g., password or OTP), and ensure first-login profile creation/onboarding still occurs; re-evaluate any Internet Identity assumptions in auth and user model.",
+    "OTP login in Bubble requires external delivery (SMS/email) via third-party providers (e.g., Twilio/Sinch/MojoAuth); implementation depends on account email being enabled and/or an SMS plugin/API being configured.",
+    "Support separate onboarding flows by role: Admin flow (restricted/allowlisted) vs Client flow (service selection + pricing/details capture) after authentication."
+  ],
+  "known_issues": [
+    "OTP sign-in cannot be completed until an email sending method is enabled and/or an SMS provider/plugin is configured for the Bubble app."
+  ],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-authentication-using-internet-identity-and-create-an-app-level-user-profile-record-on-first-sign-in-capturing-name-email-optional-role-admin-team-agency-name-monthly-revenue-goal-subscription-plan-total-revenue",
+      "title": "Implement authentication using Internet Identity and create an app-level user profile record on first sign-in, capturing: name, email (optional), role (Admin/Team), agency name, monthly revenue goal, subscription plan, total revenue.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enforce-multi-tenant-privacy-rules-users-can-only-access-data-belonging-to-their-agency-role-based-permissions-admin-vs-team-must-be-enforced-in-backend-apis-and-reflected-in-the-ui",
+      "title": "Enforce multi-tenant privacy rules: users can only access data belonging to their agency; role-based permissions (Admin vs Team) must be enforced in backend APIs and reflected in the UI.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-core-application-shell-with-a-responsive-sidebar-navigation-and-routes-for-dashboard-leads-outreach-services-deals-projects-planner-analytics-settings",
+      "title": "Build the core application shell with a responsive sidebar navigation and routes for: Dashboard, Leads, Outreach, Services, Deals, Projects, Planner, Analytics, Settings.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-the-requested-visual-design-system-across-the-app-minimal-teal-black-white-clean-dashboard-beginner-friendly-mobile-responsive-implement-reusable-ui-components-lead-card-stats-card-chart-block-progress-bar",
+      "title": "Apply the requested visual design system across the app: minimal, teal + black + white, clean dashboard, beginner-friendly, mobile responsive; implement reusable UI components: Lead card, Stats card, Chart block, Progress bar.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-leads-module-implement-leads-page-with-add-lead-manual-edit-delete-search-filter-by-niche-city-status-and-a-lead-detail-view-that-shows-website-outreach-history-ai-scripts-area-and-follow-up-reminders",
+      "title": "Leads module: implement Leads page with add lead (manual), edit/delete, search, filter by niche/city/status, and a lead detail view that shows website, outreach history, AI scripts area, and follow-up reminders.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-csv-bulk-import-allow-users-to-upload-a-csv-file-map-columns-to-lead-fields-validate-rows-and-bulk-create-leads-with-source-set-to-csv-show-an-import-summary-created-failed",
+      "title": "CSV bulk import: allow users to upload a CSV file, map columns to lead fields, validate rows, and bulk create leads with source set to CSV; show an import summary (created/failed).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-outreach-module-implement-outreach-page-with-tabs-for-email-linkedin-instagram-whatsapp-sms-for-each-lead-support-generate-message-mark-sent-mark-replied-schedule-follow-up-and-persist-outreach-activities",
+      "title": "Outreach module: implement Outreach page with tabs for Email, LinkedIn, Instagram, WhatsApp, SMS; for each lead support: generate message, mark Sent, mark Replied, schedule follow-up, and persist outreach activities.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-dashboard-analytics-implement-dashboard-page-that-shows-dynamic-stats-and-charts-total-leads-total-outreach-reply-rate-calls-booked-if-available-closed-deals-revenue-revenue-goal-progress-charts-for-outreach-by-platform-conversion-funnel-revenue-growth",
+      "title": "Dashboard analytics: implement Dashboard page that shows dynamic stats and charts: total leads, total outreach, reply rate, calls booked (if available), closed deals, revenue, revenue goal progress; charts for outreach by platform, conversion funnel, revenue growth.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-deals-module-implement-deals-page-with-a-kanban-board-for-statuses-open-proposal-sent-won-lost-allow-dragging-moving-deals-between-statuses-and-editing-deal-value-close-date-when-a-deal-becomes-won-add-deal-value-to-the-user-total-revenue-and-update-analytics",
+      "title": "Deals module: implement Deals page with a Kanban board for statuses: Open, Proposal Sent, Won, Lost; allow dragging/moving deals between statuses and editing deal value/close date; when a deal becomes Won, add deal value to the user total revenue and update analytics.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-planner-module-implement-30-day-planner-with-a-button-start-3000-outreach-plan-that-auto-creates-30-daily-task-records-with-default-targets-40-emails-25-linkedin-15-instagram-10-whatsapp-10-sms-show-progress-bars-daily-completion-and-a-streak-counter-based-on-completion",
+      "title": "Planner module: implement “30-Day Planner” with a button “Start 3000 Outreach Plan” that auto-creates 30 daily task records with default targets (40 Emails, 25 LinkedIn, 15 Instagram, 10 WhatsApp, 10 SMS); show progress bars, daily completion %, and a streak counter based on completion.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-notifications-badges-when-a-lead-follow-up-date-is-today-show-a-notification-badge-in-the-ui-global-nav-and-or-leads-outreach-views-and-provide-a-quick-view-list-of-due-follow-ups",
+      "title": "Notifications/badges: when a lead follow-up date is today, show a notification badge in the UI (global nav and/or leads/outreach views) and provide a quick view list of due follow-ups.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-services-module-add-a-services-dashboard-page-that-lists-all-services-with-price-delivery-time-total-sales-per-service-revenue-per-service-allow-add-edit-service-and-toggle-active-inactive",
+      "title": "Services module: add a Services Dashboard page that lists all services with price, delivery time, total sales per service, revenue per service; allow add/edit service and toggle active/inactive.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-proposal-generator-add-a-generate-proposal-action-on-the-lead-deal-flow-that-produces-proposal-content-containing-problem-analysis-service-recommendation-pricing-breakdown-delivery-timeline-expected-results-and-cta-allow-export-to-pdf-and-create-a-shareable-link",
+      "title": "Proposal generator: add a “Generate Proposal” action on the lead/deal flow that produces proposal content containing: problem analysis, service recommendation, pricing breakdown, delivery timeline, expected results, and CTA; allow export to PDF and create a shareable link.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-delivery-projects-module-implement-a-projects-page-client-delivery-tracker-that-lists-delivery-projects-for-sold-services-each-project-supports-project-start-date-milestones-file-uploads-client-notes-completion-and-status-updates",
+      "title": "Delivery/Projects module: implement a Projects page (“Client Delivery Tracker”) that lists delivery projects for sold services; each project supports: project start date, milestones, file uploads, client notes, completion %, and status updates.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-automation-logic-implement-the-specified-automated-updates-increment-platform-counters-when-outreach-sent-set-lead-status-to-replied-when-replied-when-lead-status-becomes-interested-generate-show-3-service-suggestions-when-deal-becomes-won-auto-create-a-delivery-project-linked-to-the-deal-service-when-service-project-is-completed-create-a-request-testimonial-notification-item",
+      "title": "Automation logic: implement the specified automated updates: increment platform counters when outreach sent; set lead status to Replied when replied; when lead status becomes Interested, generate/show 3 service suggestions; when deal becomes Won, auto-create a delivery project linked to the deal/service; when service/project is completed, create a “Request testimonial” notification item.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-revenue-analytics-upgrade-extend-analytics-dashboard-views-to-show-revenue-breakdowns-by-service-niche-city-and-platform-source-show-best-selling-service-highest-margin-service-based-on-configurable-margin-field-or-placeholder-average-deal-value-and-close-rate-per-service",
+      "title": "Revenue analytics upgrade: extend Analytics/Dashboard views to show revenue breakdowns by service, niche, city, and platform source; show best-selling service, highest margin service (based on configurable margin field or placeholder), average deal value, and close rate per service.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-scalability-readiness-add-settings-ui-and-backend-storage-for-per-user-or-per-agency-api-key-storage-for-future-ai-provider-integration-and-subscription-plan-field-management-for-future-stripe-without-implementing-stripe-payments",
+      "title": "Scalability readiness: add settings UI and backend storage for per-user or per-agency API key storage (for future AI provider integration) and subscription plan field management (for future Stripe), without implementing Stripe payments.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-sign-in-experience-to-accept-an-email-or-mobile-number-identifier-and-then-proceed-with-the-existing-internet-identity-authentication-flow-do-not-remove-internet-identity-the-entered-identifier-must-be-stored-temporarily-e-g-in-session-local-storage-so-it-can-be-used-during-first-time-profile-setup",
+      "title": "Update the sign-in experience to accept an \"Email or mobile number\" identifier and then proceed with the existing Internet Identity authentication flow (do not remove Internet Identity). The entered identifier must be stored temporarily (e.g., in session/local storage) so it can be used during first-time profile setup.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-first-time-profile-setup-modal-to-capture-a-mobile-number-optional-in-addition-to-the-existing-email-field-and-prefill-email-or-phone-from-the-identifier-entered-on-the-sign-in-screen-when-possible",
+      "title": "Extend the first-time Profile Setup modal to capture a mobile number (optional) in addition to the existing email field, and prefill email or phone from the identifier entered on the sign-in screen when possible.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-the-saved-mobile-number-in-settings-profile-information-read-only-alongside-the-existing-name-email-agency-role-fields",
+      "title": "Display the saved mobile number in Settings → Profile Information (read-only), alongside the existing name/email/agency/role fields.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-do-not-implement-otp-sign-in-sms-email-passwordless-keep-internet-identity-as-the-only-authentication-method-and-ensure-the-sign-in-ui-communicates-that-authentication-continues-via-internet-identity-after-entering-an-email-phone-identifier",
+      "title": "Do not implement OTP sign-in (SMS/email/passwordless). Keep Internet Identity as the only authentication method, and ensure the sign-in UI communicates that authentication continues via Internet Identity after entering an email/phone identifier.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-admin-only-first-time-profile-setup-path-that-is-restricted-to-the-allowlisted-admin-identity-details-name-aryan-abhishek-phone-number-919182768591-and-email-quickbeeagency-gmail-com-if-the-stored-sign-in-identifier-matches-the-allowlisted-email-or-phone-prefill-the-profile-setup-form-with-these-values-and-force-the-role-to-admin-not-editable-if-it-does-not-match-prevent-selecting-admin-during-profile-setup",
+      "title": "Implement an admin-only first-time profile setup path that is restricted to the allowlisted admin identity details: name \"Aryan Abhishek\", phone number \"+919182768591\", and email \"quickbeeagency@gmail.com\". If the stored sign-in identifier matches the allowlisted email or phone, prefill the profile setup form with these values and force the role to Admin (not editable). If it does not match, prevent selecting Admin during profile setup.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-client-onboarding-flow-for-non-admin-users-after-internet-identity-sign-in-that-lets-the-client-browse-select-a-service-and-view-detailed-service-information-and-cost-details-then-submit-their-selection-as-a-persisted-client-service-request-linked-to-their-principal-and-agency",
+      "title": "Add a client onboarding flow (for non-admin users after Internet Identity sign-in) that lets the client browse/select a service and view detailed service information and cost details, then submit their selection as a persisted “client service request” linked to their principal and agency.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-an-admin-facing-view-to-review-client-service-requests-within-the-app-accessible-only-to-admin-users-showing-the-client-identifier-principal-and-or-submitted-email-phone-if-present-selected-service-and-captured-cost-details",
+      "title": "Provide an admin-facing view to review client service requests within the app (accessible only to Admin users), showing the client identifier (principal and/or submitted email/phone if present), selected service, and captured cost details.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Set project name to “Quick Bee AI Growth Engine”",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Bubble database schema: User, Lead, Outreach Activity, Deal, Daily Task data types with specified fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Login/Signup with email/password, agency name capture, redirect to dashboard",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Dashboard: key stats + charts (outreach by platform, conversion funnel, revenue growth) and revenue goal progress",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Leads module: add/edit/delete, search/filter, CSV bulk import, lead detail panel with outreach history, AI scripts, follow-up reminders",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Outreach module: tabs by platform (Email/LinkedIn/Instagram/WhatsApp/SMS), generate AI message, mark sent/replied, schedule follow-ups; updates dashboard analytics",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "AI Message Generator using OpenAI API to generate personalized messages per channel with copy/regenerate",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "30-Day Planner: “Start 3000 Outreach Plan” creates 30 days with default daily targets, progress bars, completion %, streak counter",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Deals module: Kanban board (Open/Proposal Sent/Won/Lost) with auto-calculated revenue",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Workflow automation: increment platform counters on sent; set lead status to Replied on reply; add deal value to user total revenue on Won; notification badge for follow-ups due today",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "SaaS structure: privacy rules (users see only their leads), role-based access (Admin/Team), subscription plan field (future Stripe)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "UI/UX: minimal teal/black/white, clean beginner-friendly responsive dashboard, sidebar nav, reusable components (lead/stat/chart/progress)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Services page: services dashboard with price, delivery time, total sales, revenue per service; add/edit; active/inactive toggle",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Lead detail upgrade: AI suggested services, assign service dropdown, show estimated revenue, probability %, expected close value",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "AI Service Recommender: analyze website/niche/social presence via OpenAI to suggest best services",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Proposal Generator: AI creates problem analysis, service recommendation, pricing, timeline, expected results, CTA; export PDF + shareable link",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Revenue analytics upgrade: breakdown by service/niche/city/platform source; best-selling/highest margin service; avg deal value; close rate per service",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Delivery management: Client Delivery Tracker/Projects section with milestones, file uploads, client notes, completion %",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Automation additions: on Lead Interested suggest 3 services; on Deal Won auto-create delivery project; on service completed request testimonial; revenue updates dashboard instantly",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Scalability prep: Stripe integration readiness, team members under agency, per-user OpenAI API key storage, lead scoring algorithm, future automation triggers",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Create backend data models and CRUD APIs for: Leads, Outreach Activities, Deals, Daily Tasks (30-day plan), Services, Proposals, and Delivery Projects (client delivery tracker), including all fields specified by the user.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Lead detail upgrade: add a “Suggested Services (AI recommended)” section showing up to 3 suggested services; allow “Assign Service” via dropdown and display estimated revenue, probability %, and expected close value once assigned.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Update authentication to allow sign-in using mobile number or email (replace/augment Internet Identity flow); support onboarding/profile creation after first sign-in",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "Add mobile number storage to the backend user profile and registration flow so the profile can persist an optional phone number alongside the existing email field.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Add OTP-based sign-in (email/SMS/passwordless) via a third-party provider (e.g., Twilio/Sinch/MojoAuth) depending on enabled email/SMS capabilities",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "Create two onboarding/signup flows: (1) admin-only signup/profile for Aryan Abhishek (pre-seeded admin role with specified phone/email), (2) client signup/onboarding to select a service and view detailed service info + cost details",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "Implement admin-role gating and a client onboarding flow that works without OTP (using existing auth), including service selection and pricing/details capture for clients",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "Enforce the admin allowlist in backend profile registration so that a caller cannot self-register as Admin unless their provided email or mobile number matches the allowlisted admin details (email: quickbeeagency@gmail.com, phone: +919182768591). Ensure backend logic rejects unauthorized attempts to register/save an Admin profile.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Quick Bee AI Growth Engine",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

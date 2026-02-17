@@ -1,0 +1,93 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-do-not-implement-otp-sign-in-sms-email-passwordless-keep-internet-identity-as-the-only-authentication-method-and-ensure-the-sign-in-ui-communicates-that-authentication-continues-via-internet-identity-after-entering-an-email-phone-identifier",
+      "featureTitle": "Do not implement OTP sign-in (SMS/email/passwordless). Keep Internet Identity as the only authentication method, and ensure the sign-in UI communicates that authentication continues via Internet Identity after entering an email/phone identifier.",
+      "files": [
+        "frontend/src/pages/SignInPage.tsx",
+        "frontend/src/utils/signInIdentifier.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-24"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-an-admin-only-first-time-profile-setup-path-that-is-restricted-to-the-allowlisted-admin-identity-details-name-aryan-abhishek-phone-number-919182768591-and-email-quickbeeagency-gmail-com-if-the-stored-sign-in-identifier-matches-the-allowlisted-email-or-phone-prefill-the-profile-setup-form-with-these-values-and-force-the-role-to-admin-not-editable-if-it-does-not-match-prevent-selecting-admin-during-profile-setup",
+      "featureTitle": "Implement an admin-only first-time profile setup path that is restricted to the allowlisted admin identity details: name \"Aryan Abhishek\", phone number \"+919182768591\", and email \"quickbeeagency@gmail.com\". If the stored sign-in identifier matches the allowlisted email or phone, prefill the profile setup form with these values and force the role to Admin (not editable). If it does not match, prevent selecting Admin during profile setup.",
+      "files": [
+        "frontend/src/components/auth/ProfileSetupModal.tsx",
+        "frontend/src/utils/adminAllowlist.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-25"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-client-onboarding-flow-for-non-admin-users-after-internet-identity-sign-in-that-lets-the-client-browse-select-a-service-and-view-detailed-service-information-and-cost-details-then-submit-their-selection-as-a-persisted-client-service-request-linked-to-their-principal-and-agency",
+      "featureTitle": "Add a client onboarding flow (for non-admin users after Internet Identity sign-in) that lets the client browse/select a service and view detailed service information and cost details, then submit their selection as a persisted “client service request” linked to their principal and agency.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/nav/SidebarNav.tsx",
+        "frontend/src/hooks/useClientServiceRequests.ts",
+        "frontend/src/pages/ClientOnboardingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-27"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-provide-an-admin-facing-view-to-review-client-service-requests-within-the-app-accessible-only-to-admin-users-showing-the-client-identifier-principal-and-or-submitted-email-phone-if-present-selected-service-and-captured-cost-details",
+      "featureTitle": "Provide an admin-facing view to review client service requests within the app (accessible only to Admin users), showing the client identifier (principal and/or submitted email/phone if present), selected service, and captured cost details.",
+      "files": [
+        "frontend/src/components/admin/AdminOnlySection.tsx",
+        "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
+        "frontend/src/components/nav/SidebarNav.tsx",
+        "frontend/src/pages/SettingsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-28"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,2 +1,3 @@
-# quick-bee-ai-growth-engine
-Exported from Caffeine project: Quick Bee AI Growth Engine
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`
