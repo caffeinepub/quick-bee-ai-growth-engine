@@ -1,77 +1,107 @@
 {
   "kind": "build_request",
-  "title": "Integrate uploaded images and elevate UI elegance across the app",
+  "title": "Enable guest settings edits and seed expanded services catalog (including payment gateway offerings)",
   "projectName": "Quick Bee AI Growth Engine",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-37",
-      "text": "Add the 14 user-uploaded image files to the frontend as static assets and standardize how they are referenced in the React UI (no backend image serving). Uploaded files: f25340160.jpeg, f25339648.jpeg, f5418752.jpeg, f25481216.jpeg, f25737216.jpeg, AI automation.png, discover & strategy.jpeg, DM ICON.png, f25741568.jpeg, deployment icon.png, f25737984.jpeg, f25726208.jpeg, f25639680.jpeg, f25731584.jpeg.",
-      "target": "frontend",
+      "id": "REQ-73",
+      "text": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "use this images & make this more elegant"
+          "give access even for guest role to change settings"
         ]
       },
       "acceptanceCriteria": [
-        "All 14 uploaded images are present in the frontend static assets directory and load correctly in production build (no broken links in the UI).",
-        "No API/backend changes are required to display these images; they are loaded via static paths.",
-        "Images are referenced via a single, consistent mapping (e.g., a small constants module) rather than scattered hardcoded paths across many components."
+        "Opening the Settings page as a guest does not trap or show an authorization error.",
+        "Guest users can edit at least: Name, Email, Mobile Number, Agency, Monthly Goal, Subscription Plan, and save successfully.",
+        "After saving, reloading the app shows the saved Settings values for the same caller principal (including the anonymous principal).",
+        "Backend methods used by Settings (get/save profile) do not Runtime.trap for guest callers in the current public/no-sign-in mode."
       ]
     },
     {
-      "id": "REQ-38",
-      "text": "Incorporate the uploaded images into the UI in a cohesive way that improves perceived quality: use the icon-style images for platform affordances (Instagram/WhatsApp/Email/DM/Phone/Deployment/Automation), and use the illustration-style images as page hero/empty-state artwork where appropriate (e.g., Dashboard empty state, Planner introduction card, Outreach empty state cards).",
+      "id": "REQ-74",
+      "text": "Remove guest-only UI restrictions that prevent guests from managing services, so guest users can add and edit services from the Services management page.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "use this images & make this more elegant"
+          "give access even for guest role to change settings & add these services & payment gateways"
         ]
       },
       "acceptanceCriteria": [
-        "At least one primary page (Dashboard) and at least two secondary pages (e.g., Planner and Outreach) visually incorporate the uploaded images in a way that is responsive and does not overflow on mobile.",
-        "Platform-related visuals in Outreach use the uploaded platform/icon images in tabs and/or empty states while keeping existing labels in English and maintaining usability/contrast.",
-        "Existing generated assets currently used (e.g., quickbee-app-icon, empty-state-dashboard) remain functional; if replaced, replacements must be from the uploaded images and must not degrade layout or readability."
+        "As a guest, clicking “Add Service” on the Services page opens the service dialog and allows submitting a new service without being blocked by a “You must have a profile to manage services” error.",
+        "The Services list refreshes after a successful guest-created service and shows the new entry.",
+        "All user-facing text related to guest service management is in English."
       ]
     },
     {
-      "id": "REQ-39",
-      "text": "Refine the overall visual styling to be “more elegant” while keeping the existing minimal teal/black/white design direction: improve typography hierarchy, spacing, card/panel styling, and interactive states (hover/focus), and align visuals across AppShell/SidebarNav and key content cards (StatsCard, ChartBlock, ExportDataSection).",
-      "target": "frontend",
+      "id": "REQ-75",
+      "text": "Relax backend authorization checks for service creation and service updates so they work in public/no-sign-in mode (guests), without trapping.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "make this more elegant"
+          "give access even for guest role to change settings & add these services & payment gateways"
         ]
       },
       "acceptanceCriteria": [
-        "Sidebar header area, primary page headers, and key cards (stats/chart/export) show visibly improved spacing/typography consistency (clear hierarchy, consistent padding, balanced density).",
-        "Buttons/links have consistent hover/focus-visible states across pages, and focus styling is accessible (keyboard navigation clearly indicated).",
-        "Changes do not require editing any files under frontend/src/components/ui (Shadcn components remain unmodified); composition and styling overrides are applied from app components/pages/CSS tokens instead."
+        "Calling backend addService and updateServiceStatus as a guest does not Runtime.trap.",
+        "Services created/updated by a guest are returned by getAllServices and appear in the Services page UI.",
+        "No payment processing is implemented; services are only stored as catalog entries."
+      ]
+    },
+    {
+      "id": "REQ-76",
+      "text": "Add the provided services catalog entries into the app as Services records, grouped under the following serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "add these services & payment gateways Website & Funnel Services\n\nCustom Business Website Development\n\nHigh-Converting Landing Page Design\n\nSales Funnel Strategy & Build\n\nE-commerce Store Development\n\nWebsite Redesign & Optimization\n\nConversion Rate Optimization (CRO)\n\nSpeed Optimization & Technical Fixes\n\nWebsite Maintenance & Support\n\n🤖 AI & Automation Services\n\nWhatsApp Automation & Lead Response System\n\nAI Chatbot Development (Website + WhatsApp)\n\nCRM Setup & Workflow Automation\n\nAI Lead Qualification System\n\nAutomated Follow-up Sequences (Email/SMS/WhatsApp)\n\nAI Personalized Outreach System\n\nAppointment Booking Automation\n\nNo-Code Internal Business Automation\n\n📈 Marketing & Growth Systems\n\nSEO Setup & Local SEO Optimization\n\nGoogle Business Profile Optimization\n\nLinkedIn Lead Generation System\n\nInstagram Growth & Automation System\n\nCold Email Lead Generation System\n\nPaid Ads Funnel Setup (Meta + Google)\n\nRetargeting Funnel Setup\n\nReview & Reputation Management System\n\n💼 High-Ticket Business Solutions\n\nComplete AI Growth Engine Setup (All-in-One Package)\n\nSaaS Development for Agencies\n\nMulti-Channel Outreach System (3000-touch plan)\n\nRevenue Dashboard & Funnel Analytics Setup\n\nProposal Generator & Sales Automation System\n\nFull Business Digitization & Automation Package\n\n💎 Bonus High-Value Add-ons (Optional Upsells)\n\n• International Payment Gateway Setup (Stripe, PayPal)\n• Indian Payment Gateway Integration (Razorpay, UPI)\n• White-label CRM for Agencies\n• Subscription SaaS Monetization Setup\n• Client Portal Development\n• Funnel Audit & Strategy Consultation"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All listed items exist as individual Service records and are visible in the Services management list.",
+        "Each created Service uses the correct serviceType category (exact English category names as specified).",
+        "The two payment-gateway items are present as Service records: “International Payment Gateway Setup (Stripe, PayPal)” and “Indian Payment Gateway Integration (Razorpay, UPI)”.",
+        "No external payment gateway integration is added; these are catalog/service offering entries only."
       ]
     }
   ],
   "constraints": [
-    "Use English for any user-facing text.",
-    "Do not edit any files in frontend immutablePaths (including frontend/src/components/ui and the specified hooks/main entry points).",
-    "Do not add new backend services or external integrations; treat images as frontend static assets only.",
-    "Maintain existing routes and app shell structure (TanStack Router + AppShell)."
+    "Backend must remain a single-actor Motoko canister (all logic in backend/main.mo).",
+    "Only create/modify backend/migration.mo if a state migration is required by schema/state changes (do not add migration if not needed).",
+    "Do not edit any frontend files under frontend/src/components/ui or other paths listed as immutable in SYSTEM_CONTEXT.",
+    "Use English for all user-facing text."
   ],
   "nonGoals": [
-    "Do not implement new business features (CRM logic, exports logic changes, auth changes) as part of this UI polish task.",
-    "Do not introduce third-party UI frameworks beyond the existing stack (React, Tailwind, Shadcn, React Query).",
-    "Do not perform backend schema migrations or modify Motoko storage for this request."
+    "Implementing real payment collection or payment gateway API integrations (Stripe/PayPal/Razorpay/UPI).",
+    "Re-introducing authentication/sign-in gating or role-based restrictions.",
+    "Adding third-party authentication providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

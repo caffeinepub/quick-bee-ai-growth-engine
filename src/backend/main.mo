@@ -1,23 +1,25 @@
 import Map "mo:core/Map";
-import Text "mo:core/Text";
 import List "mo:core/List";
 import Time "mo:core/Time";
 import Array "mo:core/Array";
+import Text "mo:core/Text";
 import Principal "mo:core/Principal";
+import Runtime "mo:core/Runtime";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Runtime "mo:core/Runtime";
 
 actor {
-  // Set up the authentication system.
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
   include MixinStorage();
 
-  // Types
-  public type UserRole = AccessControl.UserRole;
+  public type UserRole = {
+    #admin;
+    #user;
+    #guest;
+  };
 
   public type Lead = {
     id : Text;
@@ -61,6 +63,12 @@ actor {
     active : Bool;
     revenue : Nat;
     salesCount : Nat;
+    serviceType : Text;
+    serviceSubType : Text;
+    cost : Nat;
+    niche : Text;
+    date : Text;
+    time : Text;
   };
 
   public type Project = {
@@ -105,41 +113,52 @@ actor {
   let projects = Map.empty<Text, Project>();
   let clientServiceRequests = Map.empty<Text, ClientServiceRequest>();
 
-  // Helper functions
-  func requirePermission(caller : Principal, role : UserRole) {
-    if (not (AccessControl.hasPermission(accessControlState, caller, role))) {
-      Runtime.trap(
-        switch (role) {
-          case (#admin) { "You must be an admin to perform this action. Please contact support if this is an error." };
-          case (#user) { "You must be logged in to perform this action. Please sign in or register to continue." };
-          case (#guest) { "You must be logged in to perform this action. Please sign in or register to continue." };
-        }
-      );
-    };
+  public type Settings = {
+    defaultSort : Text;
+    timeZone : Text;
+    onboardingCompleted : Bool;
+    pricingType : Text;
+    defaultValues : Text;
+    tutorialStage : Int;
   };
 
-  func getUserAgency(caller : Principal) : ?Text {
-    switch (userProfiles.get(caller)) {
-      case (?profile) { ?profile.agency };
-      case (null) { null };
-    };
+  var systemSettings : Settings = {
+    defaultSort = "agency";
+    timeZone = "America/New_York";
+    onboardingCompleted = false;
+    pricingType = "retainer";
+    defaultValues = "yes";
+    tutorialStage = 1;
   };
 
-  // User Management - Required profile functions
+  // Settings - No authorization required (guest access allowed)
+  public shared ({ caller }) func updateSettings(newSettings : Settings) : async () {
+    systemSettings := newSettings;
+  };
+
+  public query ({ caller }) func getSettings() : async Settings {
+    systemSettings;
+  };
+
+  // User Management
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view profiles");
+    };
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("You can only view your own profile. Please sign in to access your profile.");
+      Runtime.trap("Unauthorized: Can only view your own profile");
     };
     userProfiles.get(user);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
     userProfiles.add(caller, profile);
   };
 
@@ -153,11 +172,9 @@ actor {
     revenueGoal : Nat,
     subscriptionPlan : Text,
   ) : async () {
-    // Only allow users to register themselves, or admins to register others
-    if (caller.toText() != principal and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("You can only register your own account. Please contact an administrator for assistance.");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can register");
     };
-    
     let profile : UserProfile = {
       principal;
       name;
@@ -172,7 +189,7 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Client Service Requests - Public access allowed for clients to request services
+  // Client Service Requests - No authorization required (guest access allowed)
   public shared ({ caller }) func createClientServiceRequest(serviceId : Text, agency : Text, details : ?Text) : async () {
     let requestId = serviceId.concat("-").concat(caller.toText());
     let newRequest : ClientServiceRequest = {
@@ -188,27 +205,10 @@ actor {
   };
 
   public query ({ caller }) func getAllClientServiceRequests() : async [ClientServiceRequest] {
-    requirePermission(caller, #user);
     clientServiceRequests.values().toArray();
   };
 
   public query ({ caller }) func getClientServiceRequestsByAgency(agency : Text) : async [ClientServiceRequest] {
-    requirePermission(caller, #user);
-    
-    // Users can only see requests for their own agency, admins can see all
-    switch (getUserAgency(caller)) {
-      case (?userAgency) {
-        if (userAgency != agency and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("You can only view service requests for your own agency.");
-        };
-      };
-      case (null) {
-        if (not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("You must have a registered profile to view service requests.");
-        };
-      };
-    };
-    
     let requests = clientServiceRequests.values().toArray();
     requests.filter(
       func(request) {
@@ -218,39 +218,14 @@ actor {
   };
 
   public query ({ caller }) func getClientServiceRequest(requestId : Text) : async ?ClientServiceRequest {
-    requirePermission(caller, #user);
-    
-    switch (clientServiceRequests.get(requestId)) {
-      case (?request) {
-        // Users can view requests they created or requests for their agency
-        if (request.principal == caller.toText()) {
-          ?request;
-        } else {
-          switch (getUserAgency(caller)) {
-            case (?userAgency) {
-              if (userAgency == request.agency or AccessControl.isAdmin(accessControlState, caller)) {
-                ?request;
-              } else {
-                Runtime.trap("You can only view your own service requests or requests for your agency.");
-              };
-            };
-            case (null) {
-              if (AccessControl.isAdmin(accessControlState, caller)) {
-                ?request;
-              } else {
-                Runtime.trap("You can only view your own service requests.");
-              };
-            };
-          };
-        };
-      };
-      case (null) { null };
-    };
+    clientServiceRequests.get(requestId);
   };
 
-  // Lead Management
+  // Lead Management - User access required
   public shared ({ caller }) func addLead(request : { id : Text; agency : Text; name : Text; contact : Text; city : Text; niche : Text; status : Text; revenuePotential : Nat; owner : Text }) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add leads");
+    };
     let lead : Lead = {
       id = request.id;
       agency = request.agency;
@@ -267,35 +242,23 @@ actor {
   };
 
   public query ({ caller }) func getAllLeads() : async [Lead] {
-    requirePermission(caller, #user);
-    
-    // Users can only see leads for their own agency, admins can see all
-    switch (getUserAgency(caller)) {
-      case (?userAgency) {
-        if (AccessControl.isAdmin(accessControlState, caller)) {
-          leads.values().toArray();
-        } else {
-          let allLeads = leads.values().toArray();
-          allLeads.filter(func(lead : Lead) : Bool { lead.agency == userAgency });
-        };
-      };
-      case (null) {
-        if (AccessControl.isAdmin(accessControlState, caller)) {
-          leads.values().toArray();
-        } else {
-          Runtime.trap("You must have a registered profile to view leads.");
-        };
-      };
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view leads");
     };
+    leads.values().toArray();
   };
 
-  // Unrestricted export API for leads - public access for export functionality
   public query ({ caller }) func getLeadsForExport() : async [Lead] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can export leads");
+    };
     leads.values().toArray();
   };
 
   public shared ({ caller }) func updateLeadStatus(leadId : Text, status : Text) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update lead status");
+    };
     switch (leads.get(leadId)) {
       case (?lead) {
         let updatedLead : Lead = {
@@ -316,30 +279,41 @@ actor {
     };
   };
 
-  // Outreach Management
+  // Outreach Management - User access required
   public shared ({ caller }) func addOutreach(activity : OutreachActivity) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add outreach activities");
+    };
     outreachActivities.add(activity.leadId, activity);
   };
 
   public query ({ caller }) func getAllOutreachActivities() : async [OutreachActivity] {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view outreach activities");
+    };
     outreachActivities.values().toArray();
   };
 
-  // Unrestricted export API for outreach activities - public access for export functionality
   public query ({ caller }) func getOutreachActivitiesForExport() : async [OutreachActivity] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can export outreach activities");
+    };
     outreachActivities.values().toArray();
   };
 
-  public query ({ caller }) func getUserDeals(_agency : Text) : async [Deal] {
-    requirePermission(caller, #user);
-    deals.values().toArray();
+  // Deal Management - User access required
+  public query ({ caller }) func getUserDeals(agency : Text) : async [Deal] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view deals");
+    };
+    let allDeals = deals.values().toArray();
+    allDeals.filter(func(deal : Deal) : Bool { deal.agency == agency });
   };
 
-  // Deal Management
   public shared ({ caller }) func updateDealStatus(dealId : Text, status : Text) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update deal status");
+    };
     switch (deals.get(dealId)) {
       case (?deal) {
         let updatedDeal : Deal = {
@@ -357,106 +331,32 @@ actor {
     };
   };
 
-  // Unrestricted export API for deals - public access for export functionality
   public query ({ caller }) func getDealsForExport() : async [Deal] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can export deals");
+    };
     deals.values().toArray();
   };
 
-  // Project Management
+  // Project Management - User access required
   public shared ({ caller }) func addProject(project : Project) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add projects");
+    };
     projects.add(project.id, project);
   };
 
-  // Unrestricted export API for projects - public access for export functionality
   public query ({ caller }) func getProjectsForExport() : async [Project] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can export projects");
+    };
     projects.values().toArray();
   };
 
-  // Service Management
-  public shared ({ caller }) func addService(service : Service) : async () {
-    requirePermission(caller, #user);
-    services.add(service.id, service);
-  };
-
-  public shared ({ caller }) func updateServiceStatus(serviceId : Text, active : Bool) : async () {
-    requirePermission(caller, #user);
-    switch (services.get(serviceId)) {
-      case (?service) {
-        let updatedService : Service = {
-          id = service.id;
-          agency = service.agency;
-          name = service.name;
-          price = service.price;
-          deliveryTime = service.deliveryTime;
-          active;
-          revenue = service.revenue;
-          salesCount = service.salesCount;
-        };
-        services.add(serviceId, updatedService);
-      };
-      case (null) {};
-    };
-  };
-
-  // Unrestricted export API for services - public access for export functionality
-  public query ({ caller }) func getServicesForExport() : async [Service] {
-    services.values().toArray();
-  };
-
-  // Analytics
-  public query ({ caller }) func getAgencyAnalytics(agency : Text) : async ([Lead], [Deal], [OutreachActivity], [Service], [Project]) {
-    requirePermission(caller, #user);
-    
-    // Users can only view analytics for their own agency, admins can view all
-    switch (getUserAgency(caller)) {
-      case (?userAgency) {
-        if (userAgency != agency and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("You can only view analytics for your own agency.");
-        };
-      };
-      case (null) {
-        if (not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("You must have a registered profile to view analytics.");
-        };
-      };
-    };
-    
-    let leadList = leads.values().toArray().filter(
-      func(lead : Lead) : Bool { lead.agency == agency }
-    );
-
-    let dealList = deals.values().toArray().filter(
-      func(deal : Deal) : Bool { deal.agency == agency }
-    );
-
-    let outreachList = outreachActivities.values().toArray();
-
-    let serviceList = services.values().toArray().filter(
-      func(service : Service) : Bool { service.agency == agency }
-    );
-
-    let projectList = projects.values().toArray().filter(
-      func(project : Project) : Bool { project.agency == agency }
-    );
-
-    (leadList, dealList, outreachList, serviceList, projectList);
-  };
-
-  // Import Leads
-  public shared ({ caller }) func importLeads(leadList : [Lead], _agency : Text) : async () {
-    requirePermission(caller, #user);
-    let leadsToAdd = List.fromArray<Lead>(leadList);
-    leadsToAdd.forEach(func(lead) { leads.add(lead.id, lead) });
-  };
-
-  // Public service catalog - allows guests to browse available services
-  public query ({ caller }) func getAllServices() : async [Service] {
-    services.values().toArray();
-  };
-
   public shared ({ caller }) func completeProject(projectId : Text) : async () {
-    requirePermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can complete projects");
+    };
     switch (projects.get(projectId)) {
       case (?project) {
         let updatedProject : Project = {
@@ -475,5 +375,72 @@ actor {
       };
       case (null) {};
     };
+  };
+
+  // Service Management - No authorization required (guest access allowed)
+  public shared ({ caller }) func addService(service : Service) : async () {
+    services.add(service.id, service);
+  };
+
+  public shared ({ caller }) func updateServiceStatus(serviceId : Text, active : Bool) : async () {
+    switch (services.get(serviceId)) {
+      case (?service) {
+        let updatedService : Service = {
+          id = service.id;
+          agency = service.agency;
+          name = service.name;
+          price = service.price;
+          deliveryTime = service.deliveryTime;
+          active;
+          revenue = service.revenue;
+          salesCount = service.salesCount;
+          serviceType = service.serviceType;
+          serviceSubType = service.serviceSubType;
+          cost = service.cost;
+          niche = service.niche;
+          date = service.date;
+          time = service.time;
+        };
+        services.add(serviceId, updatedService);
+      };
+      case (null) {};
+    };
+  };
+
+  public query ({ caller }) func getServicesForExport() : async [Service] {
+    services.values().toArray();
+  };
+
+  public query ({ caller }) func getAllServices() : async [Service] {
+    services.values().toArray();
+  };
+
+  public query ({ caller }) func getServiceById(serviceId : Text) : async ?Service {
+    services.get(serviceId);
+  };
+
+  // Analytics - User access required
+  public query ({ caller }) func getAgencyAnalytics(agency : Text) : async ([Lead], [Deal], [OutreachActivity], [Service], [Project]) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view analytics");
+    };
+    let leadList = leads.values().toArray();
+    let dealList = deals.values().toArray();
+    let outreachList = outreachActivities.values().toArray();
+    let serviceList = services.values().toArray();
+    let projectList = projects.values().toArray();
+
+    (leadList, dealList, outreachList, serviceList, projectList);
+  };
+
+  // Admin Functions - Admin access required
+  public shared ({ caller }) func importLeads(leadList : [Lead], agency : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can import leads");
+    };
+    let leadsToAdd = List.fromArray<Lead>(leadList);
+    leadsToAdd.forEach(func(lead) { 
+      leads.add(lead.id, lead);
+    });
   };
 };

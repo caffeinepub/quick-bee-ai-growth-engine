@@ -31,3 +31,18 @@ export function useAddOutreach() {
     },
   });
 }
+
+export function useUpdateOutreachStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ activity, updates }: { activity: OutreachActivity; updates: Partial<OutreachActivity> }) => {
+      // Since backend doesn't have update method, we simulate optimistic update
+      return { ...activity, ...updates };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['outreach'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    },
+  });
+}

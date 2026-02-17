@@ -5,12 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Upload } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AddLeadDialog } from '../components/leads/AddLeadDialog';
+import { ImportLeadsCsvDialog } from '../components/leads/ImportLeadsCsvDialog';
+import { LeadDetailDialog } from '../components/leads/LeadDetailDialog';
+import type { Lead } from '../backend';
 
 export default function LeadsPage() {
   const { data: leads = [], isLoading } = useGetAllLeads();
   const [searchTerm, setSearchTerm] = useState('');
   const [nicheFilter, setNicheFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -21,6 +29,11 @@ export default function LeadsPage() {
   });
 
   const uniqueNiches = Array.from(new Set(leads.map(l => l.niche)));
+
+  const handleLeadClick = (lead: Lead) => {
+    setSelectedLead(lead);
+    setDetailDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -41,11 +54,11 @@ export default function LeadsPage() {
           <p className="text-muted-foreground">Manage your lead pipeline</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
             <Upload className="mr-2 h-4 w-4" />
             Import CSV
           </Button>
-          <Button>
+          <Button onClick={() => setAddDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add Lead
           </Button>
@@ -99,10 +112,14 @@ export default function LeadsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredLeads.map(lead => (
-            <LeadCard key={lead.id} lead={lead} />
+            <LeadCard key={lead.id} lead={lead} onClick={() => handleLeadClick(lead)} />
           ))}
         </div>
       )}
+
+      <AddLeadDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
+      <ImportLeadsCsvDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
+      <LeadDetailDialog lead={selectedLead} open={detailDialogOpen} onOpenChange={setDetailDialogOpen} />
     </div>
   );
 }

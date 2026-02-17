@@ -1,10 +1,13 @@
 import { useGetAgencyAnalytics } from '../hooks/useAgencyAnalytics';
+import { StatsCard } from '../components/common/StatsCard';
 import { ChartBlock } from '../components/common/ChartBlock';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { DollarSign, Users, TrendingUp, Target } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+const COLORS = ['#0ea5e9', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
 export default function AnalyticsPage() {
-  const { data: analytics, isLoading } = useGetAgencyAnalytics();
+  const { data: analytics, isLoading, error } = useGetAgencyAnalytics();
 
   if (isLoading) {
     return (
@@ -17,96 +20,150 @@ export default function AnalyticsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="page-header">
+          <h1 className="page-title">Analytics</h1>
+          <p className="page-description">Advanced business insights</p>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Failed to load analytics data. Please try again.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return null;
+  }
+
+  const { leads, deals, outreach, services } = analytics;
+
+  // Calculate metrics
+  const totalRevenue = deals.filter(d => d.status === 'won').reduce((sum, d) => sum + Number(d.value), 0);
+  const totalDeals = deals.length;
+  const wonDeals = deals.filter(d => d.status === 'won').length;
+  const closeRate = totalDeals > 0 ? Math.round((wonDeals / totalDeals) * 100) : 0;
+  const avgDealValue = wonDeals > 0 ? Math.round(totalRevenue / wonDeals) : 0;
+
   // Revenue by service
-  const revenueByService = analytics?.services.map(s => ({
-    name: s.name,
-    revenue: Number(s.revenue),
-  })) || [];
+  const revenueByService = services.map(service => ({
+    name: service.name,
+    revenue: Number(service.revenue),
+  })).sort((a, b) => b.revenue - a.revenue);
 
   // Revenue by niche
-  const nicheRevenue = new Map<string, number>();
-  analytics?.leads.forEach(lead => {
-    const leadDeals = analytics.deals.filter(d => d.leadId === lead.id && d.status === 'won');
-    const revenue = leadDeals.reduce((sum, d) => sum + Number(d.value), 0);
-    nicheRevenue.set(lead.niche, (nicheRevenue.get(lead.niche) || 0) + revenue);
+  const revenueByNiche: Record<string, number> = {};
+  deals.filter(d => d.status === 'won').forEach(deal => {
+    const lead = leads.find(l => l.id === deal.leadId);
+    if (lead) {
+      revenueByNiche[lead.niche] = (revenueByNiche[lead.niche] || 0) + Number(deal.value);
+    }
   });
-  const revenueByNiche = Array.from(nicheRevenue.entries()).map(([name, revenue]) => ({ name, revenue }));
+
+  const nicheData = Object.entries(revenueByNiche).map(([name, revenue]) => ({
+    name,
+    revenue,
+  })).sort((a, b) => b.revenue - a.revenue);
+
+  const bestSellingService = revenueByService[0];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground">Deep dive into your performance metrics</p>
+    <div className="space-y-8">
+      <div className="page-header">
+        <h1 className="page-title">Analytics</h1>
+        <p className="page-description">Advanced business insights</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Key Metrics */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="Total Revenue"
+          value={`$${totalRevenue.toLocaleString()}`}
+          icon={DollarSign}
+          subtitle="From won deals"
+        />
+        <StatsCard
+          title="Close Rate"
+          value={`${closeRate}%`}
+          icon={Target}
+          subtitle={`${wonDeals} of ${totalDeals} deals won`}
+        />
+        <StatsCard
+          title="Avg Deal Value"
+          value={`$${avgDealValue.toLocaleString()}`}
+          icon={TrendingUp}
+          subtitle="Per won deal"
+        />
+        <StatsCard
+          title="Total Leads"
+          value={leads.length.toString()}
+          icon={Users}
+          subtitle="In pipeline"
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="grid gap-6 md:grid-cols-2">
         <ChartBlock title="Revenue by Service">
-          {revenueByService.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No service revenue data yet</p>
-          ) : (
+          {revenueByService.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={revenueByService}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="revenue" fill="hsl(var(--chart-1))" />
+                <Bar dataKey="revenue" fill="oklch(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              No service data available
+            </div>
           )}
         </ChartBlock>
 
         <ChartBlock title="Revenue by Niche">
-          {revenueByNiche.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No niche revenue data yet</p>
-          ) : (
+          {nicheData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={revenueByNiche}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={nicheData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={(entry) => entry.name}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="revenue"
+                >
+                  {nicheData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
                 <Tooltip />
-                <Bar dataKey="revenue" fill="hsl(var(--chart-2))" />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+              No niche data available
+            </div>
           )}
         </ChartBlock>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">Best Selling Service</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              {analytics?.services.sort((a, b) => Number(b.salesCount) - Number(a.salesCount))[0]?.name || 'N/A'}
+      {/* Best Selling Service */}
+      {bestSellingService && (
+        <ChartBlock title="Best Selling Service">
+          <div className="p-6 text-center">
+            <h3 className="text-2xl font-bold mb-2">{bestSellingService.name}</h3>
+            <p className="text-muted-foreground">
+              Generated ${bestSellingService.revenue.toLocaleString()} in revenue
             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">Average Deal Value</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              ${analytics?.deals.length ? Math.round(analytics.deals.reduce((sum, d) => sum + Number(d.value), 0) / analytics.deals.length).toLocaleString() : 0}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">Close Rate</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              {analytics?.deals.length ? Math.round((analytics.deals.filter(d => d.status === 'won').length / analytics.deals.length) * 100) : 0}%
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </ChartBlock>
+      )}
     </div>
   );
 }

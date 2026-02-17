@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-the-14-user-uploaded-image-files-to-the-frontend-as-static-assets-and-standardize-how-they-are-referenced-in-the-react-ui-no-backend-image-serving-uploaded-files-f25340160-jpeg-f25339648-jpeg-f5418752-jpeg-f25481216-jpeg-f25737216-jpeg-ai-automation-png-discover-strategy-jpeg-dm-icon-png-f25741568-jpeg-deployment-icon-png-f25737984-jpeg-f25726208-jpeg-f25639680-jpeg-f25731584-jpeg",
-      "featureTitle": "Add the 14 user-uploaded image files to the frontend as static assets and standardize how they are referenced in the React UI (no backend image serving). Uploaded files: f25340160.jpeg, f25339648.jpeg, f5418752.jpeg, f25481216.jpeg, f25737216.jpeg, AI automation.png, discover & strategy.jpeg, DM ICON.png, f25741568.jpeg, deployment icon.png, f25737984.jpeg, f25726208.jpeg, f25639680.jpeg, f25731584.jpeg.",
+      "featureId": "feature-allow-guest-no-sign-in-no-profile-users-to-view-and-update-settings-without-encountering-authorization-traps-and-persist-those-updates-reliably",
+      "featureTitle": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably.",
       "files": [
-        "frontend/src/constants/uploadedImages.ts"
+        "frontend/src/hooks/useCurrentUserProfile.ts",
+        "frontend/src/pages/SettingsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,18 +18,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-37"
+        "REQ-73"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-incorporate-the-uploaded-images-into-the-ui-in-a-cohesive-way-that-improves-perceived-quality-use-the-icon-style-images-for-platform-affordances-instagram-whatsapp-email-dm-phone-deployment-automation-and-use-the-illustration-style-images-as-page-hero-empty-state-artwork-where-appropriate-e-g-dashboard-empty-state-planner-introduction-card-outreach-empty-state-cards",
-      "featureTitle": "Incorporate the uploaded images into the UI in a cohesive way that improves perceived quality: use the icon-style images for platform affordances (Instagram/WhatsApp/Email/DM/Phone/Deployment/Automation), and use the illustration-style images as page hero/empty-state artwork where appropriate (e.g., Dashboard empty state, Planner introduction card, Outreach empty state cards).",
+      "featureId": "feature-remove-guest-only-ui-restrictions-that-prevent-guests-from-managing-services-so-guest-users-can-add-and-edit-services-from-the-services-management-page",
+      "featureTitle": "Remove guest-only UI restrictions that prevent guests from managing services, so guest users can add and edit services from the Services management page.",
       "files": [
-        "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/pages/DashboardPage.tsx",
-        "frontend/src/pages/OutreachPage.tsx",
-        "frontend/src/pages/PlannerPage.tsx"
+        "frontend/src/components/services/ServiceDialog.tsx",
+        "frontend/src/hooks/useServices.ts",
+        "frontend/src/pages/ServicesPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -40,20 +40,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-38"
+        "REQ-74"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-refine-the-overall-visual-styling-to-be-more-elegant-while-keeping-the-existing-minimal-teal-black-white-design-direction-improve-typography-hierarchy-spacing-card-panel-styling-and-interactive-states-hover-focus-and-align-visuals-across-appshell-sidebarnav-and-key-content-cards-statscard-chartblock-exportdatasection",
-      "featureTitle": "Refine the overall visual styling to be “more elegant” while keeping the existing minimal teal/black/white design direction: improve typography hierarchy, spacing, card/panel styling, and interactive states (hover/focus), and align visuals across AppShell/SidebarNav and key content cards (StatsCard, ChartBlock, ExportDataSection).",
+      "featureId": "feature-add-the-provided-services-catalog-entries-into-the-app-as-services-records-grouped-under-the-following-servicetype-categories-website-funnel-services-ai-automation-services-marketing-growth-systems-high-ticket-business-solutions-and-bonus-high-value-add-ons-optional-upsells",
+      "featureTitle": "Add the provided services catalog entries into the app as Services records, grouped under the following serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”.",
       "files": [
-        "frontend/src/components/common/ChartBlock.tsx",
-        "frontend/src/components/common/StatsCard.tsx",
-        "frontend/src/components/export/ExportDataSection.tsx",
-        "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/components/nav/SidebarNav.tsx",
-        "frontend/src/index.css"
+        "frontend/src/hooks/useServices.ts",
+        "frontend/src/pages/ServicesPage.tsx",
+        "frontend/src/utils/services/seedCatalog.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -65,7 +62,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-39"
+        "REQ-76"
       ],
       "confidence": "high"
     }

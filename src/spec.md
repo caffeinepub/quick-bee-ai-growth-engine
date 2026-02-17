@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Integrate the 14 uploaded images as frontend static assets and use them to improve visual cohesion and overall UI elegance across key pages while preserving the existing minimal teal/black/white direction.
+**Goal:** Let guest (no-sign-in) users edit and persist Settings and manage Services, and seed the Services catalog with the provided expanded offerings (including payment gateway service entries).
 
 **Planned changes:**
-- Add the 14 uploaded image files to the frontend static assets directory and ensure they load via static paths in production (no backend/API image serving).
-- Standardize image usage through a single shared mapping/constant module so components don’t hardcode asset paths.
-- Incorporate uploaded icon-style assets into platform affordances (e.g., Outreach tabs/empty states) and use illustration-style assets as hero/empty-state visuals on at least Dashboard plus at least two secondary pages (e.g., Planner and Outreach), ensuring responsive behavior on mobile.
-- Refine UI styling for a more elegant feel by improving typography hierarchy, spacing, card/panel styling, and consistent hover/focus-visible states across AppShell/SidebarNav and key cards (StatsCard, ChartBlock, ExportDataSection), without modifying Shadcn UI component source files.
+- Update Settings flow to allow guest users to view/edit/save profile fields (Name, Email, Mobile Number, Agency, Monthly Goal, Subscription Plan) without authorization errors and persist them for the anonymous principal.
+- Remove guest-only frontend restrictions on the Services management page so guests can add/edit services and see updates reflected in the list (English UI text only).
+- Relax backend authorization checks for Settings (get/save profile) and Services (addService/updateServiceStatus) so guest calls don’t trap in public/no-sign-in mode.
+- Seed the Services catalog with all provided service entries, each as an individual Service record, grouped under the specified English serviceType categories (including the two payment-gateway offerings as catalog entries only).
 
-**User-visible outcome:** The app displays the uploaded visuals across Dashboard/Planner/Outreach with consistent, responsive artwork and icons, and the overall interface feels more polished with improved spacing, typography, and accessible interactive states.
+**User-visible outcome:** Guests can open Settings and save their details, reload and see the saved values, and can add/edit Services; the Services page shows the full seeded catalog including payment gateway setup offerings (as non-processing service listings).

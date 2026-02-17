@@ -101,6 +101,14 @@ export interface Lead {
     agency: string;
     niche: string;
 }
+export interface Settings {
+    defaultSort: string;
+    pricingType: string;
+    defaultValues: string;
+    onboardingCompleted: boolean;
+    tutorialStage: bigint;
+    timeZone: string;
+}
 export interface ClientServiceRequest {
     id: string;
     principal: string;
@@ -123,11 +131,17 @@ export interface _CaffeineStorageRefillInformation {
 }
 export interface Service {
     id: string;
+    serviceType: string;
     active: boolean;
     revenue: bigint;
+    cost: bigint;
+    date: string;
     name: string;
+    time: string;
     agency: string;
     deliveryTime: string;
+    serviceSubType: string;
+    niche: string;
     salesCount: bigint;
     price: bigint;
 }
@@ -214,18 +228,21 @@ export interface backendInterface {
     getLeadsForExport(): Promise<Array<Lead>>;
     getOutreachActivitiesForExport(): Promise<Array<OutreachActivity>>;
     getProjectsForExport(): Promise<Array<Project>>;
+    getServiceById(serviceId: string): Promise<Service | null>;
     getServicesForExport(): Promise<Array<Service>>;
-    getUserDeals(_agency: string): Promise<Array<Deal>>;
+    getSettings(): Promise<Settings>;
+    getUserDeals(agency: string): Promise<Array<Deal>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    importLeads(leadList: Array<Lead>, _agency: string): Promise<void>;
+    importLeads(leadList: Array<Lead>, agency: string): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     registerUser(principal: string, name: string, email: string, mobileNumber: string | null, agency: string, role: string, revenueGoal: bigint, subscriptionPlan: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     updateDealStatus(dealId: string, status: string): Promise<void>;
     updateLeadStatus(leadId: string, status: string): Promise<void>;
     updateServiceStatus(serviceId: string, active: boolean): Promise<void>;
+    updateSettings(newSettings: Settings): Promise<void>;
 }
-import type { ClientServiceRequest as _ClientServiceRequest, Deal as _Deal, ExternalBlob as _ExternalBlob, Project as _Project, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ClientServiceRequest as _ClientServiceRequest, Deal as _Deal, ExternalBlob as _ExternalBlob, Project as _Project, Service as _Service, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -628,6 +645,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n19(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getServiceById(arg0: string): Promise<Service | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getServiceById(arg0);
+                return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getServiceById(arg0);
+            return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getServicesForExport(): Promise<Array<Service>> {
         if (this.processError) {
             try {
@@ -639,6 +670,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getServicesForExport();
+            return result;
+        }
+    }
+    async getSettings(): Promise<Settings> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getSettings();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getSettings();
             return result;
         }
     }
@@ -715,14 +760,14 @@ export class Backend implements backendInterface {
     async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n34(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n35(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n34(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n35(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
@@ -768,6 +813,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateSettings(arg0: Settings): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateSettings(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateSettings(arg0);
+            return result;
+        }
+    }
 }
 function from_candid_ClientServiceRequest_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ClientServiceRequest): ClientServiceRequest {
     return from_candid_record_n26(_uploadFile, _downloadFile, value);
@@ -801,6 +860,9 @@ function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 }
 function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ClientServiceRequest]): ClientServiceRequest | null {
     return value.length === 0 ? null : from_candid_ClientServiceRequest_n25(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Service]): Service | null {
+    return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
     return value.length === 0 ? null : value[0];
@@ -967,8 +1029,8 @@ async function to_candid_ExternalBlob_n11(_uploadFile: (file: ExternalBlob) => P
 async function to_candid_Project_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Project): Promise<_Project> {
     return await to_candid_record_n9(_uploadFile, _downloadFile, value);
 }
-function to_candid_UserProfile_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
-    return to_candid_record_n35(_uploadFile, _downloadFile, value);
+function to_candid_UserProfile_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
+    return to_candid_record_n36(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserRole_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n13(_uploadFile, _downloadFile, value);
@@ -991,7 +1053,7 @@ function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
     };
 }
-function to_candid_record_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function to_candid_record_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     revenueGoal: bigint;
     principal: string;
     name: string;

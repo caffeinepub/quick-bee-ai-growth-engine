@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
-  "summary": "Remove authentication/sign-in gating so users can access the app directly without any sign-in screen; adjust access control/privacy expectations accordingly for a public/no-auth experience.",
+  "projectStateVersion": 27,
+  "summary": "Remove authentication/sign-in gating so users can access the app directly without any sign-in screen; additionally remove Admin vs Client role distinctions and role-based onboarding so the app is a single shared experience for everyone.",
   "architectural_notes": [
     "Bubble app with SaaS multi-tenant privacy rules: users restricted to their agency/leads; role-based access (Admin vs Team).",
     "Core data types to implement in Bubble: User, Lead, Outreach Activity, Deal, Daily Task (plus later Service/Project for Agency OS upgrades).",
@@ -15,9 +15,11 @@
     "If authentication is removed, the app becomes effectively public/no-auth; revisit multi-tenant privacy rules and data ownership since user/agency scoping cannot be enforced without a logged-in identity."
   ],
   "known_issues": [
-    "OTP sign-in cannot be completed until an email sending method is enabled and/or an SMS provider/plugin is configured for the Bubble app."
+    "OTP sign-in cannot be completed until an email sending method is enabled and/or an SMS provider/plugin is configured for the Bubble app.",
+    "Uploaded frontend static assets/images are not currently visible in the app UI; investigate asset bundling/paths/references and ensure they render in production.",
+    "Static images are still not visible in the app UI (user reports issue persists after build)."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-authentication-using-internet-identity-and-create-an-app-level-user-profile-record-on-first-sign-in-capturing-name-email-optional-role-admin-team-agency-name-monthly-revenue-goal-subscription-plan-total-revenue",
@@ -274,6 +276,254 @@
         "REQ-39"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-the-visibility-of-the-14-uploaded-static-image-assets-across-the-app-by-ensuring-the-assets-are-correctly-present-in-the-frontend-build-output-and-that-the-current-ui-references-render-successfully-in-production-planner-dashboard-empty-state-outreach-empty-states-sidebar-appshell-logo",
+      "title": "Fix the visibility of the 14 uploaded static image assets across the app by ensuring the assets are correctly present in the frontend build output and that the current UI references render successfully in production (Planner, Dashboard empty state, Outreach empty states, Sidebar/AppShell logo).",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-leads-page-actions-functional-by-implementing-working-ui-flows-for-add-lead-import-csv-and-lead-card-click-through-to-a-lead-detail-view-or-modal-using-existing-backend-apis-and-hooks-and-ensure-state-updates-reflect-immediately-in-the-ui",
+      "title": "Make Leads page actions functional by implementing working UI flows for: Add Lead, Import CSV, and Lead card click-through (to a lead detail view or modal) using existing backend APIs and hooks, and ensure state updates reflect immediately in the UI.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-outreach-page-functional-by-implementing-end-to-end-outreach-activity-creation-and-updates-allow-selecting-a-lead-generating-entering-a-message-per-platform-saving-the-activity-and-making-mark-sent-mark-replied-buttons-persist-changes-and-refresh-analytics-and-lists",
+      "title": "Make Outreach page functional by implementing end-to-end outreach activity creation and updates: allow selecting a lead, generating/entering a message per platform, saving the activity, and making “Mark Sent” / “Mark Replied” buttons persist changes and refresh analytics and lists.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-services-page-functional-by-wiring-add-service-edit-service-and-the-active-inactive-toggle-to-persist-changes-via-backend-apis-and-ensure-the-list-refreshes-correctly-after-mutations",
+      "title": "Make Services page functional by wiring “Add Service”, “Edit Service”, and the Active/Inactive toggle to persist changes via backend APIs, and ensure the list refreshes correctly after mutations.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-deals-page-functional-by-implementing-interactive-deal-management-at-minimum-create-edit-deal-update-status-across-open-proposal-sent-won-lost-and-ensure-revenue-related-analytics-update-when-deals-are-marked-won",
+      "title": "Make Deals page functional by implementing interactive deal management (at minimum: create/edit deal, update status across Open/Proposal Sent/Won/Lost) and ensure revenue-related analytics update when deals are marked Won.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-projects-page-functional-by-implementing-a-projects-list-that-loads-persisted-projects-a-new-project-creation-flow-and-the-ability-to-view-and-edit-a-project-milestones-notes-completion-status",
+      "title": "Make Projects page functional by implementing a projects list that loads persisted projects, a “New Project” creation flow, and the ability to view and edit a project (milestones, notes, completion, status).",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-in-app-image-and-file-uploading-support-so-users-can-upload-attachments-images-and-common-documents-and-attach-them-to-relevant-records-at-minimum-projects-optionally-leads-and-then-view-download-those-attachments-from-the-ui",
+      "title": "Add in-app image and file uploading support so users can upload attachments (images and common documents) and attach them to relevant records (at minimum: Projects; optionally Leads), and then view/download those attachments from the UI.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-planner-page-functional-by-wiring-start-3000-outreach-plan-to-create-and-persist-the-30-daily-tasks-targets-and-render-progress-completion-and-streak-based-on-stored-data",
+      "title": "Make Planner page functional by wiring “Start 3000 Outreach Plan” to create and persist the 30 daily tasks/targets and render progress, completion %, and streak based on stored data.",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-analytics-and-settings-pages-function-reliably-under-the-current-app-access-mode-by-preventing-authorization-traps-from-breaking-page-loads-and-ensure-each-page-displays-meaningful-states-when-the-caller-has-no-profile-agency-context",
+      "title": "Make Analytics and Settings pages function reliably under the current app access mode by preventing authorization traps from breaking page loads, and ensure each page displays meaningful states when the caller has no profile/agency context.",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-frontend-static-asset-bundling-serving-so-all-14-uploaded-images-render-in-production-wherever-referenced-including-but-not-limited-to-planner-dashboard-empty-states-outreach-empty-states-and-sidebar-appshell-logo-areas",
+      "title": "Fix frontend static asset bundling/serving so all 14 uploaded images render in production wherever referenced, including (but not limited to) Planner, Dashboard empty states, Outreach empty states, and Sidebar/AppShell logo areas.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-admin-vs-client-role-based-ux-so-the-app-is-a-single-shared-experience-for-everyone-eliminate-admin-only-sections-client-only-onboarding-navigation-and-any-role-gated-routing-ui",
+      "title": "Remove Admin vs Client role-based UX so the app is a single shared experience for everyone: eliminate admin-only sections, client-only onboarding navigation, and any role-gated routing/UI.",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-client-onboarding-flow-from-the-main-app-experience-route-and-navigation-so-there-is-no-separate-client-path-keep-core-routes-focused-on-the-main-modules-dashboard-leads-outreach-services-deals-projects-planner-analytics-settings",
+      "title": "Remove the Client Onboarding flow from the main app experience (route and navigation) so there is no separate client path; keep core routes focused on the main modules (Dashboard, Leads, Outreach, Services, Deals, Projects, Planner, Analytics, Settings).",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-uploaded-image-file-qb-logo-png-as-a-bundled-frontend-static-asset-and-expose-a-stable-url-for-it-with-correct-url-encoding-if-needed",
+      "title": "Add the uploaded image file \"qb logo.png\" as a bundled frontend static asset and expose a stable URL for it (with correct URL encoding if needed).",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-app-logo-image-used-in-the-sidebar-and-mobile-header-with-the-uploaded-qb-logo-png-so-the-new-logo-renders-consistently-across-the-appshell-and-sidebarnav",
+      "title": "Replace the current app logo image used in the sidebar and mobile header with the uploaded \"qb logo.png\" so the new logo renders consistently across the AppShell and SidebarNav.",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-browser-tab-icon-favicon-to-use-the-uploaded-qb-logo-png-or-a-derived-favicon-compatible-variant-so-the-app-branding-matches-the-new-logo",
+      "title": "Update the browser tab icon (favicon) to use the uploaded \"qb logo.png\" (or a derived favicon-compatible variant) so the app branding matches the new logo.",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-any-remaining-role-based-or-identity-based-ui-gating-so-every-user-can-navigate-to-and-use-every-main-section-of-the-app-dashboard-leads-outreach-services-deals-projects-planner-analytics-settings-without-being-blocked-redirected-or-shown-a-blocked-state",
+      "title": "Remove any remaining role-based or identity-based UI gating so every user can navigate to and use every main section of the app (Dashboard, Leads, Outreach, Services, Deals, Projects, Planner, Analytics, Settings) without being blocked, redirected, or shown a “blocked” state.",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-settings-page-behavior-to-work-in-public-no-sign-in-mode-if-the-caller-profile-cannot-be-loaded-missing-identity-or-missing-profile-record-render-a-non-blocking-guest-friendly-state-e-g-show-guest-and-not-set-values-and-do-not-require-completing-profile-setup-to-access-settings-content",
+      "title": "Update Settings page behavior to work in public/no-sign-in mode: if the caller profile cannot be loaded (missing identity or missing profile record), render a non-blocking guest-friendly state (e.g., show 'Guest' and 'Not set' values) and do not require completing profile setup to access Settings content.",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-admin-allowlist-admin-locked-profile-setup-behaviors-from-the-active-user-experience-so-the-app-does-not-treat-any-user-differently-based-on-role-do-not-force-lock-or-hide-options-based-on-allowlisted-identifiers",
+      "title": "Remove admin allowlist / admin-locked profile setup behaviors from the active user experience so the app does not treat any user differently based on role; do not force, lock, or hide options based on allowlisted identifiers.",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-serving-bundling-of-the-uploaded-static-image-assets-so-they-render-reliably-in-production-wherever-referenced-sidebar-appshell-logo-dashboard-empty-state-planner-cards-outreach-empty-states-and-favicon",
+      "title": "Fix serving/bundling of the uploaded static image assets so they render reliably in production wherever referenced (Sidebar/AppShell logo, Dashboard empty state, Planner cards, Outreach empty states, and favicon).",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-uploaded-image-url-resolution-robust-to-non-root-deployments-by-avoiding-hardcoded-absolute-paths-leading-for-uploaded-images-and-favicon-while-keeping-correct-url-encoding-for-filenames-with-spaces-and-special-characters",
+      "title": "Make uploaded image URL resolution robust to non-root deployments by avoiding hardcoded absolute paths (leading \"/\") for uploaded images and favicon, while keeping correct URL encoding for filenames with spaces and special characters.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-user-visible-non-technical-fallback-for-failed-image-loads-in-key-placements-logo-and-empty-state-hero-images-so-the-ui-remains-usable-even-if-an-image-cannot-be-fetched",
+      "title": "Add a user-visible, non-technical fallback for failed image loads in key placements (logo and empty-state/hero images) so the UI remains usable even if an image cannot be fetched.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-modern-minimal-mobile-first-services-pricing-page-for-the-digital-agency-quick-bee-ai-growth-engine-using-a-teal-and-black-theme-with-a-premium-but-affordable-look-rounded-cards-subtle-shadows-smooth-hover-animations-and-a-comparison-style-layout",
+      "title": "Create a new modern, minimal, mobile-first “Services & Pricing” page for the digital agency “Quick Bee AI Growth Engine” using a teal and black theme, with a premium-but-affordable look (rounded cards, subtle shadows, smooth hover animations, and a comparison-style layout).",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-on-the-new-services-pricing-page-render-exactly-5-productized-service-categories-quick-website-launch-whatsapp-automation-system-lead-machine-setup-personal-brand-starter-kit-mini-ai-growth-kit-each-with-three-pricing-tiers-basic-pro-premium-showing-inr-prices-and-the-provided-bullet-point-features-for-each-tier",
+      "title": "On the new “Services & Pricing” page, render exactly 5 productized service categories (Quick Website Launch, WhatsApp Automation System, Lead Machine Setup, Personal Brand Starter Kit, Mini AI Growth Kit), each with three pricing tiers (Basic, Pro, Premium) showing INR prices and the provided bullet-point features for each tier.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-monthly-maintenance-plans-toggle-section-on-the-services-pricing-page-with-student-499-month-business-999-month-and-pro-1-999-month-and-show-the-included-bullets-minor-updates-basic-support-system-monitoring",
+      "title": "Add a “Monthly Maintenance Plans” toggle/section on the “Services & Pricing” page with Student ₹499/month, Business ₹999/month, and Pro ₹1,999/month, and show the included bullets: Minor updates, Basic support, System monitoring.",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-cta-buttons-under-every-tier-package-on-the-services-pricing-page-a-visible-select-plan-button-and-a-visible-get-started-button-for-each-package",
+      "title": "Add CTA buttons under every tier/package on the “Services & Pricing” page: a visible “Select Plan” button and a visible “Get Started” button for each package.",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-faq-section-at-the-bottom-of-the-services-pricing-page-addressing-delivery-time-payment-options-upi-razorpay-stripe-and-support-using-english-user-facing-text",
+      "title": "Add an FAQ section at the bottom of the “Services & Pricing” page addressing: delivery time, payment options (UPI, Razorpay, Stripe), and support, using English user-facing text.",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-navigable-route-to-the-new-services-pricing-page-and-expose-it-in-the-app-navigation-without-removing-the-existing-services-management-page",
+      "title": "Add a navigable route to the new “Services & Pricing” page and expose it in the app navigation without removing the existing “Services” management page.",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-services-management-ui-to-capture-and-display-the-new-service-metadata-fields-service-type-sub-type-cost-niche-date-time-when-adding-editing-services-and-format-displayed-currency-as-inr-where-prices-costs-are-shown",
+      "title": "Update the Services management UI to capture and display the new Service metadata fields (service type, sub-type, cost, niche, date, time) when adding/editing services, and format displayed currency as INR (₹) where prices/costs are shown.",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-allow-guest-no-sign-in-no-profile-users-to-view-and-update-settings-without-encountering-authorization-traps-and-persist-those-updates-reliably",
+      "title": "Allow guest (no-sign-in / no-profile) users to view and update Settings without encountering authorization traps, and persist those updates reliably.",
+      "reqIds": [
+        "REQ-73"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-guest-only-ui-restrictions-that-prevent-guests-from-managing-services-so-guest-users-can-add-and-edit-services-from-the-services-management-page",
+      "title": "Remove guest-only UI restrictions that prevent guests from managing services, so guest users can add and edit services from the Services management page.",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-provided-services-catalog-entries-into-the-app-as-services-records-grouped-under-the-following-servicetype-categories-website-funnel-services-ai-automation-services-marketing-growth-systems-high-ticket-business-solutions-and-bonus-high-value-add-ons-optional-upsells",
+      "title": "Add the provided services catalog entries into the app as Services records, grouped under the following serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”.",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -455,6 +705,108 @@
       "id": "AR-55",
       "summary": "Update UI to incorporate the provided images and refine visual styling to a more elegant look (polish layout/spacing/typography to match).",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-56",
+      "summary": "Add in-app image upload support (e.g., attach/upload images to relevant records such as Leads/Projects) with UI controls and storage handling appropriate for no-auth mode",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-57",
+      "summary": "Add in-app data/file uploading options (beyond existing CSV import/exports) so users can upload and attach documents/data files where relevant (e.g., Projects/Proposals/Leads)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-67",
+      "summary": "Make Client Onboarding flow functional by ensuring service browsing works without broken dependencies, request submission persists, and the user can see their submitted requests; avoid hard dependency on agency/profile values that may be missing and handle missing context gracefully.",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-68",
+      "summary": "Remove Admin/Client role distinctions and related onboarding/allowlist logic; make the app a single shared experience for all users (no role-based views/permissions).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-72",
+      "summary": "Update backend access control behavior so backend APIs do not enforce Admin vs Client distinctions and do not trap due to missing role/profile in the current no-sign-in/direct-access mode; all users should be treated uniformly for purposes of using the app.",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-73",
+      "summary": "Set the provided image as the app logo (update Sidebar/AppShell logo to use this image consistently across the UI).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-74",
+      "summary": "Ensure all users have full access to every section of the app (including Settings) with no role-based restrictions or gating in the current no-sign-in/direct-access mode.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-78",
+      "summary": "Ensure backend APIs do not trap or deny access due to missing identity/profile/role in the current public/no-sign-in mode, including Settings-related profile queries and any data needed to render each page.",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-79",
+      "summary": "Align backend data-access behavior with “everyone can access everything” by removing/relaxing multi-tenant/agency scoping requirements that prevent users from seeing data when they do not have an agency context (e.g., analytics queries that require an agency parameter).",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-80",
+      "summary": "Create a modern, minimal, mobile-first Services & Pricing page (teal/black theme) for “Quick Bee AI Growth Engine” showing 5 productized service categories with Basic/Pro/Premium INR tiers, features, delivery/support details, CTAs (“Select Plan”/“Get Started”), a Monthly Maintenance Plans toggle (Student/Business/Pro pricing), and an FAQ (delivery time, payment options incl. UPI/Razorpay/Stripe, support); also include/track service metadata fields: service type, sub-type, cost, niche, date, time.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-87",
+      "summary": "Extend the backend Service data model to store additional metadata fields: service type, sub-type of service, cost, niche, date, and time; update service creation/update logic to persist these fields and return them from service query endpoints.",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-88",
+      "summary": "Allow guest (no-sign-in) users to edit/change Settings (remove any remaining restrictions/gating on Settings mutations in public mode).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-89",
+      "summary": "Add new Services catalog entries under categories: Website & Funnel Services, AI & Automation Services, Marketing & Growth Systems, High-Ticket Business Solutions, and Bonus Add-ons (Optional Upsells) using the provided service list.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-90",
+      "summary": "Add payment gateway offerings under services/add-ons, including International Payment Gateway Setup (Stripe, PayPal) and Indian Payment Gateway Integration (Razorpay, UPI).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-93",
+      "summary": "Relax backend authorization checks for service creation and service updates so they work in public/no-sign-in mode (guests), without trapping.",
+      "reqIds": [
+        "REQ-75"
+      ],
       "status": "pending"
     }
   ],

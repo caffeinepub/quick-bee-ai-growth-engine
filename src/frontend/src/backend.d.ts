@@ -26,6 +26,14 @@ export interface Lead {
     agency: string;
     niche: string;
 }
+export interface Settings {
+    defaultSort: string;
+    pricingType: string;
+    defaultValues: string;
+    onboardingCompleted: boolean;
+    tutorialStage: bigint;
+    timeZone: string;
+}
 export interface ClientServiceRequest {
     id: string;
     principal: string;
@@ -45,11 +53,17 @@ export interface OutreachActivity {
 }
 export interface Service {
     id: string;
+    serviceType: string;
     active: boolean;
     revenue: bigint;
+    cost: bigint;
+    date: string;
     name: string;
+    time: string;
     agency: string;
     deliveryTime: string;
+    serviceSubType: string;
+    niche: string;
     salesCount: bigint;
     price: bigint;
 }
@@ -121,14 +135,17 @@ export interface backendInterface {
     getLeadsForExport(): Promise<Array<Lead>>;
     getOutreachActivitiesForExport(): Promise<Array<OutreachActivity>>;
     getProjectsForExport(): Promise<Array<Project>>;
+    getServiceById(serviceId: string): Promise<Service | null>;
     getServicesForExport(): Promise<Array<Service>>;
-    getUserDeals(_agency: string): Promise<Array<Deal>>;
+    getSettings(): Promise<Settings>;
+    getUserDeals(agency: string): Promise<Array<Deal>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    importLeads(leadList: Array<Lead>, _agency: string): Promise<void>;
+    importLeads(leadList: Array<Lead>, agency: string): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     registerUser(principal: string, name: string, email: string, mobileNumber: string | null, agency: string, role: string, revenueGoal: bigint, subscriptionPlan: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     updateDealStatus(dealId: string, status: string): Promise<void>;
     updateLeadStatus(leadId: string, status: string): Promise<void>;
     updateServiceStatus(serviceId: string, active: boolean): Promise<void>;
+    updateSettings(newSettings: Settings): Promise<void>;
 }

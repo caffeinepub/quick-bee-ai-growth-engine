@@ -6,10 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Lock } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { UserRole } from '../../backend';
 import { getSignInIdentifier, prefillFromIdentifier } from '../../utils/signInIdentifier';
-import { isAdminAllowlisted, getAdminPrefillData } from '../../utils/adminAllowlist';
 
 interface ProfileSetupModalProps {
   open?: boolean;
@@ -27,33 +26,17 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
   const [role, setRole] = useState<'admin' | 'user'>('user');
   const [revenueGoal, setRevenueGoal] = useState('10000');
   const [subscriptionPlan, setSubscriptionPlan] = useState('Starter');
-  const [isAdminLocked, setIsAdminLocked] = useState(false);
 
   // Prefill email or mobile from stored sign-in identifier
   useEffect(() => {
     const storedIdentifier = getSignInIdentifier();
     if (storedIdentifier) {
-      // Check if this is an admin allowlisted identifier
-      const adminData = getAdminPrefillData(storedIdentifier);
-      
-      if (adminData) {
-        // Prefill admin data and lock role to admin
-        setName(adminData.name);
-        setEmail(adminData.email);
-        setMobileNumber(adminData.mobileNumber);
-        setRole('admin');
-        setIsAdminLocked(true);
-      } else {
-        // Regular user - prefill from identifier
-        const { email: prefillEmail, mobileNumber: prefillMobile } = prefillFromIdentifier(storedIdentifier);
-        if (prefillEmail) {
-          setEmail(prefillEmail);
-        }
-        if (prefillMobile) {
-          setMobileNumber(prefillMobile);
-        }
-        // Non-admin users cannot select admin role
-        setRole('user');
+      const { email: prefillEmail, mobileNumber: prefillMobile } = prefillFromIdentifier(storedIdentifier);
+      if (prefillEmail) {
+        setEmail(prefillEmail);
+      }
+      if (prefillMobile) {
+        setMobileNumber(prefillMobile);
       }
     }
   }, []);
@@ -109,7 +92,6 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
               onChange={(e) => setName(e.target.value)}
               placeholder="John Doe"
               required
-              disabled={isAdminLocked}
             />
           </div>
 
@@ -122,7 +104,6 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
               onChange={(e) => setEmail(e.target.value)}
               placeholder="john@agency.com"
               required
-              disabled={isAdminLocked}
             />
           </div>
 
@@ -133,8 +114,7 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
               type="tel"
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value)}
-              placeholder="+1234567890"
-              disabled={isAdminLocked}
+              placeholder="+1 234 567 8900"
             />
           </div>
 
@@ -144,33 +124,22 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
               id="agency"
               value={agency}
               onChange={(e) => setAgency(e.target.value)}
-              placeholder="My Digital Agency"
+              placeholder="My Agency"
               required
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role">Role *</Label>
-            {isAdminLocked ? (
-              <div className="flex items-center gap-2 px-3 py-2 border rounded-md bg-muted">
-                <Lock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Admin</span>
-              </div>
-            ) : (
-              <Select value={role} onValueChange={(v) => setRole(v as 'admin' | 'user')}>
-                <SelectTrigger id="role">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">Team Member</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-            {isAdminLocked && (
-              <p className="text-xs text-muted-foreground">
-                Admin role assigned based on allowlisted credentials
-              </p>
-            )}
+            <Select value={role} onValueChange={(value) => setRole(value as 'admin' | 'user')}>
+              <SelectTrigger id="role">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="user">User</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -182,32 +151,42 @@ export default function ProfileSetupModal({ open = true, onClose }: ProfileSetup
               onChange={(e) => setRevenueGoal(e.target.value)}
               placeholder="10000"
               required
+              min="0"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="plan">Subscription Plan *</Label>
+            <Label htmlFor="subscriptionPlan">Subscription Plan *</Label>
             <Select value={subscriptionPlan} onValueChange={setSubscriptionPlan}>
-              <SelectTrigger id="plan">
+              <SelectTrigger id="subscriptionPlan">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Starter">Starter</SelectItem>
-                <SelectItem value="Pro">Pro</SelectItem>
-                <SelectItem value="Agency">Agency</SelectItem>
+                <SelectItem value="Professional">Professional</SelectItem>
+                <SelectItem value="Enterprise">Enterprise</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" onClick={handleCancel} className="flex-1">
+          <div className="flex gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              className="flex-1"
+            >
               Skip for now
             </Button>
-            <Button type="submit" className="flex-1" disabled={registerUser.isPending}>
+            <Button
+              type="submit"
+              disabled={registerUser.isPending}
+              className="flex-1"
+            >
               {registerUser.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Setting up...
+                  Saving...
                 </>
               ) : (
                 'Complete Setup'

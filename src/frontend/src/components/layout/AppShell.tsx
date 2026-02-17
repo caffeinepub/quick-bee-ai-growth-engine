@@ -3,6 +3,8 @@ import { SidebarNav } from '../nav/SidebarNav';
 import { FollowUpBadge } from '../nav/FollowUpBadge';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { UPLOADED_IMAGES } from '../../constants/uploadedImages';
+import { SafeImage } from '../common/SafeImage';
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,7 +14,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border z-50 flex items-center justify-between px-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <img src="/assets/generated/quickbee-app-icon.dim_256x256.png" alt="Quick Bee" className="w-8 h-8" />
+          <SafeImage
+            src={UPLOADED_IMAGES.qbLogo} 
+            alt="Quick Bee" 
+            className="w-8 h-8 object-contain"
+            fallbackClassName="w-8 h-8 rounded"
+          />
           <span className="font-bold text-lg">Quick Bee</span>
         </div>
         <div className="flex items-center gap-2">

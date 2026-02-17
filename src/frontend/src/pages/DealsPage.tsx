@@ -1,7 +1,13 @@
-import { useGetUserDeals } from '../hooks/useDeals';
+import { useState } from 'react';
+import { useGetUserDeals, useUpdateDealStatus } from '../hooks/useDeals';
+import { useGetAllLeads } from '../hooks/useLeads';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { DealCard } from '../components/deals/DealCard';
+import { DealDialog } from '../components/deals/DealDialog';
+import type { Deal } from '../backend';
 
 const statusColumns = [
   { id: 'open', label: 'Open', color: 'bg-blue-500' },
@@ -12,6 +18,19 @@ const statusColumns = [
 
 export default function DealsPage() {
   const { data: deals = [], isLoading } = useGetUserDeals();
+  const { data: leads = [] } = useGetAllLeads();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
+
+  const handleDealClick = (deal: Deal) => {
+    setSelectedDeal(deal);
+    setDialogOpen(true);
+  };
+
+  const handleAddDeal = () => {
+    setSelectedDeal(null);
+    setDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -26,9 +45,15 @@ export default function DealsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Deals</h1>
-        <p className="text-muted-foreground">Track your sales pipeline</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Deals</h1>
+          <p className="text-muted-foreground">Track your sales pipeline</p>
+        </div>
+        <Button onClick={handleAddDeal}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Deal
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -51,26 +76,28 @@ export default function DealsPage() {
               </Card>
 
               <div className="space-y-2">
-                {columnDeals.map(deal => (
-                  <Card key={deal.id} className="cursor-move hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium">Lead #{deal.leadId.slice(0, 8)}</p>
-                          <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
-                            <DollarSign className="h-3 w-3" />
-                            <span>${Number(deal.value).toLocaleString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                {columnDeals.map(deal => {
+                  const lead = leads.find(l => l.id === deal.leadId);
+                  return (
+                    <DealCard 
+                      key={deal.id} 
+                      deal={deal} 
+                      leadName={lead?.name}
+                      onClick={() => handleDealClick(deal)}
+                    />
+                  );
+                })}
               </div>
             </div>
           );
         })}
       </div>
+
+      <DealDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen}
+        deal={selectedDeal}
+      />
     </div>
   );
 }

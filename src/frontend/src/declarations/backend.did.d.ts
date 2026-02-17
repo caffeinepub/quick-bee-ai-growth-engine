@@ -63,13 +63,27 @@ export interface Project {
 }
 export interface Service {
   'id' : string,
+  'serviceType' : string,
   'active' : boolean,
   'revenue' : bigint,
+  'cost' : bigint,
+  'date' : string,
   'name' : string,
+  'time' : string,
   'agency' : string,
   'deliveryTime' : string,
+  'serviceSubType' : string,
+  'niche' : string,
   'salesCount' : bigint,
   'price' : bigint,
+}
+export interface Settings {
+  'defaultSort' : string,
+  'pricingType' : string,
+  'defaultValues' : string,
+  'onboardingCompleted' : boolean,
+  'tutorialStage' : bigint,
+  'timeZone' : string,
 }
 export interface UserProfile {
   'revenueGoal' : bigint,
@@ -166,7 +180,9 @@ export interface _SERVICE {
   'getLeadsForExport' : ActorMethod<[], Array<Lead>>,
   'getOutreachActivitiesForExport' : ActorMethod<[], Array<OutreachActivity>>,
   'getProjectsForExport' : ActorMethod<[], Array<Project>>,
+  'getServiceById' : ActorMethod<[string], [] | [Service]>,
   'getServicesForExport' : ActorMethod<[], Array<Service>>,
+  'getSettings' : ActorMethod<[], Settings>,
   'getUserDeals' : ActorMethod<[string], Array<Deal>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'importLeads' : ActorMethod<[Array<Lead>, string], undefined>,
@@ -179,6 +195,7 @@ export interface _SERVICE {
   'updateDealStatus' : ActorMethod<[string, string], undefined>,
   'updateLeadStatus' : ActorMethod<[string, string], undefined>,
   'updateServiceStatus' : ActorMethod<[string, boolean], undefined>,
+  'updateSettings' : ActorMethod<[Settings], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -36,10 +36,32 @@ export function useSaveCallerUserProfile() {
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.saveCallerUserProfile(profile);
+      
+      // Ensure required fields have safe defaults
+      const normalizedProfile: UserProfile = {
+        principal: profile.principal || 'anonymous',
+        name: profile.name || 'Guest',
+        email: profile.email || '',
+        mobileNumber: profile.mobileNumber || undefined,
+        agency: profile.agency || 'Default Agency',
+        role: profile.role || 'guest',
+        revenueGoal: profile.revenueGoal || BigInt(0),
+        subscriptionPlan: profile.subscriptionPlan || 'Free',
+        totalRevenue: profile.totalRevenue || BigInt(0),
+      };
+      
+      try {
+        return await actor.saveCallerUserProfile(normalizedProfile);
+      } catch (error: any) {
+        console.error('Save profile error:', error);
+        throw new Error(error.message || 'Failed to save profile');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+    },
+    onError: (error: any) => {
+      console.error('Profile save mutation error:', error);
     },
   });
 }

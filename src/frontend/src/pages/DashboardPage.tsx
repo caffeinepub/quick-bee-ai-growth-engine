@@ -7,6 +7,7 @@ import { ExportDataSection } from '../components/export/ExportDataSection';
 import { Users, MessageSquare, DollarSign, TrendingUp, Target, CheckCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { UPLOADED_IMAGES } from '../constants/uploadedImages';
+import { SafeImage } from '../components/common/SafeImage';
 
 export default function DashboardPage() {
   const { data: analytics, isLoading } = useGetAgencyAnalytics();
@@ -66,10 +67,11 @@ export default function DashboardPage() {
 
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="relative w-full max-w-md aspect-video">
-            <img
+            <SafeImage
               src={UPLOADED_IMAGES.workspace1}
               alt="Welcome to Quick Bee"
               className="w-full h-full object-cover rounded-2xl shadow-lg"
+              fallbackClassName="w-full h-full rounded-2xl"
             />
           </div>
           <div className="text-center space-y-3 max-w-lg">

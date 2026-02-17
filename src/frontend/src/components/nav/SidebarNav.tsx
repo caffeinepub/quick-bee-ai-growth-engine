@@ -1,6 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { useIsCallerAdmin } from '../../hooks/useAuthRole';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -15,25 +14,27 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  UserPlus,
+  Tag,
 } from 'lucide-react';
 import { clearSignInIdentifier } from '../../utils/signInIdentifier';
+import { UPLOADED_IMAGES } from '../../constants/uploadedImages';
+import { SafeImage } from '../common/SafeImage';
 
 const navItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
-  { path: '/leads', label: 'Leads', icon: Users, adminOnly: false },
-  { path: '/outreach', label: 'Outreach', icon: MessageSquare, adminOnly: false },
-  { path: '/services', label: 'Services', icon: Briefcase, adminOnly: false },
-  { path: '/deals', label: 'Deals', icon: DollarSign, adminOnly: false },
-  { path: '/projects', label: 'Projects', icon: FolderKanban, adminOnly: false },
-  { path: '/planner', label: 'Planner', icon: Calendar, adminOnly: false },
-  { path: '/analytics', label: 'Analytics', icon: BarChart3, adminOnly: false },
-  { path: '/settings', label: 'Settings', icon: Settings, adminOnly: false },
+  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/leads', label: 'Leads', icon: Users },
+  { path: '/outreach', label: 'Outreach', icon: MessageSquare },
+  { path: '/services', label: 'Services', icon: Briefcase },
+  { path: '/pricing', label: 'Pricing', icon: Tag },
+  { path: '/deals', label: 'Deals', icon: DollarSign },
+  { path: '/projects', label: 'Projects', icon: FolderKanban },
+  { path: '/planner', label: 'Planner', icon: Calendar },
+  { path: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { clear, identity } = useInternetIdentity();
-  const { data: isAdmin } = useIsCallerAdmin();
   const queryClient = useQueryClient();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
@@ -44,7 +45,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     if (isAuthenticated) {
       await clear();
     }
-    // Clear all cached data
     queryClient.clear();
     clearSignInIdentifier();
   };
@@ -53,10 +53,11 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col h-full">
       <div className="p-6 pb-5">
         <div className="flex items-center gap-3">
-          <img
-            src="/assets/generated/quickbee-app-icon.dim_256x256.png"
+          <SafeImage
+            src={UPLOADED_IMAGES.qbLogo}
             alt="Quick Bee"
-            className="w-10 h-10"
+            className="w-10 h-10 object-contain"
+            fallbackClassName="w-10 h-10 rounded"
           />
           <div>
             <h2 className="text-xl font-bold tracking-tight">Quick Bee</h2>
@@ -88,24 +89,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             </Link>
           );
         })}
-
-        {!isAdmin && (
-          <>
-            <Separator className="my-3" />
-            <Link
-              to="/onboarding"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 focus-ring ${
-                currentPath === '/onboarding'
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'hover:bg-accent hover:text-accent-foreground'
-              }`}
-              onClick={onNavigate}
-            >
-              <UserPlus className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium">Client Onboarding</span>
-            </Link>
-          </>
-        )}
       </nav>
 
       <Separator />

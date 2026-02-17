@@ -43,11 +43,17 @@ export const Project = IDL.Record({
 });
 export const Service = IDL.Record({
   'id' : IDL.Text,
+  'serviceType' : IDL.Text,
   'active' : IDL.Bool,
   'revenue' : IDL.Nat,
+  'cost' : IDL.Nat,
+  'date' : IDL.Text,
   'name' : IDL.Text,
+  'time' : IDL.Text,
   'agency' : IDL.Text,
   'deliveryTime' : IDL.Text,
+  'serviceSubType' : IDL.Text,
+  'niche' : IDL.Text,
   'salesCount' : IDL.Nat,
   'price' : IDL.Nat,
 });
@@ -95,6 +101,14 @@ export const UserProfile = IDL.Record({
   'mobileNumber' : IDL.Opt(IDL.Text),
   'email' : IDL.Text,
   'totalRevenue' : IDL.Nat,
+});
+export const Settings = IDL.Record({
+  'defaultSort' : IDL.Text,
+  'pricingType' : IDL.Text,
+  'defaultValues' : IDL.Text,
+  'onboardingCompleted' : IDL.Bool,
+  'tutorialStage' : IDL.Int,
+  'timeZone' : IDL.Text,
 });
 
 export const idlService = IDL.Service({
@@ -195,7 +209,9 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getProjectsForExport' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+  'getServiceById' : IDL.Func([IDL.Text], [IDL.Opt(Service)], ['query']),
   'getServicesForExport' : IDL.Func([], [IDL.Vec(Service)], ['query']),
+  'getSettings' : IDL.Func([], [Settings], ['query']),
   'getUserDeals' : IDL.Func([IDL.Text], [IDL.Vec(Deal)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -222,6 +238,7 @@ export const idlService = IDL.Service({
   'updateDealStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'updateLeadStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'updateServiceStatus' : IDL.Func([IDL.Text, IDL.Bool], [], []),
+  'updateSettings' : IDL.Func([Settings], [], []),
 });
 
 export const idlInitArgs = [];
@@ -262,11 +279,17 @@ export const idlFactory = ({ IDL }) => {
   });
   const Service = IDL.Record({
     'id' : IDL.Text,
+    'serviceType' : IDL.Text,
     'active' : IDL.Bool,
     'revenue' : IDL.Nat,
+    'cost' : IDL.Nat,
+    'date' : IDL.Text,
     'name' : IDL.Text,
+    'time' : IDL.Text,
     'agency' : IDL.Text,
     'deliveryTime' : IDL.Text,
+    'serviceSubType' : IDL.Text,
+    'niche' : IDL.Text,
     'salesCount' : IDL.Nat,
     'price' : IDL.Nat,
   });
@@ -314,6 +337,14 @@ export const idlFactory = ({ IDL }) => {
     'mobileNumber' : IDL.Opt(IDL.Text),
     'email' : IDL.Text,
     'totalRevenue' : IDL.Nat,
+  });
+  const Settings = IDL.Record({
+    'defaultSort' : IDL.Text,
+    'pricingType' : IDL.Text,
+    'defaultValues' : IDL.Text,
+    'onboardingCompleted' : IDL.Bool,
+    'tutorialStage' : IDL.Int,
+    'timeZone' : IDL.Text,
   });
   
   return IDL.Service({
@@ -414,7 +445,9 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getProjectsForExport' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+    'getServiceById' : IDL.Func([IDL.Text], [IDL.Opt(Service)], ['query']),
     'getServicesForExport' : IDL.Func([], [IDL.Vec(Service)], ['query']),
+    'getSettings' : IDL.Func([], [Settings], ['query']),
     'getUserDeals' : IDL.Func([IDL.Text], [IDL.Vec(Deal)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -441,6 +474,7 @@ export const idlFactory = ({ IDL }) => {
     'updateDealStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'updateLeadStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'updateServiceStatus' : IDL.Func([IDL.Text, IDL.Bool], [], []),
+    'updateSettings' : IDL.Func([Settings], [], []),
   });
 };
 

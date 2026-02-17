@@ -1,163 +1,85 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Quick Bee UI polish: integrate uploaded images + elegant styling refinements",
+  "title": "Guest-friendly Settings edits and seeded expanded Services catalog (including payment gateway offerings)",
   "requirements": [
     {
-      "id": "REQ-37",
-      "summary": "Add the 14 uploaded images as static frontend assets and reference them via a single shared mapping module.",
+      "id": "REQ-73",
+      "summary": "Make Settings editable for guests and persist profile updates without authorization traps",
       "acceptanceCriteria": [
-        "All 14 uploaded images are present in the frontend static assets directory and load correctly in production build (no broken links in the UI).",
-        "No API/backend changes are required to display these images; they are loaded via static paths.",
-        "Images are referenced via a single, consistent mapping (e.g., a small constants module) rather than scattered hardcoded paths across many components."
+        "Opening the Settings page as a guest does not trap or show an authorization error.",
+        "Guest users can edit at least: Name, Email, Mobile Number, Agency, Monthly Goal, Subscription Plan, and save successfully.",
+        "After saving, reloading the app shows the saved Settings values for the same caller principal (including the anonymous principal).",
+        "Backend methods used by Settings (get/save profile) do not Runtime.trap for guest callers in the current public/no-sign-in mode."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/uploaded/f25340160.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
+          "path": "frontend/src/pages/SettingsPage.tsx",
+          "operation": "modify",
+          "description": "Convert Settings from read-only display into an editable form that works for guest callers: use the existing authorization-related profile/role fetching (from the authorization component’s frontend integration) to detect guest state, allow editing Name/Email/Mobile Number/Agency/Monthly Goal/Subscription Plan, and save via the existing profile save hook with English success/error messaging. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/public/assets/uploaded/f25339648.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
+          "path": "frontend/src/hooks/useCurrentUserProfile.ts",
+          "operation": "modify",
+          "description": "Harden profile save/query behavior for public/no-sign-in mode: ensure guest callers can attempt save without UI crashes, normalize/ensure required UserProfile fields are populated with safe defaults when the UI supplies partial data, and keep React Query invalidation/refetch behavior so reload shows persisted values. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/public/assets/uploaded/f5418752.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25481216.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25737216.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/AI automation.png",
-          "operation": "create",
-          "description": "Add uploaded static image asset (filename contains spaces; ensure URL encoding is handled by the centralized mapping module)."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/discover & strategy.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset (filename contains special character '&'; ensure URL encoding is handled by the centralized mapping module)."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/DM ICON.png",
-          "operation": "create",
-          "description": "Add uploaded static image asset (filename contains spaces; ensure URL encoding is handled by the centralized mapping module)."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25741568.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/deployment icon.png",
-          "operation": "create",
-          "description": "Add uploaded static image asset (filename contains spaces; ensure URL encoding is handled by the centralized mapping module)."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25737984.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25726208.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25639680.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/public/assets/uploaded/f25731584.jpeg",
-          "operation": "create",
-          "description": "Add uploaded static image asset for consistent UI usage."
-        },
-        {
-          "path": "frontend/src/constants/uploadedImages.ts",
-          "operation": "create",
-          "description": "Create a single source-of-truth mapping for uploaded image static paths (including safe handling for spaces and special characters) so UI imports are standardized."
+          "path": "frontend/src/hooks/useAuthRole.ts",
+          "operation": "modify",
+          "description": "Ensure role detection remains guest-friendly (no traps surfaced to UI) and expose a consistent guest fallback that Settings can use to avoid authorization-gated UX. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-38",
-      "summary": "Use uploaded icon/illustration images across Dashboard, Planner, and Outreach for tabs, affordances, and empty states without breaking responsiveness.",
+      "id": "REQ-74",
+      "summary": "Remove guest UI restrictions so guests can add and edit services from the Services page",
       "acceptanceCriteria": [
-        "At least one primary page (Dashboard) and at least two secondary pages (e.g., Planner and Outreach) visually incorporate the uploaded images in a way that is responsive and does not overflow on mobile.",
-        "Platform-related visuals in Outreach use the uploaded platform/icon images in tabs and/or empty states while keeping existing labels in English and maintaining usability/contrast.",
-        "Existing generated assets currently used (e.g., quickbee-app-icon, empty-state-dashboard) remain functional; if replaced, replacements must be from the uploaded images and must not degrade layout or readability."
+        "As a guest, clicking “Add Service” on the Services page opens the service dialog and allows submitting a new service without being blocked by a “You must have a profile to manage services” error.",
+        "The Services list refreshes after a successful guest-created service and shows the new entry.",
+        "All user-facing text related to guest service management is in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/DashboardPage.tsx",
+          "path": "frontend/src/components/services/ServiceDialog.tsx",
           "operation": "modify",
-          "description": "Import from the centralized uploaded image mapping and enhance the Dashboard empty state/hero visuals with an uploaded illustration (with responsive sizing and safe fallback so existing generated empty-state-dashboard remains functional)."
+          "description": "Remove the guest-blocking check that requires a profile/agency to manage services; allow guests to submit services by collecting any needed fields in the dialog (e.g., allow entering Agency when no profile is present, or use a safe default), and keep all messaging in English. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/PlannerPage.tsx",
+          "path": "frontend/src/pages/ServicesPage.tsx",
           "operation": "modify",
-          "description": "Incorporate an uploaded illustration-style image into the Planner introduction card (responsive, non-overflowing), using the centralized uploaded image mapping."
+          "description": "Ensure guest flows are unblocked: keep “Add Service” enabled for guests, ensure dialog open/close works, and rely on existing React Query invalidation so the list refreshes after a successful create/edit. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/OutreachPage.tsx",
+          "path": "frontend/src/hooks/useServices.ts",
           "operation": "modify",
-          "description": "Replace/augment platform tab visuals and empty-state cards with uploaded icon-style images (Email/Instagram/WhatsApp/DM/Phone/Deployment/Automation where appropriate), sourcing all paths from the centralized uploaded image mapping and ensuring mobile-safe layout."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Optionally elevate perceived quality by incorporating a subtle uploaded brand/illustration accent in the shell header area while preserving existing structure and keeping the generated quickbee-app-icon functional."
+          "description": "Improve guest error handling and consistency: ensure add/update mutations surface clean English errors to the UI and always invalidate the Services query on success so newly created guest services appear immediately. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-39",
-      "summary": "Refine global elegance: typography hierarchy, spacing, card/panel styling, and consistent accessible hover/focus states across shell and key cards without editing shadcn/ui internals.",
+      "id": "REQ-76",
+      "summary": "Seed the expanded services catalog into Services records grouped by the specified serviceType categories",
       "acceptanceCriteria": [
-        "Sidebar header area, primary page headers, and key cards (stats/chart/export) show visibly improved spacing/typography consistency (clear hierarchy, consistent padding, balanced density).",
-        "Buttons/links have consistent hover/focus-visible states across pages, and focus styling is accessible (keyboard navigation clearly indicated).",
-        "Changes do not require editing any files under frontend/src/components/ui (Shadcn components remain unmodified); composition and styling overrides are applied from app components/pages/CSS tokens instead."
+        "All listed items exist as individual Service records and are visible in the Services management list.",
+        "Each created Service uses the correct serviceType category (exact English category names as specified).",
+        "The two payment-gateway items are present as Service records: “International Payment Gateway Setup (Stripe, PayPal)” and “Indian Payment Gateway Integration (Razorpay, UPI)”.",
+        "No external payment gateway integration is added; these are catalog/service offering entries only."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Refine global design tokens and add app-level utility classes (via Tailwind layers) for consistent page headers, card density, and accessible focus-visible styling while keeping the teal/black/white direction."
+          "path": "frontend/src/utils/services/seedCatalog.ts",
+          "operation": "create",
+          "description": "Add a catalog seeding utility that defines the exact list of service names and maps them into Service objects using the exact serviceType categories: “Website & Funnel Services”, “AI & Automation Services”, “Marketing & Growth Systems”, “High-Ticket Business Solutions”, and “Bonus High-Value Add-ons (Optional Upsells)”; include the two payment-gateway offerings as plain catalog entries only (no payment integration logic). Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/nav/SidebarNav.tsx",
+          "path": "frontend/src/pages/ServicesPage.tsx",
           "operation": "modify",
-          "description": "Align sidebar header spacing/typography and standardize nav link hover/focus-visible styles (keyboard-accessible) without modifying shadcn/ui components."
+          "description": "Wire the seeding flow into the Services page: on first load (or when services are missing catalog entries), offer an English UI action (or a safe one-time auto-seed) that uses existing service creation capabilities to insert all catalog items, prevents duplicate seeding (e.g., local flag + name existence checks), and refreshes the list after completion. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/layout/AppShell.tsx",
+          "path": "frontend/src/hooks/useServices.ts",
           "operation": "modify",
-          "description": "Tune layout spacing/padding and background separation for a more elegant shell presentation while maintaining the existing TanStack Router + AppShell structure."
-        },
-        {
-          "path": "frontend/src/components/common/StatsCard.tsx",
-          "operation": "modify",
-          "description": "Improve stats card hierarchy (title/value/subtitle), padding consistency, and subtle interactive states via composition/class overrides (do not edit shadcn/ui internals)."
-        },
-        {
-          "path": "frontend/src/components/common/ChartBlock.tsx",
-          "operation": "modify",
-          "description": "Standardize chart block header typography and spacing to match StatsCard and other panels, using only wrapper-level styling."
-        },
-        {
-          "path": "frontend/src/components/export/ExportDataSection.tsx",
-          "operation": "modify",
-          "description": "Polish Export Data section card density, button grid rhythm, and hover/focus-visible consistency for an elegant feel while keeping existing export logic unchanged."
+          "description": "Add support for batch catalog insertion from the seeding utility (e.g., helper mutation that sequentially calls addService and invalidates once), ensuring the Services list reflects seeded entries after completion. Verify the component's usage instructions before implementing."
         }
       ]
     }

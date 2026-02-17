@@ -4,16 +4,15 @@ import DashboardPage from './pages/DashboardPage';
 import LeadsPage from './pages/LeadsPage';
 import OutreachPage from './pages/OutreachPage';
 import ServicesPage from './pages/ServicesPage';
+import ServicesPricingPage from './pages/ServicesPricingPage';
 import DealsPage from './pages/DealsPage';
 import ProjectsPage from './pages/ProjectsPage';
 import PlannerPage from './pages/PlannerPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
 import ProposalSharePage from './pages/ProposalSharePage';
-import ClientOnboardingPage from './pages/ClientOnboardingPage';
 
 function RootComponent() {
-  // Always render the app layout - no authentication gate
   return <Outlet />;
 }
 
@@ -51,6 +50,12 @@ const servicesRoute = createRoute({
   component: ServicesPage,
 });
 
+const servicesPricingRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: '/pricing',
+  component: ServicesPricingPage,
+});
+
 const dealsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: '/deals',
@@ -81,12 +86,6 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 });
 
-const onboardingRoute = createRoute({
-  getParentRoute: () => layoutRoute,
-  path: '/onboarding',
-  component: ClientOnboardingPage,
-});
-
 const proposalShareRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/proposal/$proposalId',
@@ -99,12 +98,12 @@ const routeTree = rootRoute.addChildren([
     leadsRoute,
     outreachRoute,
     servicesRoute,
+    servicesPricingRoute,
     dealsRoute,
     projectsRoute,
     plannerRoute,
     analyticsRoute,
     settingsRoute,
-    onboardingRoute,
   ]),
   proposalShareRoute,
 ]);
