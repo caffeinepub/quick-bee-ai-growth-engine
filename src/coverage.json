@@ -1,105 +1,95 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T14:07:08.827Z",
+  "generatedAt": "2026-02-17T15:57:20.881Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 4,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-24",
-        "summary": "Do not implement OTP sign-in (SMS/email/passwordless). Keep Internet Identity as the only authentication method, and ensure the sign-in UI communicates that authentication continues via Internet Identity after entering an email/phone identifier.",
+        "id": "REQ-37",
+        "summary": "Add the 14 user-uploaded image files to the frontend as static assets and standardize how they are referenced in the React UI (no backend image serving). Uploaded files: f25340160.jpeg, f25339648.jpeg, f5418752.jpeg, f25481216.jpeg, f25737216.jpeg, AI automation.png, discover & strategy.jpeg, DM ICON.png, f25741568.jpeg, deployment icon.png, f25737984.jpeg, f25726208.jpeg, f25639680.jpeg, f25731584.jpeg.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/SignInPage.tsx",
-          "frontend/src/utils/signInIdentifier.ts"
+          "frontend/public/assets/uploaded/f25340160.jpeg",
+          "frontend/public/assets/uploaded/f25339648.jpeg",
+          "frontend/public/assets/uploaded/f5418752.jpeg",
+          "frontend/public/assets/uploaded/f25481216.jpeg",
+          "frontend/public/assets/uploaded/f25737216.jpeg",
+          "frontend/public/assets/uploaded/AI automation.png",
+          "frontend/public/assets/uploaded/discover & strategy.jpeg",
+          "frontend/public/assets/uploaded/DM ICON.png",
+          "frontend/public/assets/uploaded/f25741568.jpeg",
+          "frontend/public/assets/uploaded/deployment icon.png",
+          "frontend/public/assets/uploaded/f25737984.jpeg",
+          "frontend/public/assets/uploaded/f25726208.jpeg",
+          "frontend/public/assets/uploaded/f25639680.jpeg",
+          "frontend/public/assets/uploaded/f25731584.jpeg",
+          "frontend/src/constants/uploadedImages.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/SignInPage.tsx",
-          "frontend/src/utils/signInIdentifier.ts"
+          "frontend/src/constants/uploadedImages.ts"
         ]
       },
       {
-        "id": "REQ-25",
-        "summary": "Implement an admin-only first-time profile setup path that is restricted to the allowlisted admin identity details: name \"Aryan Abhishek\", phone number \"+919182768591\", and email \"quickbeeagency@gmail.com\". If the stored sign-in identifier matches the allowlisted email or phone, prefill the profile setup form with these values and force the role to Admin (not editable). If it does not match, prevent selecting Admin during profile setup.",
+        "id": "REQ-38",
+        "summary": "Incorporate the uploaded images into the UI in a cohesive way that improves perceived quality: use the icon-style images for platform affordances (Instagram/WhatsApp/Email/DM/Phone/Deployment/Automation), and use the illustration-style images as page hero/empty-state artwork where appropriate (e.g., Dashboard empty state, Planner introduction card, Outreach empty state cards).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/adminAllowlist.ts",
-          "frontend/src/components/auth/ProfileSetupModal.tsx"
+          "frontend/src/pages/DashboardPage.tsx",
+          "frontend/src/pages/PlannerPage.tsx",
+          "frontend/src/pages/OutreachPage.tsx",
+          "frontend/src/components/layout/AppShell.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/adminAllowlist.ts",
-          "frontend/src/components/auth/ProfileSetupModal.tsx"
+          "frontend/src/pages/DashboardPage.tsx",
+          "frontend/src/pages/PlannerPage.tsx",
+          "frontend/src/pages/OutreachPage.tsx",
+          "frontend/src/components/layout/AppShell.tsx"
         ]
       },
       {
-        "id": "REQ-26",
-        "summary": "Enforce the admin allowlist in backend profile registration so that a caller cannot self-register as Admin unless their provided email or mobile number matches the allowlisted admin details (email: quickbeeagency@gmail.com, phone: +919182768591). Ensure backend logic rejects unauthorized attempts to register/save an Admin profile.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-27",
-        "summary": "Add a client onboarding flow (for non-admin users after Internet Identity sign-in) that lets the client browse/select a service and view detailed service information and cost details, then submit their selection as a persisted “client service request” linked to their principal and agency.",
+        "id": "REQ-39",
+        "summary": "Refine the overall visual styling to be “more elegant” while keeping the existing minimal teal/black/white design direction: improve typography hierarchy, spacing, card/panel styling, and interactive states (hover/focus), and align visuals across AppShell/SidebarNav and key content cards (StatsCard, ChartBlock, ExportDataSection).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useClientServiceRequests.ts",
-          "frontend/src/pages/ClientOnboardingPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/nav/SidebarNav.tsx"
+          "frontend/src/index.css",
+          "frontend/src/components/nav/SidebarNav.tsx",
+          "frontend/src/components/layout/AppShell.tsx",
+          "frontend/src/components/common/StatsCard.tsx",
+          "frontend/src/components/common/ChartBlock.tsx",
+          "frontend/src/components/export/ExportDataSection.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useClientServiceRequests.ts",
-          "frontend/src/pages/ClientOnboardingPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/nav/SidebarNav.tsx"
-        ]
-      },
-      {
-        "id": "REQ-28",
-        "summary": "Provide an admin-facing view to review client service requests within the app (accessible only to Admin users), showing the client identifier (principal and/or submitted email/phone if present), selected service, and captured cost details.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/admin/AdminOnlySection.tsx",
-          "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
-          "frontend/src/pages/SettingsPage.tsx",
-          "frontend/src/components/nav/SidebarNav.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/admin/AdminOnlySection.tsx",
-          "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
-          "frontend/src/pages/SettingsPage.tsx",
-          "frontend/src/components/nav/SidebarNav.tsx"
+          "frontend/src/index.css",
+          "frontend/src/components/nav/SidebarNav.tsx",
+          "frontend/src/components/layout/AppShell.tsx",
+          "frontend/src/components/common/StatsCard.tsx",
+          "frontend/src/components/common/ChartBlock.tsx",
+          "frontend/src/components/export/ExportDataSection.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/admin/AdminOnlySection.tsx",
-    "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
-    "frontend/src/components/auth/ProfileSetupModal.tsx",
+    "frontend/src/components/common/ChartBlock.tsx",
+    "frontend/src/components/common/StatsCard.tsx",
+    "frontend/src/components/export/ExportDataSection.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
     "frontend/src/components/nav/SidebarNav.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useClientServiceRequests.ts",
-    "frontend/src/pages/ClientOnboardingPage.tsx",
-    "frontend/src/pages/SettingsPage.tsx",
-    "frontend/src/pages/SignInPage.tsx",
-    "frontend/src/utils/adminAllowlist.ts",
-    "frontend/src/utils/signInIdentifier.ts",
+    "frontend/src/constants/uploadedImages.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/OutreachPage.tsx",
+    "frontend/src/pages/PlannerPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

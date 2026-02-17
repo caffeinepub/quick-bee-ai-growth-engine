@@ -1,68 +1,47 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T14:07:08.823Z",
-  "summary": "Most requested functionality appears implemented: sign-in remains Internet Identity with a stored identifier for prefill (no OTP), frontend admin allowlist prefill/locking is added, client onboarding page and request creation hooks are added, and an admin-only review panel is added in Settings. However, due to truncation, key backend enforcement and API persistence details cannot be confirmed, and the non-admin UI restriction on selecting Admin role is not fully evidenced.",
+  "generatedAt": "2026-02-17T15:57:20.876Z",
+  "summary": "REQ-38 and REQ-39 appear largely implemented via a centralized image mapping plus UI/layout/style refinements across Dashboard/Planner/Outreach, cards, AppShell, SidebarNav, and global CSS utilities. However, REQ-37 is only partially evidenced (a mapping exists) with no evidence that the 14 image files were actually added to the frontend static assets directory. The diff summary also indicates unrequested/auth-related and export-format behavior changes that fall outside the UI polish scope and non-goals.",
   "missing_requirements": [
     {
-      "id": "REQ-25",
-      "requirement": "When the stored identifier does not match the allowlist, prevent selecting Admin during profile setup (role effectively Team/User-only).",
-      "reason": "ProfileSetupModal sets role to 'user' for non-allowlisted identifiers, but the diff is truncated before showing the role <Select> rendering/option filtering; there is no explicit evidence that the Admin option is removed/disabled for non-allowlisted users.",
+      "id": "REQ-37",
+      "requirement": "Add all 14 uploaded image files to the frontend static assets directory so they load correctly in production builds (no broken links).",
+      "reason": "The diff shows a constants mapping pointing to \"/assets/uploaded/...\" paths, but provides no evidence that the actual 14 image files were added under a static assets directory (e.g., frontend/public/assets/uploaded).",
       "evidence": [
-        "frontend/src/components/auth/ProfileSetupModal.tsx (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-26",
-      "requirement": "Backend must reject attempts to register/save an Admin profile unless provided email or mobile matches the allowlisted admin details; prevent privilege escalation via direct backend calls.",
-      "reason": "backend/main.mo shows an isAuthorizedAdmin(email, mobileNumber) helper, but the diff is truncated before any register/save function logic that uses it; there is no visible trap/rejection path tied to Admin registration.",
-      "evidence": [
-        "backend/main.mo (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-27",
-      "requirement": "Submitting a client service selection must persist a \"client service request\" in the backend including at least: client principal, agency, selected service identifier, captured cost/price details shown/accepted, and a timestamp.",
-      "reason": "Frontend calls actor.createClientServiceRequest(...) and the backend defines a ClientServiceRequest type/map, but the backend methods (createClientServiceRequest, storage of timestamp/details, and retrieval functions) are not shown in the truncated backend diff, so persistence and required fields cannot be verified from provided evidence.",
-      "evidence": [
-        "frontend/src/hooks/useClientServiceRequests.ts",
-        "frontend/src/pages/ClientOnboardingPage.tsx (truncated)",
-        "backend/main.mo (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-27",
-      "requirement": "Clients can see their submitted requests in-app (e.g., a \"My Requests\" list in the onboarding screen).",
-      "reason": "ClientOnboardingPage computes myRequests by filtering requests by principal, but the file is truncated before showing any UI that renders the list of the caller’s submitted requests.",
-      "evidence": [
-        "frontend/src/pages/ClientOnboardingPage.tsx (truncated)"
+        "frontend/src/constants/uploadedImages.ts"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Settings UI includes subscription management messaging (\"Stripe integration coming soon\" / \"Manage Subscription\") unrelated to the requested allowlist/onboarding/service-request review changes.",
-      "reason": "BuildRequest explicitly lists payments/Stripe checkout as a non-goal for this work; while this is only copy/disabled UI, it introduces a Stripe-focused feature surface not requested.",
+      "description": "Removed authentication/sign-in gating to allow direct access without sign-in, and adjusted multiple hooks/pages to support guest access.",
+      "reason": "BuildRequest explicitly lists auth changes as non-goals, and this work is unrelated to integrating images / UI elegance.",
       "evidence": [
-        "frontend/src/pages/SettingsPage.tsx"
+        "frontend-file-summaries.txt (\"frontend/src/App.tsx\": authentication gate removed; hooks updated for guest users; SignInPage made optional)"
+      ]
+    },
+    {
+      "description": "Changed export behavior/file types (e.g., PDF export downloads HTML, DOCX export downloads RTF, Excel uses .xls MIME/type) and updated related user messaging.",
+      "reason": "BuildRequest non-goals include \"exports logic changes\"; these changes appear functional/behavioral rather than purely UI polish.",
+      "evidence": [
+        "frontend/src/components/export/ExportDataSection.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/admin/AdminOnlySection.tsx",
-    "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
-    "frontend/src/components/auth/ProfileSetupModal.tsx",
+    "frontend/src/components/common/ChartBlock.tsx",
+    "frontend/src/components/common/StatsCard.tsx",
+    "frontend/src/components/export/ExportDataSection.tsx",
+    "frontend/src/components/layout/AppShell.tsx",
     "frontend/src/components/nav/SidebarNav.tsx",
-    "frontend/src/hooks/useClientServiceRequests.ts",
-    "frontend/src/pages/ClientOnboardingPage.tsx",
-    "frontend/src/pages/SettingsPage.tsx",
-    "frontend/src/pages/SignInPage.tsx",
-    "frontend/src/utils/adminAllowlist.ts",
-    "frontend/src/utils/signInIdentifier.ts",
+    "frontend/src/constants/uploadedImages.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/OutreachPage.tsx",
+    "frontend/src/pages/PlannerPage.tsx",
     "project_state.json"
   ]
 }

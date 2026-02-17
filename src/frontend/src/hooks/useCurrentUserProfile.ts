@@ -9,8 +9,14 @@ export function useGetCallerUserProfile() {
   const query = useQuery<UserProfile | null>({
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getCallerUserProfile();
+      if (!actor) return null;
+      try {
+        return await actor.getCallerUserProfile();
+      } catch (error) {
+        // Gracefully handle unauthorized/guest errors
+        console.warn('Profile query failed (likely guest user):', error);
+        return null;
+      }
     },
     enabled: !!actor && !actorFetching,
     retry: false,

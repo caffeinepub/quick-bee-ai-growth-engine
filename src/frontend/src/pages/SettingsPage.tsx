@@ -28,24 +28,29 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Name</Label>
-              <Input value={profile?.name || ''} disabled />
+              <Input value={profile?.name || 'Guest'} disabled />
             </div>
             <div className="space-y-2">
               <Label>Email</Label>
-              <Input value={profile?.email || ''} disabled />
+              <Input value={profile?.email || 'Not set'} disabled />
             </div>
             <div className="space-y-2">
               <Label>Mobile number</Label>
-              <Input value={profile?.mobileNumber || ''} disabled />
+              <Input value={profile?.mobileNumber || 'Not set'} disabled />
             </div>
             <div className="space-y-2">
               <Label>Agency</Label>
-              <Input value={profile?.agency || ''} disabled />
+              <Input value={profile?.agency || 'Not set'} disabled />
             </div>
             <div className="space-y-2">
               <Label>Role</Label>
-              <Input value={profile?.role || ''} disabled />
+              <Input value={profile?.role || 'Guest'} disabled />
             </div>
+            {!profile && (
+              <p className="text-sm text-muted-foreground">
+                You are browsing as a guest. Profile information is not available.
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -70,7 +75,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {isAdmin && (
+        {isAdmin && profile && (
           <Card>
             <CardHeader>
               <CardTitle>Subscription Plan</CardTitle>
@@ -79,7 +84,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Current Plan</Label>
-                <Input value={profile?.subscriptionPlan || ''} disabled />
+                <Input value={profile?.subscriptionPlan || 'Not set'} disabled />
               </div>
               <Button variant="outline" disabled>
                 Manage Subscription

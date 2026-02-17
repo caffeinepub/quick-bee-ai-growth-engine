@@ -10,7 +10,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border z-50 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border z-50 flex items-center justify-between px-4 shadow-sm">
         <div className="flex items-center gap-3">
           <img src="/assets/generated/quickbee-app-icon.dim_256x256.png" alt="Quick Bee" className="w-8 h-8" />
           <span className="font-bold text-lg">Quick Bee</span>
@@ -21,6 +21,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="focus-ring"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -29,7 +30,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-card border-r border-border z-40 transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 h-full w-64 bg-card border-r border-border z-40 transition-transform duration-300 lg:translate-x-0 shadow-lg lg:shadow-none ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -45,8 +46,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
       )}
 
       {/* Main content */}
-      <main className="lg:ml-64 pt-16 lg:pt-0">
-        <div className="container mx-auto p-4 lg:p-8 max-w-7xl">
+      <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
+        <div className="container mx-auto p-6 lg:p-10 max-w-7xl">
           {children}
         </div>
       </main>

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
-  "summary": "Build “Quick Bee AI Growth Engine”: a scalable Bubble SaaS for digital agencies combining lead import/scraping, multi-channel outreach tracking, AI message generation, follow-up automation, deals + revenue analytics, 30-day execution planner, plus Agency OS upgrades (services catalog, AI service recommendations, proposal generator, and delivery/project tracking) with a minimal teal/black/white responsive dashboard UI.",
+  "projectStateVersion": 13,
+  "summary": "Remove authentication/sign-in gating so users can access the app directly without any sign-in screen; adjust access control/privacy expectations accordingly for a public/no-auth experience.",
   "architectural_notes": [
     "Bubble app with SaaS multi-tenant privacy rules: users restricted to their agency/leads; role-based access (Admin vs Team).",
     "Core data types to implement in Bubble: User, Lead, Outreach Activity, Deal, Daily Task (plus later Service/Project for Agency OS upgrades).",
@@ -11,7 +11,8 @@
     "UI architecture: reusable components (cards, chart blocks, progress bars) and responsive sidebar navigation in teal/black/white theme.",
     "Authentication direction change: support sign-in via mobile number or email (e.g., password or OTP), and ensure first-login profile creation/onboarding still occurs; re-evaluate any Internet Identity assumptions in auth and user model.",
     "OTP login in Bubble requires external delivery (SMS/email) via third-party providers (e.g., Twilio/Sinch/MojoAuth); implementation depends on account email being enabled and/or an SMS plugin/API being configured.",
-    "Support separate onboarding flows by role: Admin flow (restricted/allowlisted) vs Client flow (service selection + pricing/details capture) after authentication."
+    "Support separate onboarding flows by role: Admin flow (restricted/allowlisted) vs Client flow (service selection + pricing/details capture) after authentication.",
+    "If authentication is removed, the app becomes effectively public/no-auth; revisit multi-tenant privacy rules and data ownership since user/agency scoping cannot be enforced without a logged-in identity."
   ],
   "known_issues": [
     "OTP sign-in cannot be completed until an email sending method is enabled and/or an SMS provider/plugin is configured for the Bubble app."
@@ -209,6 +210,70 @@
         "REQ-28"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-remove-the-sign-in-requirement-so-the-app-loads-directly-into-the-main-application-routes-without-showing-the-signinpage-or-requiring-internet-identity-login",
+      "title": "Remove the sign-in requirement so the app loads directly into the main application routes without showing the SignInPage or requiring Internet Identity login.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-root-routing-onboarding-logic-to-stop-blocking-access-based-on-identity-and-stop-showing-the-first-time-profilesetupmodal-as-a-prerequisite-for-accessing-the-app",
+      "title": "Update the root routing/onboarding logic to stop blocking access based on `identity` and stop showing the first-time ProfileSetupModal as a prerequisite for accessing the app.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-navigation-and-settings-ux-for-a-no-sign-in-experience-by-removing-or-reworking-sign-out-related-ui-so-it-does-not-appear-or-does-not-imply-authentication-is-required",
+      "title": "Adjust navigation and settings UX for a no-sign-in experience by removing or reworking sign-out-related UI so it does not appear or does not imply authentication is required.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-export-data-ui-section-that-lets-users-download-app-data-with-separately-downloadable-buttons-for-each-format-pdf-docx-csv-google-sheets-compatible-and-excel-xlsx",
+      "title": "Add a new “Export Data” UI section that lets users download app data with separately downloadable buttons for each format: PDF, DOCX, CSV (Google Sheets compatible), and Excel (.xlsx).",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-exports-for-the-key-datasets-available-in-the-app-at-minimum-leads-outreach-activities-services-deals-projects-and-ensure-each-export-includes-a-clear-header-row-labels-and-consistent-field-ordering-across-formats",
+      "title": "Implement exports for the key datasets available in the app (at minimum: Leads, Outreach Activities, Services, Deals, Projects) and ensure each export includes a clear header row/labels and consistent field ordering across formats.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-14-user-uploaded-image-files-to-the-frontend-as-static-assets-and-standardize-how-they-are-referenced-in-the-react-ui-no-backend-image-serving-uploaded-files-f25340160-jpeg-f25339648-jpeg-f5418752-jpeg-f25481216-jpeg-f25737216-jpeg-ai-automation-png-discover-strategy-jpeg-dm-icon-png-f25741568-jpeg-deployment-icon-png-f25737984-jpeg-f25726208-jpeg-f25639680-jpeg-f25731584-jpeg",
+      "title": "Add the 14 user-uploaded image files to the frontend as static assets and standardize how they are referenced in the React UI (no backend image serving). Uploaded files: f25340160.jpeg, f25339648.jpeg, f5418752.jpeg, f25481216.jpeg, f25737216.jpeg, AI automation.png, discover & strategy.jpeg, DM ICON.png, f25741568.jpeg, deployment icon.png, f25737984.jpeg, f25726208.jpeg, f25639680.jpeg, f25731584.jpeg.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-incorporate-the-uploaded-images-into-the-ui-in-a-cohesive-way-that-improves-perceived-quality-use-the-icon-style-images-for-platform-affordances-instagram-whatsapp-email-dm-phone-deployment-automation-and-use-the-illustration-style-images-as-page-hero-empty-state-artwork-where-appropriate-e-g-dashboard-empty-state-planner-introduction-card-outreach-empty-state-cards",
+      "title": "Incorporate the uploaded images into the UI in a cohesive way that improves perceived quality: use the icon-style images for platform affordances (Instagram/WhatsApp/Email/DM/Phone/Deployment/Automation), and use the illustration-style images as page hero/empty-state artwork where appropriate (e.g., Dashboard empty state, Planner introduction card, Outreach empty state cards).",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refine-the-overall-visual-styling-to-be-more-elegant-while-keeping-the-existing-minimal-teal-black-white-design-direction-improve-typography-hierarchy-spacing-card-panel-styling-and-interactive-states-hover-focus-and-align-visuals-across-appshell-sidebarnav-and-key-content-cards-statscard-chartblock-exportdatasection",
+      "title": "Refine the overall visual styling to be “more elegant” while keeping the existing minimal teal/black/white design direction: improve typography hierarchy, spacing, card/panel styling, and interactive states (hover/focus), and align visuals across AppShell/SidebarNav and key content cards (StatsCard, ChartBlock, ExportDataSection).",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -221,12 +286,6 @@
     {
       "id": "AR-2",
       "summary": "Bubble database schema: User, Lead, Outreach Activity, Deal, Daily Task data types with specified fields",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Login/Signup with email/password, agency name capture, redirect to dashboard",
       "reqIds": [],
       "status": "pending"
     },
@@ -349,12 +408,6 @@
       "status": "pending"
     },
     {
-      "id": "AR-35",
-      "summary": "Update authentication to allow sign-in using mobile number or email (replace/augment Internet Identity flow); support onboarding/profile creation after first sign-in",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
       "id": "AR-38",
       "summary": "Add mobile number storage to the backend user profile and registration flow so the profile can persist an optional phone number alongside the existing email field.",
       "reqIds": [
@@ -363,29 +416,45 @@
       "status": "pending"
     },
     {
-      "id": "AR-39",
-      "summary": "Add OTP-based sign-in (email/SMS/passwordless) via a third-party provider (e.g., Twilio/Sinch/MojoAuth) depending on enabled email/SMS capabilities",
+      "id": "AR-45",
+      "summary": "Remove sign-in/authentication requirement and allow direct access to the app (no sign-in screen); update routing/onboarding accordingly",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-40",
-      "summary": "Create two onboarding/signup flows: (1) admin-only signup/profile for Aryan Abhishek (pre-seeded admin role with specified phone/email), (2) client signup/onboarding to select a service and view detailed service info + cost details",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-41",
-      "summary": "Implement admin-role gating and a client onboarding flow that works without OTP (using existing auth), including service selection and pricing/details capture for clients",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-44",
-      "summary": "Enforce the admin allowlist in backend profile registration so that a caller cannot self-register as Admin unless their provided email or mobile number matches the allowlisted admin details (email: quickbeeagency@gmail.com, phone: +919182768591). Ensure backend logic rejects unauthorized attempts to register/save an Admin profile.",
+      "id": "AR-49",
+      "summary": "Make backend APIs usable without requiring Internet Identity authentication by removing/relaxing backend permission checks that currently trap for unauthenticated callers, so the app functions in a public/no-auth mode.",
       "reqIds": [
-        "REQ-26"
+        "REQ-32"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "Align data-scoping logic with direct-access mode by ensuring backend filtering that depends on an existing `UserProfile`/agency does not result in empty data or authorization traps for guest users.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-51",
+      "summary": "Add separate export/download buttons for key app data in multiple formats (PDF, DOCX, CSV/Excel, Google Sheets-compatible) so files can be manually shared via WhatsApp",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-54",
+      "summary": "Add or extend backend query APIs as needed to support exporting Deals and Projects data in no-auth/direct-access mode without trapping for unauthenticated callers.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-55",
+      "summary": "Update UI to incorporate the provided images and refine visual styling to a more elegant look (polish layout/spacing/typography to match).",
+      "reqIds": [],
       "status": "pending"
     }
   ],

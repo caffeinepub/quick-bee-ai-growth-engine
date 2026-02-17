@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useGetCallerUserProfile } from './useCurrentUserProfile';
-import type { Deal, DealStatus } from '../backend';
+import type { Deal } from '../backend';
 
 export function useGetUserDeals() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -22,7 +22,7 @@ export function useUpdateDealStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ dealId, status }: { dealId: string; status: DealStatus }) => {
+    mutationFn: async ({ dealId, status }: { dealId: string; status: string }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.updateDealStatus(dealId, status);
     },

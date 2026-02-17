@@ -32,31 +32,40 @@ const navItems = [
 ];
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
-  const { clear } = useInternetIdentity();
+  const { clear, identity } = useInternetIdentity();
   const { data: isAdmin } = useIsCallerAdmin();
   const queryClient = useQueryClient();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
-  const handleLogout = async () => {
-    await clear();
+  const isAuthenticated = !!identity;
+
+  const handleClearSession = async () => {
+    if (isAuthenticated) {
+      await clear();
+    }
+    // Clear all cached data
     queryClient.clear();
     clearSignInIdentifier();
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-6 hidden lg:block">
+      <div className="p-6 pb-5">
         <div className="flex items-center gap-3">
-          <img src="/assets/generated/quickbee-app-icon.dim_256x256.png" alt="Quick Bee" className="w-10 h-10" />
+          <img
+            src="/assets/generated/quickbee-app-icon.dim_256x256.png"
+            alt="Quick Bee"
+            className="w-10 h-10"
+          />
           <div>
-            <h1 className="font-bold text-xl">Quick Bee</h1>
+            <h2 className="text-xl font-bold tracking-tight">Quick Bee</h2>
             <p className="text-xs text-muted-foreground">AI Growth Engine</p>
           </div>
         </div>
       </div>
 
-      <Separator className="hidden lg:block" />
+      <Separator />
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
@@ -67,14 +76,14 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             <Link
               key={item.path}
               to={item.path}
-              onClick={onNavigate}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 focus-ring ${
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'hover:bg-accent hover:text-accent-foreground'
               }`}
+              onClick={onNavigate}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5 flex-shrink-0" />
               <span className="font-medium">{item.label}</span>
             </Link>
           );
@@ -82,17 +91,17 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
         {!isAdmin && (
           <>
-            <Separator className="my-2" />
+            <Separator className="my-3" />
             <Link
               to="/onboarding"
-              onClick={onNavigate}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 focus-ring ${
                 currentPath === '/onboarding'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'hover:bg-accent hover:text-accent-foreground'
               }`}
+              onClick={onNavigate}
             >
-              <UserPlus className="h-5 w-5" />
+              <UserPlus className="h-5 w-5 flex-shrink-0" />
               <span className="font-medium">Client Onboarding</span>
             </Link>
           </>
@@ -103,12 +112,12 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="p-4">
         <Button
-          onClick={handleLogout}
           variant="ghost"
-          className="w-full justify-start text-muted-foreground hover:text-foreground"
+          className="w-full justify-start gap-3 focus-ring hover:bg-accent"
+          onClick={handleClearSession}
         >
-          <LogOut className="mr-3 h-5 w-5" />
-          Sign Out
+          <LogOut className="h-5 w-5" />
+          <span>Clear Session</span>
         </Button>
       </div>
     </div>

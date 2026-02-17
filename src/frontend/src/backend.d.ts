@@ -14,6 +14,18 @@ export class ExternalBlob {
     static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
+export interface Lead {
+    id: string;
+    status: string;
+    contact: string;
+    owner: string;
+    city: string;
+    name: string;
+    createdAt: bigint;
+    revenuePotential: bigint;
+    agency: string;
+    niche: string;
+}
 export interface ClientServiceRequest {
     id: string;
     principal: string;
@@ -41,21 +53,9 @@ export interface Service {
     salesCount: bigint;
     price: bigint;
 }
-export interface Lead {
-    id: string;
-    status: LeadStatus;
-    contact: string;
-    owner: string;
-    city: string;
-    name: string;
-    createdAt: bigint;
-    revenuePotential: bigint;
-    agency: string;
-    niche: string;
-}
 export interface Deal {
     id: string;
-    status: DealStatus;
+    status: string;
     closeDate?: bigint;
     value: bigint;
     createdAt: bigint;
@@ -78,27 +78,12 @@ export interface UserProfile {
     revenueGoal: bigint;
     principal: string;
     name: string;
-    role: UserRole;
+    role: string;
     subscriptionPlan: string;
     agency: string;
     mobileNumber?: string;
     email: string;
     totalRevenue: bigint;
-}
-export enum DealStatus {
-    won = "won",
-    lost = "lost",
-    open = "open",
-    proposalSent = "proposalSent"
-}
-export enum LeadStatus {
-    won = "won",
-    cold = "cold",
-    lost = "lost",
-    proposalSent = "proposalSent",
-    contacted = "contacted",
-    interested = "interested",
-    qualified = "qualified"
 }
 export enum UserRole {
     admin = "admin",
@@ -108,7 +93,7 @@ export enum UserRole {
 export interface backendInterface {
     addLead(request: {
         id: string;
-        status: LeadStatus;
+        status: string;
         contact: string;
         owner: string;
         city: string;
@@ -132,13 +117,18 @@ export interface backendInterface {
     getCallerUserRole(): Promise<UserRole>;
     getClientServiceRequest(requestId: string): Promise<ClientServiceRequest | null>;
     getClientServiceRequestsByAgency(agency: string): Promise<Array<ClientServiceRequest>>;
-    getUserDeals(agency: string): Promise<Array<Deal>>;
+    getDealsForExport(): Promise<Array<Deal>>;
+    getLeadsForExport(): Promise<Array<Lead>>;
+    getOutreachActivitiesForExport(): Promise<Array<OutreachActivity>>;
+    getProjectsForExport(): Promise<Array<Project>>;
+    getServicesForExport(): Promise<Array<Service>>;
+    getUserDeals(_agency: string): Promise<Array<Deal>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    importLeads(leadList: Array<Lead>, agency: string): Promise<void>;
+    importLeads(leadList: Array<Lead>, _agency: string): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    registerUser(principal: string, name: string, email: string, mobileNumber: string | null, agency: string, role: UserRole, revenueGoal: bigint, subscriptionPlan: string): Promise<void>;
+    registerUser(principal: string, name: string, email: string, mobileNumber: string | null, agency: string, role: string, revenueGoal: bigint, subscriptionPlan: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateDealStatus(dealId: string, status: DealStatus): Promise<void>;
-    updateLeadStatus(leadId: string, status: LeadStatus): Promise<void>;
+    updateDealStatus(dealId: string, status: string): Promise<void>;
+    updateLeadStatus(leadId: string, status: string): Promise<void>;
     updateServiceStatus(serviceId: string, active: boolean): Promise<void>;
 }

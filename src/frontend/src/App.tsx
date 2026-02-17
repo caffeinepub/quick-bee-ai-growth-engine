@@ -1,8 +1,4 @@
 import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile } from './hooks/useCurrentUserProfile';
-import SignInPage from './pages/SignInPage';
-import ProfileSetupModal from './components/auth/ProfileSetupModal';
 import AppShell from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import LeadsPage from './pages/LeadsPage';
@@ -17,23 +13,8 @@ import ProposalSharePage from './pages/ProposalSharePage';
 import ClientOnboardingPage from './pages/ClientOnboardingPage';
 
 function RootComponent() {
-  const { identity } = useInternetIdentity();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
-  
-  const isAuthenticated = !!identity;
-  
-  if (!isAuthenticated) {
-    return <SignInPage />;
-  }
-  
-  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
-  
-  return (
-    <>
-      {showProfileSetup && <ProfileSetupModal />}
-      {!showProfileSetup && <Outlet />}
-    </>
-  );
+  // Always render the app layout - no authentication gate
+  return <Outlet />;
 }
 
 const rootRoute = createRootRoute({

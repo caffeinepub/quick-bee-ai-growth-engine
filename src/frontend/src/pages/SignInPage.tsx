@@ -35,8 +35,12 @@ export default function SignInPage() {
 
         <div className="space-y-6">
           <div className="space-y-4 bg-card p-6 rounded-lg border">
+            <p className="text-sm text-muted-foreground text-center">
+              This page is optional. The app can be accessed directly without sign-in.
+            </p>
+            
             <div className="space-y-2">
-              <Label htmlFor="identifier">Email or mobile number</Label>
+              <Label htmlFor="identifier">Email or mobile number (optional)</Label>
               <Input
                 id="identifier"
                 type="text"

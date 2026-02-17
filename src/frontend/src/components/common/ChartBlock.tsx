@@ -9,12 +9,12 @@ interface ChartBlockProps {
 
 export function ChartBlock({ title, children, action }: ChartBlockProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{title}</CardTitle>
+    <Card className="interactive-card">
+      <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <CardTitle className="text-xl font-semibold tracking-tight">{title}</CardTitle>
         {action}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="pt-2">{children}</CardContent>
     </Card>
   );
 }

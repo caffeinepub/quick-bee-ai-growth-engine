@@ -66,3 +66,46 @@
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     }
 }
+
+@layer utilities {
+    /* Page header consistency */
+    .page-header {
+        @apply mb-8;
+    }
+    
+    .page-title {
+        @apply text-3xl font-bold tracking-tight mb-2;
+    }
+    
+    .page-description {
+        @apply text-muted-foreground text-base;
+    }
+    
+    /* Card density and spacing */
+    .card-compact {
+        @apply p-5;
+    }
+    
+    .card-comfortable {
+        @apply p-6;
+    }
+    
+    /* Accessible focus states */
+    .focus-ring {
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+    }
+    
+    /* Interactive states */
+    .interactive-card {
+        @apply transition-all duration-200 hover:shadow-md hover:border-primary/20;
+    }
+    
+    /* Typography hierarchy */
+    .section-heading {
+        @apply text-xl font-semibold tracking-tight mb-4;
+    }
+    
+    .subsection-heading {
+        @apply text-lg font-medium mb-3;
+    }
+}

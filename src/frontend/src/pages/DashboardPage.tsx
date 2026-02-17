@@ -3,8 +3,10 @@ import { useGetCallerUserProfile } from '../hooks/useCurrentUserProfile';
 import { StatsCard } from '../components/common/StatsCard';
 import { ChartBlock } from '../components/common/ChartBlock';
 import { ProgressBar } from '../components/common/ProgressBar';
+import { ExportDataSection } from '../components/export/ExportDataSection';
 import { Users, MessageSquare, DollarSign, TrendingUp, Target, CheckCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { UPLOADED_IMAGES } from '../constants/uploadedImages';
 
 export default function DashboardPage() {
   const { data: analytics, isLoading } = useGetAgencyAnalytics();
@@ -54,27 +56,45 @@ export default function DashboardPage() {
 
   if (totalLeads === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 space-y-4">
-        <img
-          src="/assets/generated/empty-state-dashboard.dim_1200x800.png"
-          alt="No data yet"
-          className="w-96 h-64 object-contain opacity-50"
-        />
-        <h2 className="text-2xl font-bold">Welcome to Quick Bee!</h2>
-        <p className="text-muted-foreground">Start by adding your first lead to see your dashboard come to life.</p>
+      <div className="space-y-8">
+        <div className="page-header">
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-description">Overview of your agency's performance</p>
+        </div>
+
+        <ExportDataSection />
+
+        <div className="flex flex-col items-center justify-center py-16 space-y-6">
+          <div className="relative w-full max-w-md aspect-video">
+            <img
+              src={UPLOADED_IMAGES.workspace1}
+              alt="Welcome to Quick Bee"
+              className="w-full h-full object-cover rounded-2xl shadow-lg"
+            />
+          </div>
+          <div className="text-center space-y-3 max-w-lg">
+            <h2 className="text-3xl font-bold">Welcome to Quick Bee!</h2>
+            <p className="text-muted-foreground text-lg">
+              Start by adding your first lead to see your dashboard come to life.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your agency's performance</p>
+    <div className="space-y-8">
+      <div className="page-header">
+        <h1 className="page-title">Dashboard</h1>
+        <p className="page-description">Overview of your agency's performance</p>
       </div>
 
+      {/* Export Data Section */}
+      <ExportDataSection />
+
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="Total Leads" value={totalLeads} icon={Users} />
         <StatsCard title="Total Outreach" value={totalOutreach} icon={MessageSquare} />
         <StatsCard title="Reply Rate" value={`${replyRate}%`} icon={TrendingUp} />
@@ -83,20 +103,20 @@ export default function DashboardPage() {
 
       {/* Revenue Goal Progress */}
       <ChartBlock title="Revenue Goal Progress">
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold">${totalRevenue.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">of ${revenueGoal.toLocaleString()} goal</p>
+              <p className="text-3xl font-bold">${totalRevenue.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground mt-1">of ${revenueGoal.toLocaleString()} goal</p>
             </div>
-            <Target className="h-8 w-8 text-muted-foreground" />
+            <Target className="h-10 w-10 text-muted-foreground" />
           </div>
           <ProgressBar value={totalRevenue} max={revenueGoal} showPercentage />
         </div>
       </ChartBlock>
 
       {/* Charts Grid */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         <ChartBlock title="Outreach by Platform">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={platformData}>

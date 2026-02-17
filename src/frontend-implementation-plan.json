@@ -1,110 +1,163 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin allowlist signup + client service-selection onboarding (Internet Identity only, no OTP)",
+  "title": "Quick Bee UI polish: integrate uploaded images + elegant styling refinements",
   "requirements": [
     {
-      "id": "REQ-24",
-      "summary": "Keep Internet Identity as the only authentication method and ensure sign-in UI does not imply OTP; identifier is only for context/prefill.",
+      "id": "REQ-37",
+      "summary": "Add the 14 uploaded images as static frontend assets and reference them via a single shared mapping module.",
       "acceptanceCriteria": [
-        "There is no UI, API, or backend logic that attempts to send or verify OTP codes.",
-        "Sign-in continues to use the existing Internet Identity login flow, with the identifier only used for prefill/onboarding context.",
-        "User-facing copy on the sign-in page remains in English and does not claim OTP delivery."
+        "All 14 uploaded images are present in the frontend static assets directory and load correctly in production build (no broken links in the UI).",
+        "No API/backend changes are required to display these images; they are loaded via static paths.",
+        "Images are referenced via a single, consistent mapping (e.g., a small constants module) rather than scattered hardcoded paths across many components."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/SignInPage.tsx",
-          "operation": "modify",
-          "description": "Update English UI copy to explicitly state that authentication continues via Internet Identity after entering an email/phone identifier, and ensure no wording suggests OTP delivery or verification."
+          "path": "frontend/public/assets/uploaded/f25340160.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
         },
         {
-          "path": "frontend/src/utils/signInIdentifier.ts",
-          "operation": "modify",
-          "description": "Add small helper(s) for normalizing/comparing identifiers (e.g., case-insensitive email compare and phone normalization) so the identifier remains a context value only and is safe to reuse for prefills."
+          "path": "frontend/public/assets/uploaded/f25339648.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f5418752.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25481216.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25737216.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/AI automation.png",
+          "operation": "create",
+          "description": "Add uploaded static image asset (filename contains spaces; ensure URL encoding is handled by the centralized mapping module)."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/discover & strategy.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset (filename contains special character '&'; ensure URL encoding is handled by the centralized mapping module)."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/DM ICON.png",
+          "operation": "create",
+          "description": "Add uploaded static image asset (filename contains spaces; ensure URL encoding is handled by the centralized mapping module)."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25741568.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/deployment icon.png",
+          "operation": "create",
+          "description": "Add uploaded static image asset (filename contains spaces; ensure URL encoding is handled by the centralized mapping module)."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25737984.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25726208.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25639680.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/public/assets/uploaded/f25731584.jpeg",
+          "operation": "create",
+          "description": "Add uploaded static image asset for consistent UI usage."
+        },
+        {
+          "path": "frontend/src/constants/uploadedImages.ts",
+          "operation": "create",
+          "description": "Create a single source-of-truth mapping for uploaded image static paths (including safe handling for spaces and special characters) so UI imports are standardized."
         }
       ]
     },
     {
-      "id": "REQ-25",
-      "summary": "Implement admin-only first-time profile setup allowlist behavior (prefill/lock Admin for allowlisted identifier; prevent Admin selection otherwise).",
+      "id": "REQ-38",
+      "summary": "Use uploaded icon/illustration images across Dashboard, Planner, and Outreach for tabs, affordances, and empty states without breaking responsiveness.",
       "acceptanceCriteria": [
-        "When the stored identifier equals \"+919182768591\" or \"quickbeeagency@gmail.com\" (case-insensitive for email), the profile setup modal prefills name/email/phone accordingly and the role is locked to Admin.",
-        "When the stored identifier does not match the allowlist, the profile setup modal does not allow choosing Admin (role is effectively Team/User-only).",
-        "All user-facing text related to this flow is in English."
+        "At least one primary page (Dashboard) and at least two secondary pages (e.g., Planner and Outreach) visually incorporate the uploaded images in a way that is responsive and does not overflow on mobile.",
+        "Platform-related visuals in Outreach use the uploaded platform/icon images in tabs and/or empty states while keeping existing labels in English and maintaining usability/contrast.",
+        "Existing generated assets currently used (e.g., quickbee-app-icon, empty-state-dashboard) remain functional; if replaced, replacements must be from the uploaded images and must not degrade layout or readability."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/adminAllowlist.ts",
-          "operation": "create",
-          "description": "Create a small allowlist utility that contains the allowlisted admin identity details and exposes functions to check whether a stored identifier matches (email case-insensitive; phone normalized)."
+          "path": "frontend/src/pages/DashboardPage.tsx",
+          "operation": "modify",
+          "description": "Import from the centralized uploaded image mapping and enhance the Dashboard empty state/hero visuals with an uploaded illustration (with responsive sizing and safe fallback so existing generated empty-state-dashboard remains functional)."
         },
         {
-          "path": "frontend/src/components/auth/ProfileSetupModal.tsx",
+          "path": "frontend/src/pages/PlannerPage.tsx",
           "operation": "modify",
-          "description": "Use the authorization component's profile setup approach (getCallerUserProfile/registerUser pattern) to enforce allowlist UI rules: when identifier matches allowlist, prefill name/email/phone and lock role to Admin (not editable); otherwise, default to non-admin role and remove/disable the Admin option. Verify the component's usage instructions before implementing."
+          "description": "Incorporate an uploaded illustration-style image into the Planner introduction card (responsive, non-overflowing), using the centralized uploaded image mapping."
+        },
+        {
+          "path": "frontend/src/pages/OutreachPage.tsx",
+          "operation": "modify",
+          "description": "Replace/augment platform tab visuals and empty-state cards with uploaded icon-style images (Email/Instagram/WhatsApp/DM/Phone/Deployment/Automation where appropriate), sourcing all paths from the centralized uploaded image mapping and ensuring mobile-safe layout."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Optionally elevate perceived quality by incorporating a subtle uploaded brand/illustration accent in the shell header area while preserving existing structure and keeping the generated quickbee-app-icon functional."
         }
       ]
     },
     {
-      "id": "REQ-27",
-      "summary": "Add a client onboarding flow for non-admin users to browse services, review details/cost, submit a client service request, and view their submitted requests in-app.",
+      "id": "REQ-39",
+      "summary": "Refine global elegance: typography hierarchy, spacing, card/panel styling, and consistent accessible hover/focus states across shell and key cards without editing shadcn/ui internals.",
       "acceptanceCriteria": [
-        "After a non-admin user completes profile setup (or on next app entry if already registered), they can access a client onboarding screen to select a service.",
-        "The client onboarding UI shows service details and cost details for the selected service before submission.",
-        "Submitting creates a stored record in the backend that includes at least: client principal, agency, selected service identifier, captured cost/price details shown/accepted, and a timestamp.",
-        "Clients can see their submitted requests in-app (e.g., a “My Requests” list in the onboarding screen)."
+        "Sidebar header area, primary page headers, and key cards (stats/chart/export) show visibly improved spacing/typography consistency (clear hierarchy, consistent padding, balanced density).",
+        "Buttons/links have consistent hover/focus-visible states across pages, and focus styling is accessible (keyboard navigation clearly indicated).",
+        "Changes do not require editing any files under frontend/src/components/ui (Shadcn components remain unmodified); composition and styling overrides are applied from app components/pages/CSS tokens instead."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useClientServiceRequests.ts",
-          "operation": "create",
-          "description": "Add React Query hooks to (1) create a client service request and (2) fetch requests for the current agency; client UI can filter by current principal to render a 'My Requests' list. Handle authorization failures gracefully per the authorization component guidance. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/ClientOnboardingPage.tsx",
-          "operation": "create",
-          "description": "Create a client onboarding page that loads available services, lets the user select a service, displays service details and price/cost details before submission, submits a request, and renders a 'My Requests' list for the signed-in principal (filtering agency requests by principal string). Use the authorization component guidance for authenticated data access and error handling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Wire the new client onboarding page into routing (add a route such as '/onboarding') so it is navigable after sign-in/profile setup."
+          "description": "Refine global design tokens and add app-level utility classes (via Tailwind layers) for consistent page headers, card density, and accessible focus-visible styling while keeping the teal/black/white direction."
         },
         {
           "path": "frontend/src/components/nav/SidebarNav.tsx",
           "operation": "modify",
-          "description": "Add a navigation entry to the client onboarding screen for non-admin users only (hide from Admin) using role information from the authorization flow. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-28",
-      "summary": "Provide an admin-only in-app view to review client service requests with client identifier, selected service, cost details, and submission time.",
-      "acceptanceCriteria": [
-        "Admin users can access a page/section that lists client service requests for their agency.",
-        "Non-admin users cannot access this admin review UI (route/section hidden and guarded).",
-        "The list displays, per request: client identifier, service, cost details, and submission time."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/admin/AdminOnlySection.tsx",
-          "operation": "create",
-          "description": "Create a small wrapper component that uses role/admin status checks to guard admin-only UI; show an English access-denied message when unauthorized, following the authorization component's access-control UI guidance. Verify the component's usage instructions before implementing."
+          "description": "Align sidebar header spacing/typography and standardize nav link hover/focus-visible styles (keyboard-accessible) without modifying shadcn/ui components."
         },
         {
-          "path": "frontend/src/components/admin/ClientServiceRequestsAdminPanel.tsx",
-          "operation": "create",
-          "description": "Implement an admin panel component that fetches agency client service requests, joins display data with service info (as needed), and renders a list showing client identifier (principal and any available submitted email/phone if present in request details), selected service, captured cost details, and submission time. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/SettingsPage.tsx",
+          "path": "frontend/src/components/layout/AppShell.tsx",
           "operation": "modify",
-          "description": "Add an Admin-only section within Settings that renders the ClientServiceRequestsAdminPanel under an AdminOnlySection guard; keep all user-facing copy in English and ensure non-admins cannot view the content."
+          "description": "Tune layout spacing/padding and background separation for a more elegant shell presentation while maintaining the existing TanStack Router + AppShell structure."
         },
         {
-          "path": "frontend/src/components/nav/SidebarNav.tsx",
+          "path": "frontend/src/components/common/StatsCard.tsx",
           "operation": "modify",
-          "description": "Ensure the admin review UI is not presented to non-admin users in navigation (if any link/label is added for admin review, keep it hidden for non-admins) using the authorization component's role-based access approach. Verify the component's usage instructions before implementing."
+          "description": "Improve stats card hierarchy (title/value/subtitle), padding consistency, and subtle interactive states via composition/class overrides (do not edit shadcn/ui internals)."
+        },
+        {
+          "path": "frontend/src/components/common/ChartBlock.tsx",
+          "operation": "modify",
+          "description": "Standardize chart block header typography and spacing to match StatsCard and other panels, using only wrapper-level styling."
+        },
+        {
+          "path": "frontend/src/components/export/ExportDataSection.tsx",
+          "operation": "modify",
+          "description": "Polish Export Data section card density, button grid rhythm, and hover/focus-visible consistency for an elegant feel while keeping existing export logic unchanged."
         }
       ]
     }

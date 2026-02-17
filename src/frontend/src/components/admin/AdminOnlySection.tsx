@@ -7,13 +7,14 @@ interface AdminOnlySectionProps {
 }
 
 export default function AdminOnlySection({ children }: AdminOnlySectionProps) {
-  const { data: isAdmin, isLoading } = useIsCallerAdmin();
+  const { data: isAdmin, isLoading, isError } = useIsCallerAdmin();
 
   if (isLoading) {
     return null;
   }
 
-  if (!isAdmin) {
+  // Treat errors or non-admin as access denied
+  if (isError || !isAdmin) {
     return (
       <Alert variant="destructive">
         <ShieldAlert className="h-4 w-4" />

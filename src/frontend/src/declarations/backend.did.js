@@ -19,15 +19,6 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
-export const LeadStatus = IDL.Variant({
-  'won' : IDL.Null,
-  'cold' : IDL.Null,
-  'lost' : IDL.Null,
-  'proposalSent' : IDL.Null,
-  'contacted' : IDL.Null,
-  'interested' : IDL.Null,
-  'qualified' : IDL.Null,
-});
 export const OutreachActivity = IDL.Record({
   'createdAt' : IDL.Int,
   'sent' : IDL.Bool,
@@ -67,7 +58,7 @@ export const UserRole = IDL.Variant({
 });
 export const Lead = IDL.Record({
   'id' : IDL.Text,
-  'status' : LeadStatus,
+  'status' : IDL.Text,
   'contact' : IDL.Text,
   'owner' : IDL.Text,
   'city' : IDL.Text,
@@ -77,15 +68,9 @@ export const Lead = IDL.Record({
   'agency' : IDL.Text,
   'niche' : IDL.Text,
 });
-export const DealStatus = IDL.Variant({
-  'won' : IDL.Null,
-  'lost' : IDL.Null,
-  'open' : IDL.Null,
-  'proposalSent' : IDL.Null,
-});
 export const Deal = IDL.Record({
   'id' : IDL.Text,
-  'status' : DealStatus,
+  'status' : IDL.Text,
   'closeDate' : IDL.Opt(IDL.Int),
   'value' : IDL.Nat,
   'createdAt' : IDL.Int,
@@ -104,7 +89,7 @@ export const UserProfile = IDL.Record({
   'revenueGoal' : IDL.Nat,
   'principal' : IDL.Text,
   'name' : IDL.Text,
-  'role' : UserRole,
+  'role' : IDL.Text,
   'subscriptionPlan' : IDL.Text,
   'agency' : IDL.Text,
   'mobileNumber' : IDL.Opt(IDL.Text),
@@ -144,7 +129,7 @@ export const idlService = IDL.Service({
       [
         IDL.Record({
           'id' : IDL.Text,
-          'status' : LeadStatus,
+          'status' : IDL.Text,
           'contact' : IDL.Text,
           'owner' : IDL.Text,
           'city' : IDL.Text,
@@ -202,6 +187,15 @@ export const idlService = IDL.Service({
       [IDL.Vec(ClientServiceRequest)],
       ['query'],
     ),
+  'getDealsForExport' : IDL.Func([], [IDL.Vec(Deal)], ['query']),
+  'getLeadsForExport' : IDL.Func([], [IDL.Vec(Lead)], ['query']),
+  'getOutreachActivitiesForExport' : IDL.Func(
+      [],
+      [IDL.Vec(OutreachActivity)],
+      ['query'],
+    ),
+  'getProjectsForExport' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+  'getServicesForExport' : IDL.Func([], [IDL.Vec(Service)], ['query']),
   'getUserDeals' : IDL.Func([IDL.Text], [IDL.Vec(Deal)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -217,7 +211,7 @@ export const idlService = IDL.Service({
         IDL.Text,
         IDL.Opt(IDL.Text),
         IDL.Text,
-        UserRole,
+        IDL.Text,
         IDL.Nat,
         IDL.Text,
       ],
@@ -225,8 +219,8 @@ export const idlService = IDL.Service({
       [],
     ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'updateDealStatus' : IDL.Func([IDL.Text, DealStatus], [], []),
-  'updateLeadStatus' : IDL.Func([IDL.Text, LeadStatus], [], []),
+  'updateDealStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'updateLeadStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'updateServiceStatus' : IDL.Func([IDL.Text, IDL.Bool], [], []),
 });
 
@@ -243,15 +237,6 @@ export const idlFactory = ({ IDL }) => {
   const _CaffeineStorageRefillResult = IDL.Record({
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
-  });
-  const LeadStatus = IDL.Variant({
-    'won' : IDL.Null,
-    'cold' : IDL.Null,
-    'lost' : IDL.Null,
-    'proposalSent' : IDL.Null,
-    'contacted' : IDL.Null,
-    'interested' : IDL.Null,
-    'qualified' : IDL.Null,
   });
   const OutreachActivity = IDL.Record({
     'createdAt' : IDL.Int,
@@ -292,7 +277,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const Lead = IDL.Record({
     'id' : IDL.Text,
-    'status' : LeadStatus,
+    'status' : IDL.Text,
     'contact' : IDL.Text,
     'owner' : IDL.Text,
     'city' : IDL.Text,
@@ -302,15 +287,9 @@ export const idlFactory = ({ IDL }) => {
     'agency' : IDL.Text,
     'niche' : IDL.Text,
   });
-  const DealStatus = IDL.Variant({
-    'won' : IDL.Null,
-    'lost' : IDL.Null,
-    'open' : IDL.Null,
-    'proposalSent' : IDL.Null,
-  });
   const Deal = IDL.Record({
     'id' : IDL.Text,
-    'status' : DealStatus,
+    'status' : IDL.Text,
     'closeDate' : IDL.Opt(IDL.Int),
     'value' : IDL.Nat,
     'createdAt' : IDL.Int,
@@ -329,7 +308,7 @@ export const idlFactory = ({ IDL }) => {
     'revenueGoal' : IDL.Nat,
     'principal' : IDL.Text,
     'name' : IDL.Text,
-    'role' : UserRole,
+    'role' : IDL.Text,
     'subscriptionPlan' : IDL.Text,
     'agency' : IDL.Text,
     'mobileNumber' : IDL.Opt(IDL.Text),
@@ -369,7 +348,7 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Record({
             'id' : IDL.Text,
-            'status' : LeadStatus,
+            'status' : IDL.Text,
             'contact' : IDL.Text,
             'owner' : IDL.Text,
             'city' : IDL.Text,
@@ -427,6 +406,15 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(ClientServiceRequest)],
         ['query'],
       ),
+    'getDealsForExport' : IDL.Func([], [IDL.Vec(Deal)], ['query']),
+    'getLeadsForExport' : IDL.Func([], [IDL.Vec(Lead)], ['query']),
+    'getOutreachActivitiesForExport' : IDL.Func(
+        [],
+        [IDL.Vec(OutreachActivity)],
+        ['query'],
+      ),
+    'getProjectsForExport' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+    'getServicesForExport' : IDL.Func([], [IDL.Vec(Service)], ['query']),
     'getUserDeals' : IDL.Func([IDL.Text], [IDL.Vec(Deal)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -442,7 +430,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Text,
           IDL.Opt(IDL.Text),
           IDL.Text,
-          UserRole,
+          IDL.Text,
           IDL.Nat,
           IDL.Text,
         ],
@@ -450,8 +438,8 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'updateDealStatus' : IDL.Func([IDL.Text, DealStatus], [], []),
-    'updateLeadStatus' : IDL.Func([IDL.Text, LeadStatus], [], []),
+    'updateDealStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'updateLeadStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'updateServiceStatus' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   });
 };

@@ -11,7 +11,12 @@ import { UserRole } from '../../backend';
 import { getSignInIdentifier, prefillFromIdentifier } from '../../utils/signInIdentifier';
 import { isAdminAllowlisted, getAdminPrefillData } from '../../utils/adminAllowlist';
 
-export default function ProfileSetupModal() {
+interface ProfileSetupModalProps {
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export default function ProfileSetupModal({ open = true, onClose }: ProfileSetupModalProps) {
   const { identity } = useInternetIdentity();
   const registerUser = useRegisterUser();
 
@@ -53,6 +58,11 @@ export default function ProfileSetupModal() {
     }
   }, []);
 
+  // Only show modal if authenticated
+  if (!identity) {
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identity) return;
@@ -70,11 +80,21 @@ export default function ProfileSetupModal() {
       revenueGoal: BigInt(Math.floor(parseFloat(revenueGoal) || 0)),
       subscriptionPlan,
     });
+
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
-    <Dialog open={true}>
-      <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Welcome to Quick Bee!</DialogTitle>
           <DialogDescription>Let's set up your profile to get started.</DialogDescription>
@@ -179,16 +199,21 @@ export default function ProfileSetupModal() {
             </Select>
           </div>
 
-          <Button type="submit" className="w-full" disabled={registerUser.isPending}>
-            {registerUser.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Setting up...
-              </>
-            ) : (
-              'Complete Setup'
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" onClick={handleCancel} className="flex-1">
+              Skip for now
+            </Button>
+            <Button type="submit" className="flex-1" disabled={registerUser.isPending}>
+              {registerUser.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Setting up...
+                </>
+              ) : (
+                'Complete Setup'
+              )}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

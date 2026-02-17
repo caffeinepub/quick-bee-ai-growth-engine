@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Lead, LeadStatus } from '../backend';
+import type { Lead } from '../backend';
 
 export function useGetAllLeads() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -27,7 +27,7 @@ export function useAddLead() {
       contact: string;
       city: string;
       niche: string;
-      status: LeadStatus;
+      status: string;
       revenuePotential: bigint;
       owner: string;
     }) => {
@@ -46,7 +46,7 @@ export function useUpdateLeadStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ leadId, status }: { leadId: string; status: LeadStatus }) => {
+    mutationFn: async ({ leadId, status }: { leadId: string; status: string }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.updateLeadStatus(leadId, status);
     },

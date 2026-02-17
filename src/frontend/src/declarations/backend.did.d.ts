@@ -20,21 +20,17 @@ export interface ClientServiceRequest {
 }
 export interface Deal {
   'id' : string,
-  'status' : DealStatus,
+  'status' : string,
   'closeDate' : [] | [bigint],
   'value' : bigint,
   'createdAt' : bigint,
   'agency' : string,
   'leadId' : string,
 }
-export type DealStatus = { 'won' : null } |
-  { 'lost' : null } |
-  { 'open' : null } |
-  { 'proposalSent' : null };
 export type ExternalBlob = Uint8Array;
 export interface Lead {
   'id' : string,
-  'status' : LeadStatus,
+  'status' : string,
   'contact' : string,
   'owner' : string,
   'city' : string,
@@ -44,13 +40,6 @@ export interface Lead {
   'agency' : string,
   'niche' : string,
 }
-export type LeadStatus = { 'won' : null } |
-  { 'cold' : null } |
-  { 'lost' : null } |
-  { 'proposalSent' : null } |
-  { 'contacted' : null } |
-  { 'interested' : null } |
-  { 'qualified' : null };
 export interface OutreachActivity {
   'createdAt' : bigint,
   'sent' : boolean,
@@ -86,7 +75,7 @@ export interface UserProfile {
   'revenueGoal' : bigint,
   'principal' : string,
   'name' : string,
-  'role' : UserRole,
+  'role' : string,
   'subscriptionPlan' : string,
   'agency' : string,
   'mobileNumber' : [] | [string],
@@ -128,7 +117,7 @@ export interface _SERVICE {
     [
       {
         'id' : string,
-        'status' : LeadStatus,
+        'status' : string,
         'contact' : string,
         'owner' : string,
         'city' : string,
@@ -173,17 +162,22 @@ export interface _SERVICE {
     [string],
     Array<ClientServiceRequest>
   >,
+  'getDealsForExport' : ActorMethod<[], Array<Deal>>,
+  'getLeadsForExport' : ActorMethod<[], Array<Lead>>,
+  'getOutreachActivitiesForExport' : ActorMethod<[], Array<OutreachActivity>>,
+  'getProjectsForExport' : ActorMethod<[], Array<Project>>,
+  'getServicesForExport' : ActorMethod<[], Array<Service>>,
   'getUserDeals' : ActorMethod<[string], Array<Deal>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'importLeads' : ActorMethod<[Array<Lead>, string], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'registerUser' : ActorMethod<
-    [string, string, string, [] | [string], string, UserRole, bigint, string],
+    [string, string, string, [] | [string], string, string, bigint, string],
     undefined
   >,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'updateDealStatus' : ActorMethod<[string, DealStatus], undefined>,
-  'updateLeadStatus' : ActorMethod<[string, LeadStatus], undefined>,
+  'updateDealStatus' : ActorMethod<[string, string], undefined>,
+  'updateLeadStatus' : ActorMethod<[string, string], undefined>,
   'updateServiceStatus' : ActorMethod<[string, boolean], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
