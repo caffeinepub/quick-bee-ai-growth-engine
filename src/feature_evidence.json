@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-existing-services-pricing-page-to-render-the-provided-complete-pricing-catalog-as-grouped-sections-with-all-30-offerings-and-their-exact-inr-prices-and-bullet-features-using-english-section-headings-no-emoji-only-headings",
-      "featureTitle": "Update the existing Services & Pricing page to render the provided complete pricing catalog as grouped sections with all 30 offerings and their exact INR prices and bullet features, using English section headings (no emoji-only headings).",
+      "featureId": "feature-add-a-revenue-trends-over-time-line-chart-to-the-analyticspage-showing-daily-or-weekly-revenue-progression",
+      "featureTitle": "Add a revenue trends over time line chart to the AnalyticsPage showing daily or weekly revenue progression",
       "files": [
-        "frontend/src/pages/ServicesPricingPage.tsx"
+        "frontend/src/components/analytics/RevenueTrendsChart.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,16 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-93"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-apply-a-gradient-themed-visual-style-to-the-services-pricing-page-including-gradient-card-accents-backgrounds-and-consistent-premium-styling-spacing-typography-hierarchy-while-keeping-all-user-facing-text-in-english",
-      "featureTitle": "Apply a gradient-themed visual style to the Services & Pricing page, including gradient card accents/backgrounds and consistent premium styling (spacing, typography hierarchy), while keeping all user-facing text in English.",
+      "featureId": "feature-add-a-service-categories-distribution-chart-to-the-analyticspage-showing-breakdown-of-services-by-category-or-niche",
+      "featureTitle": "Add a service categories distribution chart to the AnalyticsPage showing breakdown of services by category or niche",
       "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/ServicesPricingPage.tsx"
+        "frontend/src/components/analytics/ServiceCategoriesChart.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,16 +37,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-94"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-and-render-gradient-styled-3d-icons-for-the-pricing-catalog-categories-offerings-on-the-services-pricing-page-using-the-existing-serviceniche3dicon-component-and-icon-mapping-with-a-safe-fallback-if-an-icon-asset-is-missing",
-      "featureTitle": "Add and render gradient-styled 3D icons for the pricing catalog categories/offerings on the Services & Pricing page, using the existing ServiceNiche3dIcon component and icon mapping, with a safe fallback if an icon asset is missing.",
+      "featureId": "feature-add-a-top-performers-chart-to-the-analyticspage-ranking-services-or-leads-by-revenue-or-conversion-metrics",
+      "featureTitle": "Add a top performers chart to the AnalyticsPage ranking services or leads by revenue or conversion metrics",
       "files": [
-        "frontend/src/pages/ServicesPricingPage.tsx",
-        "frontend/src/utils/icons/serviceNiche3dIcons.ts"
+        "frontend/src/components/analytics/TopPerformersChart.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -59,15 +57,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-95"
+        "REQ-3"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-current-single-monthly-maintenance-card-on-the-services-pricing-page-with-a-monthly-maintenance-plans-section-that-shows-exactly-3-plans-student-499-month-business-999-month-pro-1-999-month-and-the-included-bullets-minor-updates-basic-support-monitoring",
-      "featureTitle": "Replace the current single “Monthly Maintenance” card on the Services & Pricing page with a “Monthly Maintenance Plans” section that shows exactly 3 plans (Student ₹499/month, Business ₹999/month, Pro ₹1,999/month) and the included bullets: Minor updates, Basic support, Monitoring.",
+      "featureId": "feature-compute-revenue-trends-data-from-existing-analytics-hook-useagencyanalytics-by-aggregating-payment-or-project-data-over-time-periods",
+      "featureTitle": "Compute revenue trends data from existing analytics hook (useAgencyAnalytics) by aggregating payment or project data over time periods",
       "files": [
-        "frontend/src/pages/ServicesPricingPage.tsx"
+        "frontend/src/utils/analytics/computeRevenueTrends.ts",
+        "frontend/src/utils/analytics/computeServiceCategories.ts",
+        "frontend/src/utils/analytics/computeTopPerformers.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -79,15 +79,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-96"
+        "REQ-5"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-each-offering-and-maintenance-plan-displays-clear-ctas-consistent-with-the-app-s-pricing-flow-at-minimum-a-visible-select-plan-and-a-visible-get-started-action-per-offering-plan-and-keep-the-existing-checkoutdialog-integration-working-when-a-cta-triggers-checkout",
-      "featureTitle": "Ensure each offering and maintenance plan displays clear CTAs consistent with the app’s pricing flow (at minimum: a visible “Select Plan” and a visible “Get Started” action per offering/plan), and keep the existing CheckoutDialog integration working when a CTA triggers checkout.",
+      "featureId": "feature-update-analyticspage-layout-to-display-the-three-new-charts-in-a-responsive-grid-below-existing-metrics-cards",
+      "featureTitle": "Update AnalyticsPage layout to display the three new charts in a responsive grid below existing metrics cards",
       "files": [
-        "frontend/src/pages/ServicesPricingPage.tsx"
+        "frontend/src/pages/AnalyticsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -99,7 +99,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-97"
+        "REQ-6"
       ],
       "confidence": "high"
     }

@@ -30,10 +30,10 @@
         --chart-4: 0.65 0.20 220;
         --chart-5: 0.45 0.10 140;
         
-        /* Gradient colors */
-        --gradient-from: 0.60 0.18 200;
-        --gradient-via: 0.55 0.15 180;
-        --gradient-to: 0.50 0.12 280;
+        /* Teal green + black gradient colors */
+        --gradient-from: 0.65 0.18 175;
+        --gradient-via: 0.55 0.15 165;
+        --gradient-to: 0.15 0.02 180;
     }
 
     .dark {
@@ -62,10 +62,10 @@
         --chart-4: 0.70 0.22 220;
         --chart-5: 0.50 0.12 140;
         
-        /* Gradient colors for dark mode */
-        --gradient-from: 0.65 0.20 200;
-        --gradient-via: 0.60 0.18 180;
-        --gradient-to: 0.55 0.15 280;
+        /* Teal green + black gradient colors for dark mode */
+        --gradient-from: 0.70 0.20 175;
+        --gradient-via: 0.60 0.18 165;
+        --gradient-to: 0.20 0.03 180;
     }
 
     * {
@@ -119,21 +119,21 @@
         @apply text-lg font-medium mb-3;
     }
     
-    /* Gradient utilities for pricing page */
+    /* Gradient utilities for pricing page - Teal green + black theme */
     .gradient-header {
         background: linear-gradient(135deg, 
-            oklch(var(--gradient-from) / 0.1) 0%, 
-            oklch(var(--gradient-via) / 0.15) 50%, 
-            oklch(var(--gradient-to) / 0.1) 100%);
-        border: 1px solid oklch(var(--border) / 0.5);
+            oklch(var(--gradient-from) / 0.15) 0%, 
+            oklch(var(--gradient-via) / 0.2) 50%, 
+            oklch(var(--gradient-to) / 0.3) 100%);
+        border: 1px solid oklch(var(--gradient-from) / 0.3);
     }
     
     .gradient-card-border {
         border-width: 2px;
         border-image: linear-gradient(135deg, 
-            oklch(var(--gradient-from) / 0.3), 
-            oklch(var(--gradient-via) / 0.5), 
-            oklch(var(--gradient-to) / 0.3)) 1;
+            oklch(var(--gradient-from) / 0.4), 
+            oklch(var(--gradient-via) / 0.6), 
+            oklch(var(--gradient-to) / 0.5)) 1;
         position: relative;
     }
     
@@ -144,9 +144,9 @@
         border-radius: inherit;
         padding: 2px;
         background: linear-gradient(135deg, 
-            oklch(var(--gradient-from) / 0.3), 
-            oklch(var(--gradient-via) / 0.5), 
-            oklch(var(--gradient-to) / 0.3));
+            oklch(var(--gradient-from) / 0.4), 
+            oklch(var(--gradient-via) / 0.6), 
+            oklch(var(--gradient-to) / 0.5));
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
@@ -169,21 +169,21 @@
             oklch(var(--gradient-via)), 
             oklch(var(--gradient-to)));
         border: none;
-        color: oklch(var(--primary-foreground));
+        color: white;
         transition: all 0.3s ease;
     }
     
     .gradient-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px -5px oklch(var(--gradient-via) / 0.4);
+        box-shadow: 0 10px 25px -5px oklch(var(--gradient-via) / 0.5);
     }
     
     .gradient-icon-border {
         border: 2px solid transparent;
         background: linear-gradient(oklch(var(--card)), oklch(var(--card))) padding-box,
                     linear-gradient(135deg, 
-                        oklch(var(--gradient-from) / 0.5), 
-                        oklch(var(--gradient-via) / 0.7), 
-                        oklch(var(--gradient-to) / 0.5)) border-box;
+                        oklch(var(--gradient-from) / 0.6), 
+                        oklch(var(--gradient-via) / 0.8), 
+                        oklch(var(--gradient-to) / 0.6)) border-box;
     }
 }

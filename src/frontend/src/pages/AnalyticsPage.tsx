@@ -3,6 +3,9 @@ import { StatsCard } from '../components/common/StatsCard';
 import { ChartBlock } from '../components/common/ChartBlock';
 import { DollarSign, Users, TrendingUp, Target } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { RevenueTrendsChart } from '../components/analytics/RevenueTrendsChart';
+import { ServiceCategoriesChart } from '../components/analytics/ServiceCategoriesChart';
+import { TopPerformersChart } from '../components/analytics/TopPerformersChart';
 
 const COLORS = ['#0ea5e9', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
@@ -104,7 +107,14 @@ export default function AnalyticsPage() {
         />
       </div>
 
-      {/* Charts */}
+      {/* New Analytics Charts */}
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+        <RevenueTrendsChart />
+        <ServiceCategoriesChart />
+        <TopPerformersChart />
+      </div>
+
+      {/* Existing Charts */}
       <div className="grid gap-6 md:grid-cols-2">
         <ChartBlock title="Revenue by Service">
           {revenueByService.length > 0 ? (

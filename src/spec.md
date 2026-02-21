@@ -1,13 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Expand the Services & Pricing page to display the full 30-item pricing catalog with grouped English sections, gradient premium styling, and gradient 3D icons, while keeping checkout CTAs working.
+**Goal:** Add analytics dashboard with three charts showing revenue trends, service categories distribution, and top performers.
 
 **Planned changes:**
-- Update the Services & Pricing page to render all 30 offerings with exact names, ₹ INR prices, and the exact bullet features, grouped under clear English section headings.
-- Apply a consistent gradient-themed visual style across the page (cards/sections), with responsive layout and clear typography hierarchy.
-- Add gradient-styled 3D icons to each pricing section (or offering cards) using the existing `ServiceNiche3dIcon` and mapping, with `SafeImage` fallback when an icon asset is missing.
-- Replace the single “Monthly Maintenance” card with a “Monthly Maintenance Plans” section containing exactly three plans (Student ₹499/month, Business ₹999/month, Pro ₹1,999/month) and bullets: Minor updates, Basic support, Monitoring.
-- Ensure each offering/plan shows two English CTAs (“Select Plan” and “Get Started”) and that triggering checkout continues to open the existing `CheckoutDialog` with the correct service name and amount.
+- Integrate React charting library (Recharts) for line charts, pie charts, and bar charts
+- Add revenue trends over time line chart showing daily or weekly revenue progression
+- Add service categories distribution chart (pie or bar chart) showing breakdown by niche
+- Add top performers chart ranking services or leads by revenue/conversion metrics
+- Compute revenue trends data from existing useAgencyAnalytics hook
+- Update AnalyticsPage layout to display three charts in responsive grid below existing metrics cards
+- Apply gradient theme styling (teal green, electric blue) to all charts with animations
 
-**User-visible outcome:** Users can browse a complete, sectioned 30-item Services & Pricing catalog with gradient styling and 3D icons, view the new 3-tier Monthly Maintenance Plans, and start checkout from “Select Plan”/“Get Started” for any offering.
+**User-visible outcome:** Users can view three interactive, animated charts on the Analytics page showing revenue trends over time, service distribution by category, and top-performing services or leads.

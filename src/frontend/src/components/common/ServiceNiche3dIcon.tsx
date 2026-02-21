@@ -3,7 +3,7 @@
  */
 
 import { SafeImage } from './SafeImage';
-import { getServiceIcon, getNicheIcon } from '../../utils/icons/serviceNiche3dIcons';
+import { getServiceIcon, getNicheIcon, getDefaultServiceIcon } from '../../utils/icons/serviceNiche3dIcons';
 import type { Service } from '../../backend';
 
 interface ServiceNiche3dIconProps {
@@ -21,13 +21,18 @@ export function ServiceNiche3dIcon({
   size = 48,
   className = '',
 }: ServiceNiche3dIconProps) {
-  const iconUrl = variant === 'service' && service
-    ? getServiceIcon(service)
-    : variant === 'niche' && niche
-    ? getNicheIcon(niche)
-    : '';
-
-  if (!iconUrl) return null;
+  let iconUrl = '';
+  
+  if (variant === 'service' && service) {
+    iconUrl = getServiceIcon(service);
+  } else if (variant === 'niche' && niche) {
+    iconUrl = getNicheIcon(niche);
+  }
+  
+  // Always use default icon if no specific icon found
+  if (!iconUrl) {
+    iconUrl = getDefaultServiceIcon();
+  }
 
   // Generate initials for fallback
   const fallbackText = variant === 'service' && service

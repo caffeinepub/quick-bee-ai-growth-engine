@@ -1,160 +1,120 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Services & Pricing: full 30-item catalog, gradient theme, and 3D category icons",
+  "title": "Add analytics dashboard with revenue trends, service categories, and top performers charts",
   "requirements": [
     {
-      "id": "REQ-93",
-      "summary": "Expand Services & Pricing page to render the complete 30-item pricing catalog grouped into English sections with exact INR prices and provided bullet features.",
+      "id": "REQ-4",
+      "summary": "Integrate Recharts library for line, pie, and bar charts with animations",
       "acceptanceCriteria": [
-        "The Services & Pricing page shows all 30 offerings, each with its name, INR price formatted with the ₹ symbol, and the exact bullet list items provided by the user.",
-        "Offerings are grouped under clear English section headers that correspond to the user’s groupings (e.g., “Website Packages”, “WhatsApp Automation”, “Lead Generation Systems”, “Personal Brand Services”, “SEO Services”, “AI & Automation”, “Business Systems”, “Outreach Systems”, “E-commerce”, “Student Special Packages”, “Complete Low-Ticket Growth Engine”).",
-        "No offerings from the user list are missing or merged; each appears as its own card/listing."
+        "Charting library is installed and configured",
+        "Library supports responsive charts",
+        "Library works with existing React Query data flows",
+        "Charts render without layout issues on mobile and desktop"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ServicesPricingPage.tsx",
+          "path": "frontend/package.json",
           "operation": "modify",
-          "description": "Replace the current small tier list with a static, in-code catalog that includes ALL 30 offerings from msg-8, grouped into the requested English section headings. Ensure each offering card renders: offering name, exact INR price with ₹, and the exact bullet features text provided by the user (no merging or paraphrasing). Keep the existing CheckoutDialog wiring pattern (selected item -> dialog props)."
+          "description": "Add recharts library as a dependency to support line charts, pie charts, and bar charts with animation capabilities"
         }
       ]
     },
     {
-      "id": "REQ-94",
-      "summary": "Apply premium gradient-themed styling (background accents, card highlights, spacing, typography hierarchy) to the Services & Pricing page with responsive layout and English-only UI text.",
+      "id": "REQ-5",
+      "summary": "Compute revenue trends data from existing analytics hook by aggregating payment data over time periods",
       "acceptanceCriteria": [
-        "The pricing page uses visible gradient styling (e.g., subtle gradient background and/or gradient borders/highlights on cards) consistently across sections and cards.",
-        "The page remains mobile-first and responsive (single-column on small screens, multi-column grids on larger screens).",
-        "All headings, buttons, and helper text displayed to users are English."
+        "Revenue data is computed from existing payments or projects data",
+        "Data is grouped by time period (daily, weekly, or monthly)",
+        "Computation handles empty or missing data gracefully",
+        "Data structure matches chart component requirements"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ServicesPricingPage.tsx",
-          "operation": "modify",
-          "description": "Update layout to be mobile-first with responsive grids per section, and apply consistent gradient-themed styling (e.g., subtle gradient page background, gradient borders/accents on cards, premium spacing and typography hierarchy). Ensure all user-facing headings/helper text remain English."
+          "path": "frontend/src/utils/analytics/computeRevenueTrends.ts",
+          "operation": "create",
+          "description": "Create utility function to aggregate payment data from useAgencyAnalytics hook into time-series format (daily or weekly) for the revenue trends line chart. Handle empty data gracefully and return an array of {date: string, revenue: number} objects suitable for Recharts LineChart"
         },
         {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add or refine app-wide utility classes (within existing @layer utilities) that support the pricing page’s premium gradient look (e.g., reusable gradient border/accent helpers) without modifying any shadcn/ui source files."
+          "path": "frontend/src/utils/analytics/computeServiceCategories.ts",
+          "operation": "create",
+          "description": "Create utility function to aggregate services by niche from useAgencyAnalytics data, computing count and revenue per category. Return an array of {category: string, count: number, revenue: number} objects for Recharts PieChart or BarChart"
+        },
+        {
+          "path": "frontend/src/utils/analytics/computeTopPerformers.ts",
+          "operation": "create",
+          "description": "Create utility function to rank services by revenue or sales count from useAgencyAnalytics data, returning the top 5-10 performers as an array of {name: string, value: number} objects for Recharts BarChart"
         }
       ]
     },
     {
-      "id": "REQ-95",
-      "summary": "Render gradient-styled 3D icons for categories/offerings on the pricing page using ServiceNiche3dIcon and existing base-path-safe asset URL mapping with fallback behavior.",
+      "id": "REQ-1",
+      "summary": "Add revenue trends over time line chart showing daily or weekly revenue progression",
       "acceptanceCriteria": [
-        "Each pricing section (or each offering card) displays a 3D icon near the title area.",
-        "Icons load via static frontend assets (no backend image serving) and are base-path safe.",
-        "If an icon fails to load, the existing SafeImage fallback renders a non-technical fallback (e.g., initials) and the page remains usable."
+        "Line chart displays revenue data over a time period (e.g., last 30 days)",
+        "Chart uses the existing gradient theme colors (teal green primary, electric blue accent)",
+        "Chart animates on initial load",
+        "Chart is wrapped in a ChartBlock component with appropriate title"
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/generated/svc-3d-website-packages.dim_256x256.png",
+          "path": "frontend/src/components/analytics/RevenueTrendsChart.tsx",
           "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-whatsapp-automation-packages.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-lead-generation-systems.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-personal-brand-services.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-seo-services.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-ai-automation.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-business-systems.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-outreach-systems.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-ecommerce.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-student-packages.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-all-in-one-growth-kit.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-maintenance-plans.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/public/assets/generated/svc-3d-default.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated static default icon asset required by the BuildRequest at this exact path/filename for base-path-safe usage via publicAssetUrl."
-        },
-        {
-          "path": "frontend/src/utils/icons/serviceNiche3dIcons.ts",
-          "operation": "modify",
-          "description": "Extend/adjust the service/category icon mapping to include the new category keys used by the updated pricing catalog (e.g., website packages, WhatsApp automation, lead generation systems, personal brand services, SEO services, AI & automation, business systems, outreach systems, e-commerce, student packages, all-in-one growth kit, maintenance plans) and map them to the new required static assets under frontend/public/assets/generated via publicAssetUrl. Ensure an explicit default mapping points to frontend/public/assets/generated/svc-3d-default.dim_256x256.png."
-        },
-        {
-          "path": "frontend/src/pages/ServicesPricingPage.tsx",
-          "operation": "modify",
-          "description": "Use the existing ServiceNiche3dIcon component to render a gradient-styled 3D icon for each pricing section header (and/or each offering card) by passing a suitable serviceType/category key that resolves via the icon mapping. Verify the component's usage instructions before implementing."
+          "description": "Create a RevenueTrendsChart component that uses Recharts LineChart to display revenue over time. Fetch data via useAgencyAnalytics, compute trends using computeRevenueTrends utility, apply gradient theme colors (#00b3a4 teal green, #00f0ff electric blue), enable animations, wrap in ChartBlock with title 'Revenue Trends', and handle loading/error states"
         }
       ]
     },
     {
-      "id": "REQ-96",
-      "summary": "Replace the single Monthly Maintenance card with a Monthly Maintenance Plans section containing exactly three plans and the provided included bullets.",
+      "id": "REQ-2",
+      "summary": "Add service categories distribution chart showing breakdown by niche or category",
       "acceptanceCriteria": [
-        "The pricing page shows a “Monthly Maintenance Plans” section containing exactly three plan cards/entries: Student, Business, Pro, with the exact monthly prices provided.",
-        "Each maintenance plan displays the included bullets: “Minor updates”, “Basic support”, “Monitoring”.",
-        "The previous single maintenanceTier presentation is no longer shown on the page."
+        "Pie chart or bar chart shows services grouped by niche or category",
+        "Chart displays count or revenue per category",
+        "Chart uses gradient theme colors consistently",
+        "Chart animates on load and updates",
+        "Chart is wrapped in a ChartBlock component"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ServicesPricingPage.tsx",
-          "operation": "modify",
-          "description": "Remove the existing single maintenanceTier UI and replace it with a “Monthly Maintenance Plans” section containing exactly three plans: Student ₹499/month, Business ₹999/month, Pro ₹1,999/month. Each plan must display the included bullets exactly: Minor updates, Basic support, Monitoring. Include a section-level (or plan-level) 3D icon keyed to the new maintenance plans mapping."
+          "path": "frontend/src/components/analytics/ServiceCategoriesChart.tsx",
+          "operation": "create",
+          "description": "Create a ServiceCategoriesChart component using Recharts PieChart to show service distribution by niche. Fetch data via useAgencyAnalytics, compute categories using computeServiceCategories utility, apply gradient theme colors, enable animations, wrap in ChartBlock with title 'Service Categories', and handle loading/error states"
         }
       ]
     },
     {
-      "id": "REQ-97",
-      "summary": "Ensure every offering and maintenance plan has two English CTAs (Select Plan, Get Started) and that at least one CTA per card opens the existing CheckoutDialog with correct service name and amount.",
+      "id": "REQ-3",
+      "summary": "Add top performers chart ranking services by revenue or conversion metrics",
       "acceptanceCriteria": [
-        "Every offering card includes two visible buttons labeled “Select Plan” and “Get Started”.",
-        "Clicking at least one of the CTAs per offering opens the existing CheckoutDialog with the correct service name and amount for that offering.",
-        "Buttons are English-labeled and remain readable/accessible on mobile."
+        "Bar chart or ranking list shows top 5-10 performers",
+        "Chart displays either top services by revenue or top-converting leads",
+        "Chart uses gradient theme styling",
+        "Chart animates on load",
+        "Chart is wrapped in a ChartBlock component with descriptive title"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ServicesPricingPage.tsx",
+          "path": "frontend/src/components/analytics/TopPerformersChart.tsx",
+          "operation": "create",
+          "description": "Create a TopPerformersChart component using Recharts BarChart to display top 5-10 services ranked by revenue. Fetch data via useAgencyAnalytics, compute rankings using computeTopPerformers utility, apply gradient theme colors, enable animations with animationDuration, wrap in ChartBlock with title 'Top Performers', and handle loading/error states"
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Update AnalyticsPage layout to display three new charts in responsive grid below existing metrics cards",
+      "acceptanceCriteria": [
+        "Charts are arranged in a clean grid layout",
+        "Layout is responsive on mobile and desktop",
+        "Charts maintain gradient theme styling",
+        "Existing metrics cards remain visible above charts",
+        "Loading and error states are handled for all charts"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/AnalyticsPage.tsx",
           "operation": "modify",
-          "description": "Update offering cards and maintenance plan cards to display two visible English-labeled buttons: “Select Plan” and “Get Started”. Wire at least one button per card to the existing handleCheckout logic so CheckoutDialog opens with the correct serviceName and amount for that offering/plan. Keep button layout responsive and accessible on mobile."
+          "description": "Update AnalyticsPage to import and render RevenueTrendsChart, ServiceCategoriesChart, and TopPerformersChart below the existing metrics cards. Arrange the three charts in a responsive grid using Tailwind grid layout (grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6). Preserve all existing metrics cards and layout structure. Ensure gradient theme styling is maintained across all charts and the page handles loading/error states gracefully"
         }
       ]
     }
