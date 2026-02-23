@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCreatePayment, useGetPaymentSettings } from '../../hooks/usePayments';
+import { useCreateCheckoutSession } from '../../hooks/useStripeCheckout';
 import { PaymentMethod } from '../../backend';
 import { toast } from 'sonner';
 import { ExternalLink, CreditCard, Smartphone, Globe } from 'lucide-react';
@@ -22,6 +23,7 @@ export function CheckoutDialog({ open, onOpenChange, serviceId, serviceName, amo
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(PaymentMethod.upi);
   const [orderId, setOrderId] = useState<string | null>(null);
   const createPayment = useCreatePayment();
+  const createCheckoutSession = useCreateCheckoutSession();
   const { data: paymentSettings } = useGetPaymentSettings();
 
   // Refs for auto-scrolling
@@ -58,13 +60,34 @@ export function CheckoutDialog({ open, onOpenChange, serviceId, serviceName, amo
 
   const handleCreateOrder = async () => {
     try {
-      const paymentId = await createPayment.mutateAsync({
-        serviceId,
-        amount: BigInt(amount),
-        paymentMethod: selectedMethod,
-      });
-      setOrderId(paymentId);
-      toast.success('Order created successfully! Please complete the payment.');
+      if (selectedMethod === PaymentMethod.stripe) {
+        // Handle Stripe checkout
+        const session = await createCheckoutSession.mutateAsync([
+          {
+            productName: serviceName,
+            productDescription: `Service: ${serviceName}`,
+            priceInCents: BigInt(amount * 100), // Convert to cents
+            currency: 'inr',
+            quantity: BigInt(1),
+          }
+        ]);
+
+        if (!session?.url) {
+          throw new Error('Stripe session missing url');
+        }
+
+        // Redirect to Stripe checkout
+        window.location.href = session.url;
+      } else {
+        // Handle UPI/Razorpay
+        const paymentId = await createPayment.mutateAsync({
+          serviceId,
+          amount: BigInt(amount),
+          paymentMethod: selectedMethod,
+        });
+        setOrderId(paymentId);
+        toast.success('Order created successfully! Please complete the payment.');
+      }
     } catch (error: any) {
       toast.error(error.message || 'Failed to create order');
     }
@@ -166,15 +189,15 @@ export function CheckoutDialog({ open, onOpenChange, serviceId, serviceName, amo
               className="w-full" 
               size="lg"
               onClick={handleCreateOrder}
-              disabled={createPayment.isPending}
+              disabled={createPayment.isPending || createCheckoutSession.isPending}
             >
-              {createPayment.isPending ? (
+              {(createPayment.isPending || createCheckoutSession.isPending) ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Creating Order...
+                  {selectedMethod === PaymentMethod.stripe ? 'Redirecting to Stripe...' : 'Creating Order...'}
                 </>
               ) : (
-                'Create Order'
+                selectedMethod === PaymentMethod.stripe ? 'Proceed to Stripe Checkout' : 'Create Order'
               )}
             </Button>
           )}
@@ -223,27 +246,6 @@ export function CheckoutDialog({ open, onOpenChange, serviceId, serviceName, amo
                     </Button>
                     <p className="text-xs text-muted-foreground">
                       You'll be redirected to Razorpay's secure payment page.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {selectedMethod === PaymentMethod.stripe && (
-                <Card>
-                  <CardContent className="pt-6 space-y-3">
-                    <p className="text-sm">Click the button below to complete your payment via Stripe:</p>
-                    <Button 
-                      className="w-full" 
-                      variant="default"
-                      asChild
-                    >
-                      <a href={getPaymentLink()} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Pay with Stripe
-                      </a>
-                    </Button>
-                    <p className="text-xs text-muted-foreground">
-                      You'll be redirected to Stripe's secure payment page.
                     </p>
                   </CardContent>
                 </Card>

@@ -22,7 +22,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
     contact: '',
     city: '',
     niche: '',
-    status: 'cold',
+    status: 'New',
     revenuePotential: '',
     owner: profile?.name || '',
   });
@@ -61,7 +61,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
         contact: '',
         city: '',
         niche: '',
-        status: 'cold',
+        status: 'New',
         revenuePotential: '',
         owner: profile?.name || '',
       });
@@ -76,7 +76,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
         <DialogHeader>
           <DialogTitle>Add New Lead</DialogTitle>
           <DialogDescription>
-            Enter the details of your new lead. All fields are required.
+            Enter the details of your new lead. Fields marked with * are required.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -88,6 +88,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Lead name"
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -97,6 +98,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
                 value={formData.contact}
                 onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                 placeholder="Email or phone"
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -106,6 +108,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 placeholder="City"
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -115,6 +118,7 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
                 value={formData.niche}
                 onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
                 placeholder="e.g., E-commerce, SaaS, Healthcare"
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -124,22 +128,25 @@ export function AddLeadDialog({ open, onOpenChange }: AddLeadDialogProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cold">Cold</SelectItem>
-                  <SelectItem value="contacted">Contacted</SelectItem>
-                  <SelectItem value="interested">Interested</SelectItem>
-                  <SelectItem value="qualified">Qualified</SelectItem>
-                  <SelectItem value="proposalSent">Proposal Sent</SelectItem>
+                  <SelectItem value="New">New</SelectItem>
+                  <SelectItem value="Contacted">Contacted</SelectItem>
+                  <SelectItem value="Qualified">Qualified</SelectItem>
+                  <SelectItem value="Proposal">Proposal</SelectItem>
+                  <SelectItem value="Negotiation">Negotiation</SelectItem>
+                  <SelectItem value="Won">Won</SelectItem>
+                  <SelectItem value="Lost">Lost</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="revenuePotential">Revenue Potential ($)</Label>
+              <Label htmlFor="revenuePotential">Revenue Potential (₹)</Label>
               <Input
                 id="revenuePotential"
                 type="number"
                 value={formData.revenuePotential}
                 onChange={(e) => setFormData({ ...formData, revenuePotential: e.target.value })}
                 placeholder="0"
+                min="0"
               />
             </div>
             <div className="grid gap-2">

@@ -2,10 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-revenue-trends-over-time-line-chart-to-the-analyticspage-showing-daily-or-weekly-revenue-progression",
-      "featureTitle": "Add a revenue trends over time line chart to the AnalyticsPage showing daily or weekly revenue progression",
+      "featureId": "feature-add-bulk-csv-excel-file-upload-capability-for-importing-leads-into-the-system-the-upload-should-validate-required-columns-name-contact-city-niche-and-provide-feedback-on-successful-imports-and-any-parsing-errors",
+      "featureTitle": "Add bulk CSV/Excel file upload capability for importing leads into the system. The upload should validate required columns (name, contact, city, niche) and provide feedback on successful imports and any parsing errors.",
       "files": [
-        "frontend/src/components/analytics/RevenueTrendsChart.tsx"
+        "frontend/src/components/leads/ImportLeadsCsvDialog.tsx",
+        "frontend/src/pages/LeadsPage.tsx",
+        "frontend/src/utils/leads/csv.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -14,7 +16,9 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
       ],
       "testIds": [
         "REQ-1"
@@ -22,10 +26,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-service-categories-distribution-chart-to-the-analyticspage-showing-breakdown-of-services-by-category-or-niche",
-      "featureTitle": "Add a service categories distribution chart to the AnalyticsPage showing breakdown of services by category or niche",
+      "featureId": "feature-enhance-the-existing-lead-dashboard-with-comprehensive-search-and-filtering-capabilities-users-should-be-able-to-search-leads-by-name-filter-by-status-and-niche-and-manage-lead-data-through-the-interface",
+      "featureTitle": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities. Users should be able to search leads by name, filter by status and niche, and manage lead data through the interface.",
       "files": [
-        "frontend/src/components/analytics/ServiceCategoriesChart.tsx"
+        "frontend/src/components/leads/LeadDetailDialog.tsx",
+        "frontend/src/pages/LeadsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -34,7 +39,9 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
       ],
       "testIds": [
         "REQ-2"
@@ -42,10 +49,17 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-top-performers-chart-to-the-analyticspage-ranking-services-or-leads-by-revenue-or-conversion-metrics",
-      "featureTitle": "Add a top performers chart to the AnalyticsPage ranking services or leads by revenue or conversion metrics",
+      "featureId": "feature-integrate-stripe-payment-processing-into-the-application-users-should-be-able-to-make-payments-for-services-view-payment-history-and-admins-should-be-able-to-update-payment-status",
+      "featureTitle": "Integrate Stripe payment processing into the application. Users should be able to make payments for services, view payment history, and admins should be able to update payment status.",
       "files": [
-        "frontend/src/components/analytics/TopPerformersChart.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/components/payments/CheckoutDialog.tsx",
+        "frontend/src/components/payments/StripeConfigurationDialog.tsx",
+        "frontend/src/hooks/useStripeCheckout.ts",
+        "frontend/src/hooks/useStripeConfiguration.ts",
+        "frontend/src/pages/PaymentFailurePage.tsx",
+        "frontend/src/pages/PaymentSuccessPage.tsx",
+        "frontend/src/pages/SettingsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -54,7 +68,9 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
       ],
       "testIds": [
         "REQ-3"
@@ -62,12 +78,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-compute-revenue-trends-data-from-existing-analytics-hook-useagencyanalytics-by-aggregating-payment-or-project-data-over-time-periods",
-      "featureTitle": "Compute revenue trends data from existing analytics hook (useAgencyAnalytics) by aggregating payment or project data over time periods",
+      "featureId": "feature-create-web-forms-for-capturing-new-leads-directly-through-the-application-the-form-should-collect-essential-lead-information-name-contact-city-niche-status-revenue-potential-owner-and-save-it-to-the-backend",
+      "featureTitle": "Create web forms for capturing new leads directly through the application. The form should collect essential lead information (name, contact, city, niche, status, revenue potential, owner) and save it to the backend.",
       "files": [
-        "frontend/src/utils/analytics/computeRevenueTrends.ts",
-        "frontend/src/utils/analytics/computeServiceCategories.ts",
-        "frontend/src/utils/analytics/computeTopPerformers.ts"
+        "frontend/src/components/leads/AddLeadDialog.tsx",
+        "frontend/src/pages/LeadsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -76,30 +91,12 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-analyticspage-layout-to-display-the-three-new-charts-in-a-responsive-grid-below-existing-metrics-cards",
-      "featureTitle": "Update AnalyticsPage layout to display the three new charts in a responsive grid below existing metrics cards",
-      "files": [
-        "frontend/src/pages/AnalyticsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
+        "REQ-4"
       ],
       "confidence": "high"
     }

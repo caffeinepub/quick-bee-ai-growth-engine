@@ -1,60 +1,44 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Business Management SaaS platform for QUICK BEE AGENCY with 3D-style UI, analytics dashboard, CRM, service catalog, payment integration, and AI automation",
+  "summary": "Lead management system with data uploads and Stripe payment integration",
   "architectural_notes": [
-    "3D-style UI with glassmorphism, neon glow accents, and CSS 3D transforms",
-    "Firebase backend (Firestore, Cloud Functions, Storage, Auth)",
-    "Webflow as frontend system",
-    "Mobile-first responsive design",
-    "Theme colors: Teal Green (#00b3a4), Deep Matte Black (#0f0f0f), Electric Blue Glow (#00f0ff)",
-    "Razorpay and Stripe payment integration",
-    "Real-time data sync with Firestore",
-    "AI automation engine with Firebase Cloud Functions"
+    "Backend lead storage with CSV/Excel upload support",
+    "Stripe integration for payment processing",
+    "Dashboard for lead viewing and analytics"
   ],
-  "known_issues": [
-    "Previous build attempts failed due to scope complexity",
-    "Combined service catalog + analytics requests causing AI implementation errors"
-  ],
+  "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-a-revenue-trends-over-time-line-chart-to-the-analyticspage-showing-daily-or-weekly-revenue-progression",
-      "title": "Add a revenue trends over time line chart to the AnalyticsPage showing daily or weekly revenue progression",
+      "id": "feature-add-bulk-csv-excel-file-upload-capability-for-importing-leads-into-the-system-the-upload-should-validate-required-columns-name-contact-city-niche-and-provide-feedback-on-successful-imports-and-any-parsing-errors",
+      "title": "Add bulk CSV/Excel file upload capability for importing leads into the system. The upload should validate required columns (name, contact, city, niche) and provide feedback on successful imports and any parsing errors.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-a-service-categories-distribution-chart-to-the-analyticspage-showing-breakdown-of-services-by-category-or-niche",
-      "title": "Add a service categories distribution chart to the AnalyticsPage showing breakdown of services by category or niche",
+      "id": "feature-enhance-the-existing-lead-dashboard-with-comprehensive-search-and-filtering-capabilities-users-should-be-able-to-search-leads-by-name-filter-by-status-and-niche-and-manage-lead-data-through-the-interface",
+      "title": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities. Users should be able to search leads by name, filter by status and niche, and manage lead data through the interface.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-a-top-performers-chart-to-the-analyticspage-ranking-services-or-leads-by-revenue-or-conversion-metrics",
-      "title": "Add a top performers chart to the AnalyticsPage ranking services or leads by revenue or conversion metrics",
+      "id": "feature-integrate-stripe-payment-processing-into-the-application-users-should-be-able-to-make-payments-for-services-view-payment-history-and-admins-should-be-able-to-update-payment-status",
+      "title": "Integrate Stripe payment processing into the application. Users should be able to make payments for services, view payment history, and admins should be able to update payment status.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-compute-revenue-trends-data-from-existing-analytics-hook-useagencyanalytics-by-aggregating-payment-or-project-data-over-time-periods",
-      "title": "Compute revenue trends data from existing analytics hook (useAgencyAnalytics) by aggregating payment or project data over time periods",
+      "id": "feature-create-web-forms-for-capturing-new-leads-directly-through-the-application-the-form-should-collect-essential-lead-information-name-contact-city-niche-status-revenue-potential-owner-and-save-it-to-the-backend",
+      "title": "Create web forms for capturing new leads directly through the application. The form should collect essential lead information (name, contact, city, niche, status, revenue potential, owner) and save it to the backend.",
       "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-analyticspage-layout-to-display-the-three-new-charts-in-a-responsive-grid-below-existing-metrics-cards",
-      "title": "Update AnalyticsPage layout to display the three new charts in a responsive grid below existing metrics cards",
-      "reqIds": [
-        "REQ-6"
+        "REQ-4"
       ],
       "version": 1
     }
@@ -62,21 +46,30 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Analytics dashboard with 3 charts: revenue trends, service categories, and top performers",
+      "summary": "Lead database with CSV/Excel bulk data upload capability",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-5",
-      "summary": "Integrate a React charting library (Recharts or similar) that supports line charts, pie charts, and bar charts with animation capabilities",
-      "reqIds": [
-        "REQ-4"
-      ],
+      "id": "AR-2",
+      "summary": "Lead dashboard with search, filter, and management features",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Stripe payment processing integration",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Web forms for capturing new leads",
+      "reqIds": [],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "QUICK BEE AGENCY Business Management SaaS",
+  "projectName": "Quick Bee Agency",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -1,4 +1,5 @@
 import Map "mo:core/Map";
+import Iter "mo:core/Iter";
 import Time "mo:core/Time";
 import Array "mo:core/Array";
 import Int "mo:core/Int";
@@ -8,11 +9,13 @@ import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
+import Stripe "stripe/stripe";
+import OutCall "http-outcalls/outcall";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 
 
- actor {
+actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
   include MixinStorage();
@@ -155,6 +158,12 @@ import MixinAuthorization "authorization/MixinAuthorization";
     updatedAt : Int;
   };
 
+  public type StripeSession = {
+    sessionId : Text;
+    userId : Principal;
+    createdAt : Int;
+  };
+
   var systemSettings : Settings = {
     defaultSort = "agency";
     timeZone = "America/New_York";
@@ -180,6 +189,8 @@ import MixinAuthorization "authorization/MixinAuthorization";
   var clientServiceRequests = Map.empty<Text, ClientServiceRequest>();
   var payments = Map.empty<Text, Payment>();
   var demoSessions = Map.empty<Principal, Bool>();
+  var stripeSessions = Map.empty<Text, StripeSession>();
+  var stripeConfiguration : ?Stripe.StripeConfiguration = null;
 
   // Helper function to get application role
   private func getAppRole(caller : Principal) : AppRole {
@@ -589,4 +600,74 @@ import MixinAuthorization "authorization/MixinAuthorization";
     requireAdmin(caller);
     deals.remove(dealId);
   };
+
+  // CSV upload for leads
+  public shared ({ caller }) func uploadLeadsFromCSV(_file : Storage.ExternalBlob) : async Nat {
+    requireManagerOrAdmin(caller);
+    Runtime.trap("CSV/Excel parsing to be handled in the frontend TypeScript");
+  };
+
+  // Stripe integration
+  public shared ({ caller }) func setStripeConfiguration(config : Stripe.StripeConfiguration) : async () {
+    requireAdmin(caller);
+    stripeConfiguration := ?config;
+  };
+
+  public query ({ caller }) func isStripeConfigured() : async Bool {
+    requireClientOrHigher(caller);
+    stripeConfiguration != null;
+  };
+
+  public shared ({ caller }) func createCheckoutSession(items : [Stripe.ShoppingItem], successUrl : Text, cancelUrl : Text) : async Text {
+    requireClientOrHigher(caller);
+
+    let config = switch (stripeConfiguration) {
+      case (null) { Runtime.trap("Stripe needs to be first configured") };
+      case (?value) { value };
+    };
+
+    let sessionId = await Stripe.createCheckoutSession(config, caller, items, successUrl, cancelUrl, transform);
+    
+    let session : StripeSession = {
+      sessionId;
+      userId = caller;
+      createdAt = Time.now();
+    };
+    stripeSessions.add(sessionId, session);
+    
+    sessionId;
+  };
+
+  public shared ({ caller }) func getStripeSessionStatus(sessionId : Text) : async Stripe.StripeSessionStatus {
+    requireClientOrHigher(caller);
+    
+    switch (stripeSessions.get(sessionId)) {
+      case (?session) {
+        let role = getAppRole(caller);
+        switch (role) {
+          case (#Admin or #Manager) {};
+          case (_) {
+            if (session.userId != caller) {
+              Runtime.trap("Unauthorized: Can only view your own payment sessions");
+            };
+          };
+        };
+      };
+      case (null) {
+        Runtime.trap("Session not found");
+      };
+    };
+
+    let config = switch (stripeConfiguration) {
+      case (null) { Runtime.trap("Stripe needs to be first configured") };
+      case (?value) { value };
+    };
+
+    await Stripe.getSessionStatus(config, sessionId, transform);
+  };
+
+  public query func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
+    OutCall.transform(input);
+  };
 };
+

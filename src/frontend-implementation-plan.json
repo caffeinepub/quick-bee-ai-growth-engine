@@ -1,120 +1,168 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add analytics dashboard with revenue trends, service categories, and top performers charts",
+  "title": "Lead management system with CSV uploads and Stripe integration",
   "requirements": [
     {
-      "id": "REQ-4",
-      "summary": "Integrate Recharts library for line, pie, and bar charts with animations",
-      "acceptanceCriteria": [
-        "Charting library is installed and configured",
-        "Library supports responsive charts",
-        "Library works with existing React Query data flows",
-        "Charts render without layout issues on mobile and desktop"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Add recharts library as a dependency to support line charts, pie charts, and bar charts with animation capabilities"
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Compute revenue trends data from existing analytics hook by aggregating payment data over time periods",
-      "acceptanceCriteria": [
-        "Revenue data is computed from existing payments or projects data",
-        "Data is grouped by time period (daily, weekly, or monthly)",
-        "Computation handles empty or missing data gracefully",
-        "Data structure matches chart component requirements"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/analytics/computeRevenueTrends.ts",
-          "operation": "create",
-          "description": "Create utility function to aggregate payment data from useAgencyAnalytics hook into time-series format (daily or weekly) for the revenue trends line chart. Handle empty data gracefully and return an array of {date: string, revenue: number} objects suitable for Recharts LineChart"
-        },
-        {
-          "path": "frontend/src/utils/analytics/computeServiceCategories.ts",
-          "operation": "create",
-          "description": "Create utility function to aggregate services by niche from useAgencyAnalytics data, computing count and revenue per category. Return an array of {category: string, count: number, revenue: number} objects for Recharts PieChart or BarChart"
-        },
-        {
-          "path": "frontend/src/utils/analytics/computeTopPerformers.ts",
-          "operation": "create",
-          "description": "Create utility function to rank services by revenue or sales count from useAgencyAnalytics data, returning the top 5-10 performers as an array of {name: string, value: number} objects for Recharts BarChart"
-        }
-      ]
-    },
-    {
       "id": "REQ-1",
-      "summary": "Add revenue trends over time line chart showing daily or weekly revenue progression",
+      "summary": "Add bulk CSV/Excel file upload capability for importing leads into the system with validation and feedback",
       "acceptanceCriteria": [
-        "Line chart displays revenue data over a time period (e.g., last 30 days)",
-        "Chart uses the existing gradient theme colors (teal green primary, electric blue accent)",
-        "Chart animates on initial load",
-        "Chart is wrapped in a ChartBlock component with appropriate title"
+        "Users can upload CSV files containing lead data",
+        "Users can upload Excel files containing lead data",
+        "System validates that required columns (name, contact, city, niche) are present",
+        "System displays a summary of successfully imported leads",
+        "System displays errors for any leads that failed to import",
+        "Imported leads are stored in the backend and appear in the leads list"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/analytics/RevenueTrendsChart.tsx",
-          "operation": "create",
-          "description": "Create a RevenueTrendsChart component that uses Recharts LineChart to display revenue over time. Fetch data via useAgencyAnalytics, compute trends using computeRevenueTrends utility, apply gradient theme colors (#00b3a4 teal green, #00f0ff electric blue), enable animations, wrap in ChartBlock with title 'Revenue Trends', and handle loading/error states"
+          "path": "frontend/src/components/leads/ImportLeadsCsvDialog.tsx",
+          "operation": "modify",
+          "description": "Extend the existing CSV import dialog to support Excel file uploads (.xlsx, .xls) in addition to CSV. Add file type detection and appropriate parsing for both formats. Update the file input accept attribute to include Excel MIME types. Use the blob-storage component for handling file uploads by converting uploaded files to ExternalBlob format before sending to backend. Verify the component's usage instructions before implementing. Display comprehensive feedback including success count, error count, and detailed error messages for failed rows with row numbers and reasons."
+        },
+        {
+          "path": "frontend/src/utils/leads/csv.ts",
+          "operation": "modify",
+          "description": "Add Excel file parsing capability alongside existing CSV parsing. Implement detection of file type based on file extension or content. For Excel files, parse the first sheet and extract data into the same Lead object structure. Ensure validation of required columns (name, contact, city, niche) works for both CSV and Excel formats. Return parsing errors with row numbers and specific validation failures for user feedback."
+        },
+        {
+          "path": "frontend/src/hooks/useLeads.ts",
+          "operation": "modify",
+          "description": "Update the import leads mutation to handle ExternalBlob file uploads. Ensure the mutation calls the backend uploadLeadsFromCSV function with the ExternalBlob parameter. Add error handling for file upload failures and backend validation errors. Invalidate the leads query cache after successful import to refresh the leads list immediately."
+        },
+        {
+          "path": "frontend/src/pages/LeadsPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the ImportLeadsCsvDialog is properly wired into the leads page. Verify the dialog trigger button is visible and accessible. After successful import, display a toast notification or success message with the count of imported leads. Refresh the leads list to show newly imported leads without requiring page reload."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add service categories distribution chart showing breakdown by niche or category",
+      "summary": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities",
       "acceptanceCriteria": [
-        "Pie chart or bar chart shows services grouped by niche or category",
-        "Chart displays count or revenue per category",
-        "Chart uses gradient theme colors consistently",
-        "Chart animates on load and updates",
-        "Chart is wrapped in a ChartBlock component"
+        "Search field filters leads by name in real-time",
+        "Status dropdown filters leads by their current status",
+        "Niche dropdown filters leads by service niche/category",
+        "Filtered results update dynamically as filters change",
+        "Users can view full lead details by clicking on a lead card",
+        "Users can edit lead information through the detail dialog"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/analytics/ServiceCategoriesChart.tsx",
-          "operation": "create",
-          "description": "Create a ServiceCategoriesChart component using Recharts PieChart to show service distribution by niche. Fetch data via useAgencyAnalytics, compute categories using computeServiceCategories utility, apply gradient theme colors, enable animations, wrap in ChartBlock with title 'Service Categories', and handle loading/error states"
+          "path": "frontend/src/pages/LeadsPage.tsx",
+          "operation": "modify",
+          "description": "Verify that the existing search field, status dropdown, and niche dropdown filters are working correctly with debounced search. Ensure all filter controls are visible and properly styled. Confirm that clicking on a LeadCard opens the LeadDetailDialog with the selected lead's data. Test that filtered results update dynamically as users change filter values. Add loading states during filter application if needed."
+        },
+        {
+          "path": "frontend/src/components/leads/LeadDetailDialog.tsx",
+          "operation": "modify",
+          "description": "Enhance the lead detail dialog to support editing all lead fields including name, contact, city, niche, status, revenue potential, and owner. Add form validation for required fields. Implement save functionality that calls the updateLead mutation. Show success/error feedback after save attempts. Ensure the dialog closes and the leads list refreshes after successful update."
+        },
+        {
+          "path": "frontend/src/hooks/useLeads.ts",
+          "operation": "modify",
+          "description": "Verify the useUpdateLead mutation exists and properly invalidates the leads query cache after successful updates. Add optimistic updates if not present to improve perceived performance. Ensure error handling provides user-friendly error messages."
+        },
+        {
+          "path": "frontend/src/components/common/LeadCard.tsx",
+          "operation": "modify",
+          "description": "Ensure the LeadCard component properly triggers the LeadDetailDialog when clicked. Add visual feedback (hover state, cursor pointer) to indicate the card is clickable. Verify all lead information (status, niche, location, revenue, owner) is displayed correctly with appropriate formatting and icons."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Add top performers chart ranking services by revenue or conversion metrics",
+      "summary": "Integrate Stripe payment processing into the application with payment history and status management",
       "acceptanceCriteria": [
-        "Bar chart or ranking list shows top 5-10 performers",
-        "Chart displays either top services by revenue or top-converting leads",
-        "Chart uses gradient theme styling",
-        "Chart animates on load",
-        "Chart is wrapped in a ChartBlock component with descriptive title"
+        "Users can initiate Stripe checkout for services",
+        "Payment orders are created and stored in the backend",
+        "Users can view their payment history on the settings page",
+        "Payment status is tracked (pending, paid, failed, refunded)",
+        "Admins can manually update payment status through the interface",
+        "Stripe payment method is available alongside existing UPI and Razorpay options"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/analytics/TopPerformersChart.tsx",
+          "path": "frontend/src/hooks/useStripeCheckout.ts",
           "operation": "create",
-          "description": "Create a TopPerformersChart component using Recharts BarChart to display top 5-10 services ranked by revenue. Fetch data via useAgencyAnalytics, compute rankings using computeTopPerformers utility, apply gradient theme colors, enable animations with animationDuration, wrap in ChartBlock with title 'Top Performers', and handle loading/error states"
+          "description": "Create a custom hook for initiating Stripe checkout sessions. Use the stripe component to support Stripe payment processing. Verify the component's usage instructions before implementing. Implement useMutation that calls the backend createCheckoutSession function with ShoppingItem array, successUrl, and cancelUrl parameters. Parse the JSON response to extract the CheckoutSession with id and url fields. Validate that session.url exists and is non-empty before redirecting. Return mutation state and mutateAsync function for use in checkout components. Add error handling for missing actor, failed requests, and invalid session responses."
+        },
+        {
+          "path": "frontend/src/hooks/useStripeConfiguration.ts",
+          "operation": "create",
+          "description": "Create hooks for managing Stripe configuration. Implement useIsStripeConfigured query hook that calls backend isStripeConfigured. Implement useSetStripeConfiguration mutation hook that calls backend setStripeConfiguration with StripeConfiguration object containing secretKey and allowedCountries. Add admin role validation before allowing configuration updates. Include proper error handling and query invalidation after configuration changes."
+        },
+        {
+          "path": "frontend/src/components/payments/StripeConfigurationDialog.tsx",
+          "operation": "create",
+          "description": "Create an admin-only dialog for configuring Stripe integration. Use the stripe component which requires configuration before use. Verify the component's usage instructions before implementing. Include form fields for Stripe secret key (password input) and allowed countries (multi-select or comma-separated text input with country code validation). Display the dialog automatically when an admin logs in and Stripe is not yet configured. Use useSetStripeConfiguration hook to save configuration. Show success message after successful configuration. Add validation for secret key format and country codes."
+        },
+        {
+          "path": "frontend/src/components/payments/CheckoutDialog.tsx",
+          "operation": "modify",
+          "description": "Add Stripe as a payment method option in the existing CheckoutDialog alongside UPI and Razorpay. When Stripe is selected, use the useStripeCheckout hook to create a checkout session with the current service as a ShoppingItem. On successful session creation, redirect to the Stripe checkout URL using window.location.href (not router navigation). Validate that session.url exists before redirecting; show error if missing. Pass successUrl and cancelUrl pointing to /payment-success and /payment-failure routes respectively. Show loading state during checkout session creation."
+        },
+        {
+          "path": "frontend/src/pages/PaymentSuccessPage.tsx",
+          "operation": "create",
+          "description": "Create a payment success page that displays a success message, order summary, and next steps. Extract session_id from URL query parameters. Optionally call backend getStripeSessionStatus to verify payment completion. Show a link to view payment history in settings. Provide a button to return to services catalog or dashboard. Style with success colors and checkmark icon."
+        },
+        {
+          "path": "frontend/src/pages/PaymentFailurePage.tsx",
+          "operation": "create",
+          "description": "Create a payment failure page that displays an error message explaining the payment was cancelled or failed. Extract session_id from URL query parameters if present. Provide options to retry payment (return to checkout) or browse services. Include a link to contact support if needed. Style with warning colors and appropriate icon."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register two new routes in the TanStack Router configuration: /payment-success mapped to PaymentSuccessPage and /payment-failure mapped to PaymentFailurePage. These routes should be public (not wrapped in RequireRole) since users are redirected here from external Stripe checkout. Ensure proper route definitions with lazy loading if applicable."
+        },
+        {
+          "path": "frontend/src/pages/SettingsPage.tsx",
+          "operation": "modify",
+          "description": "Verify that the existing payment history tab displays payments with Stripe payment method. Ensure the PaymentsList component shows Stripe payments alongside UPI and Razorpay. Add a section in payment settings tab for Stripe configuration status with a button to open StripeConfigurationDialog (admin-only). Display whether Stripe is configured and allow admins to update configuration."
+        },
+        {
+          "path": "frontend/src/components/payments/PaymentsList.tsx",
+          "operation": "modify",
+          "description": "Ensure the PaymentsList component properly displays Stripe payments with appropriate payment method badges. Verify that the payment status dropdown for admins includes all statuses: pending, paid, failed, cancelled, and refunded. Ensure the useUpdatePaymentStatus mutation is called when an admin changes payment status. Add filtering or sorting options if payment list becomes long."
+        },
+        {
+          "path": "frontend/src/hooks/usePayments.ts",
+          "operation": "modify",
+          "description": "Verify that useCreatePayment mutation supports PaymentMethod.stripe. Ensure useGetUserPayments and useGetAllPayments queries return payments with all payment methods including Stripe. Confirm useUpdatePaymentStatus mutation accepts all payment statuses including refunded and cancelled. Add proper error handling for all payment operations."
         }
       ]
     },
     {
-      "id": "REQ-6",
-      "summary": "Update AnalyticsPage layout to display three new charts in responsive grid below existing metrics cards",
+      "id": "REQ-4",
+      "summary": "Create web forms for capturing new leads directly through the application",
       "acceptanceCriteria": [
-        "Charts are arranged in a clean grid layout",
-        "Layout is responsive on mobile and desktop",
-        "Charts maintain gradient theme styling",
-        "Existing metrics cards remain visible above charts",
-        "Loading and error states are handled for all charts"
+        "Form includes fields for lead name, contact info, city, and niche",
+        "Form includes dropdown for lead status selection",
+        "Form includes field for revenue potential estimation",
+        "Form includes dropdown for assigning lead owner",
+        "Form validates required fields before submission",
+        "Successfully submitted leads appear in the leads list immediately",
+        "Form displays success message after lead creation",
+        "Form resets after successful submission"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AnalyticsPage.tsx",
+          "path": "frontend/src/components/leads/AddLeadDialog.tsx",
           "operation": "modify",
-          "description": "Update AnalyticsPage to import and render RevenueTrendsChart, ServiceCategoriesChart, and TopPerformersChart below the existing metrics cards. Arrange the three charts in a responsive grid using Tailwind grid layout (grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6). Preserve all existing metrics cards and layout structure. Ensure gradient theme styling is maintained across all charts and the page handles loading/error states gracefully"
+          "description": "Enhance the existing add lead dialog form to ensure all required fields are present: name (text input), contact (text input with phone/email validation), city (text input), niche (dropdown or text input), status (dropdown with options: New, Contacted, Qualified, Proposal, Won, Lost), revenue potential (number input with currency formatting), and owner (dropdown populated with available users or agency members). Add comprehensive form validation requiring name, contact, city, and niche as mandatory fields. Implement the useAddLead mutation hook to save the new lead. Display a success toast notification after successful creation. Reset all form fields to empty state after successful submission. Ensure the leads list refreshes immediately by invalidating the query cache. Add loading state during submission and disable submit button while processing."
+        },
+        {
+          "path": "frontend/src/hooks/useLeads.ts",
+          "operation": "modify",
+          "description": "Verify the useAddLead mutation properly creates leads with all fields including name, contact, city, niche, status, revenuePotential, and owner. Ensure the mutation calls backend createLead function. Add automatic query invalidation for the leads list after successful creation so new leads appear immediately. Implement proper error handling with user-friendly error messages. Add optimistic updates if appropriate to improve perceived performance."
+        },
+        {
+          "path": "frontend/src/pages/LeadsPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the AddLeadDialog is properly wired into the leads page with a visible 'Add Lead' button in an appropriate location (e.g., page header or top-right corner). Verify the dialog opens when the button is clicked. Confirm that after successful lead creation, the dialog closes and the leads list updates to show the new lead without requiring page reload. Add success feedback such as a toast notification showing 'Lead added successfully'."
         }
       ]
     }

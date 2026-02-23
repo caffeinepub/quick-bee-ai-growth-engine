@@ -1,130 +1,114 @@
 {
   "kind": "build_request",
-  "title": "Add analytics dashboard with revenue trends, service categories, and top performers charts",
+  "title": "Implement lead management system with data uploads and Stripe integration",
+  "projectName": "Quick Bee Agency",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a revenue trends over time line chart to the AnalyticsPage showing daily or weekly revenue progression",
-      "target": "frontend",
+      "text": "Add bulk CSV/Excel file upload capability for importing leads into the system. The upload should validate required columns (name, contact, city, niche) and provide feedback on successful imports and any parsing errors.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-conversation"
         ],
         "quotes": [
-          "3 charts showing revenue trends, service categories, and top performers"
+          "Lead database with CSV/Excel bulk data upload capability"
         ]
       },
       "acceptanceCriteria": [
-        "Line chart displays revenue data over a time period (e.g., last 30 days)",
-        "Chart uses the existing gradient theme colors (teal green primary, electric blue accent)",
-        "Chart animates on initial load",
-        "Chart is wrapped in a ChartBlock component with appropriate title"
+        "Users can upload CSV files containing lead data",
+        "Users can upload Excel files containing lead data",
+        "System validates that required columns (name, contact, city, niche) are present",
+        "System displays a summary of successfully imported leads",
+        "System displays errors for any leads that failed to import",
+        "Imported leads are stored in the backend and appear in the leads list"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a service categories distribution chart to the AnalyticsPage showing breakdown of services by category or niche",
+      "text": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities. Users should be able to search leads by name, filter by status and niche, and manage lead data through the interface.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-conversation"
         ],
         "quotes": [
-          "3 charts showing revenue trends, service categories, and top performers"
+          "Lead dashboard with search, filter, and management features"
         ]
       },
       "acceptanceCriteria": [
-        "Pie chart or bar chart shows services grouped by niche or category",
-        "Chart displays count or revenue per category",
-        "Chart uses gradient theme colors consistently",
-        "Chart animates on load and updates",
-        "Chart is wrapped in a ChartBlock component"
+        "Search field filters leads by name in real-time",
+        "Status dropdown filters leads by their current status",
+        "Niche dropdown filters leads by service niche/category",
+        "Filtered results update dynamically as filters change",
+        "Users can view full lead details by clicking on a lead card",
+        "Users can edit lead information through the detail dialog"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add a top performers chart to the AnalyticsPage ranking services or leads by revenue or conversion metrics",
-      "target": "frontend",
+      "text": "Integrate Stripe payment processing into the application. Users should be able to make payments for services, view payment history, and admins should be able to update payment status.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-conversation"
         ],
         "quotes": [
-          "3 charts showing revenue trends, service categories, and top performers"
+          "Stripe payment processing integration"
         ]
       },
       "acceptanceCriteria": [
-        "Bar chart or ranking list shows top 5-10 performers",
-        "Chart displays either top services by revenue or top-converting leads",
-        "Chart uses gradient theme styling",
-        "Chart animates on load",
-        "Chart is wrapped in a ChartBlock component with descriptive title"
+        "Users can initiate Stripe checkout for services",
+        "Payment orders are created and stored in the backend",
+        "Users can view their payment history on the settings page",
+        "Payment status is tracked (pending, paid, failed, refunded)",
+        "Admins can manually update payment status through the interface",
+        "Stripe payment method is available alongside existing UPI and Razorpay options"
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Integrate a React charting library (Recharts or similar) that supports line charts, pie charts, and bar charts with animation capabilities",
-      "target": "frontend",
+      "text": "Create web forms for capturing new leads directly through the application. The form should collect essential lead information (name, contact, city, niche, status, revenue potential, owner) and save it to the backend.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-conversation"
+        ],
+        "quotes": [
+          "Web forms for capturing new leads"
         ]
       },
       "acceptanceCriteria": [
-        "Charting library is installed and configured",
-        "Library supports responsive charts",
-        "Library works with existing React Query data flows",
-        "Charts render without layout issues on mobile and desktop"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Compute revenue trends data from existing analytics hook (useAgencyAnalytics) by aggregating payment or project data over time periods",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Revenue data is computed from existing payments or projects data",
-        "Data is grouped by time period (daily, weekly, or monthly)",
-        "Computation handles empty or missing data gracefully",
-        "Data structure matches chart component requirements"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Update AnalyticsPage layout to display the three new charts in a responsive grid below existing metrics cards",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Charts are arranged in a clean grid layout",
-        "Layout is responsive on mobile and desktop",
-        "Charts maintain gradient theme styling",
-        "Existing metrics cards remain visible above charts",
-        "Loading and error states are handled for all charts"
+        "Form includes fields for lead name, contact info, city, and niche",
+        "Form includes dropdown for lead status selection",
+        "Form includes field for revenue potential estimation",
+        "Form includes dropdown for assigning lead owner",
+        "Form validates required fields before submission",
+        "Successfully submitted leads appear in the leads list immediately",
+        "Form displays success message after lead creation",
+        "Form resets after successful submission"
       ]
     }
   ],
   "constraints": [
-    "Do not modify backend/main.mo or add new backend endpoints",
-    "Use existing useAgencyAnalytics hook data without changing its API",
-    "Maintain gradient theme (teal green #00b3a4, electric blue #00f0ff, deep matte black #0f0f0f)",
-    "Preserve existing AnalyticsPage metrics cards and layout structure",
-    "Do not modify immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui"
+    "Use only Stripe for payment processing - do not implement Razorpay, WhatsApp, phone calls, LinkedIn, or Facebook integrations",
+    "Do not modify Internet Identity authentication hooks (useInternetIdentity.ts, useInternetIdentity.tsx)",
+    "Do not edit read-only UI component sources in frontend/src/components/ui",
+    "Maintain role-based access control (RBAC) throughout the implementation",
+    "Keep all Motoko logic in the single main actor file (backend/main.mo)",
+    "Preserve existing analytics features and dashboard functionality"
   ],
   "nonGoals": [
-    "Adding new backend analytics endpoints or data models",
-    "Implementing real-time chart updates or WebSocket connections",
-    "Adding export functionality for chart data",
-    "Creating custom chart components from scratch",
-    "Modifying the service catalog or adding new analytics metrics beyond the three requested charts"
+    "WhatsApp Business API integration",
+    "Razorpay payment gateway integration",
+    "Telephony or calling features",
+    "LinkedIn or Facebook API integrations",
+    "Free email sending capabilities",
+    "AI automation service integrations (OpenAI, Anthropic, etc.)",
+    "External data export to third-party automation platforms",
+    "Real-time WebSocket features",
+    "Mobile app development"
   ],
   "imageRequirements": {
     "required": [],

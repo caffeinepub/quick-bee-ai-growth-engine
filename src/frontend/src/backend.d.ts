@@ -22,6 +22,11 @@ export interface ClientServiceRequest {
     details?: string;
     serviceId: string;
 }
+export interface TransformationOutput {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
 export interface OutreachActivity {
     createdAt: bigint;
     sent: boolean;
@@ -62,6 +67,15 @@ export interface Payment {
     serviceId: string;
     amount: bigint;
 }
+export interface http_header {
+    value: string;
+    name: string;
+}
+export interface http_request_result {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
 export interface Lead {
     id: string;
     status: string;
@@ -87,6 +101,17 @@ export interface PaymentSettings {
     razorpayLink: string;
     stripeLink: string;
 }
+export interface ShoppingItem {
+    productName: string;
+    currency: string;
+    quantity: bigint;
+    priceInCents: bigint;
+    productDescription: string;
+}
+export interface TransformationInput {
+    context: Uint8Array;
+    response: http_request_result;
+}
 export interface Deal {
     id: string;
     status: string;
@@ -95,6 +120,22 @@ export interface Deal {
     createdAt: bigint;
     agency: string;
     leadId: string;
+}
+export type StripeSessionStatus = {
+    __kind__: "completed";
+    completed: {
+        userPrincipal?: string;
+        response: string;
+    };
+} | {
+    __kind__: "failed";
+    failed: {
+        error: string;
+    };
+};
+export interface StripeConfiguration {
+    allowedCountries: Array<string>;
+    secretKey: string;
 }
 export interface Project {
     id: string;
@@ -143,6 +184,7 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    createCheckoutSession(items: Array<ShoppingItem>, successUrl: string, cancelUrl: string): Promise<string>;
     createClientServiceRequest(request: ClientServiceRequest): Promise<void>;
     createDeal(deal: Deal): Promise<void>;
     createLead(lead: Lead): Promise<void>;
@@ -168,13 +210,17 @@ export interface backendInterface {
     getService(serviceId: string): Promise<Service | null>;
     getServices(): Promise<Array<Service>>;
     getSettings(): Promise<Settings>;
+    getStripeSessionStatus(sessionId: string): Promise<StripeSessionStatus>;
     getUserPayments(): Promise<Array<Payment>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserRole(): Promise<AppRole>;
     isCallerAdmin(): Promise<boolean>;
     isDemoSession(): Promise<boolean>;
+    isStripeConfigured(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    setStripeConfiguration(config: StripeConfiguration): Promise<void>;
     startDemoSession(): Promise<void>;
+    transform(input: TransformationInput): Promise<TransformationOutput>;
     updateDeal(dealId: string, deal: Deal): Promise<void>;
     updateLead(leadId: string, lead: Lead): Promise<void>;
     updatePaymentSettings(newSettings: PaymentSettings): Promise<void>;
@@ -182,4 +228,5 @@ export interface backendInterface {
     updateProject(projectId: string, project: Project): Promise<void>;
     updateService(serviceId: string, service: Service): Promise<void>;
     updateSettings(newSettings: Settings): Promise<void>;
+    uploadLeadsFromCSV(_file: ExternalBlob): Promise<bigint>;
 }

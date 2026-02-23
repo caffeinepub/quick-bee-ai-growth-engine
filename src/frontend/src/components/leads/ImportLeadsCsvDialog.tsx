@@ -8,7 +8,7 @@ import { useGetCallerUserProfile } from '../../hooks/useCurrentUserProfile';
 import { toast } from 'sonner';
 import { Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { parseCsvToLeads } from '../../utils/leads/csv';
+import { parseCsvToLeads, parseExcelToLeads } from '../../utils/leads/csv';
 
 interface ImportLeadsCsvDialogProps {
   open: boolean;
@@ -25,8 +25,9 @@ export function ImportLeadsCsvDialog({ open, onOpenChange }: ImportLeadsCsvDialo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      if (!selectedFile.name.endsWith('.csv')) {
-        toast.error('Please select a CSV file');
+      const fileName = selectedFile.name.toLowerCase();
+      if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+        toast.error('Please select a CSV or Excel file (.csv, .xlsx, .xls)');
         return;
       }
       setFile(selectedFile);
@@ -44,11 +45,28 @@ export function ImportLeadsCsvDialog({ open, onOpenChange }: ImportLeadsCsvDialo
     setResult(null);
 
     try {
-      const text = await file.text();
-      const { leads, errors } = parseCsvToLeads(text, profile.agency, profile.name);
+      const fileName = file.name.toLowerCase();
+      let leads: any[] = [];
+      let errors: string[] = [];
+
+      if (fileName.endsWith('.csv')) {
+        const text = await file.text();
+        const parsed = parseCsvToLeads(text, profile.agency, profile.name);
+        leads = parsed.leads;
+        errors = parsed.errors;
+      } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const parsed = await parseExcelToLeads(arrayBuffer, profile.agency, profile.name);
+        leads = parsed.leads;
+        errors = parsed.errors;
+      } else {
+        toast.error('Unsupported file format');
+        setImporting(false);
+        return;
+      }
 
       if (leads.length === 0) {
-        toast.error('No valid leads found in CSV file');
+        toast.error('No valid leads found in file');
         setResult({ created: 0, failed: errors.length, errors });
         setImporting(false);
         return;
@@ -80,19 +98,19 @@ export function ImportLeadsCsvDialog({ open, onOpenChange }: ImportLeadsCsvDialo
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Import Leads from CSV</DialogTitle>
+          <DialogTitle>Import Leads from CSV/Excel</DialogTitle>
           <DialogDescription>
-            Upload a CSV file with columns: name, contact, city, niche, status, revenuePotential
+            Upload a CSV or Excel file with columns: name, contact, city, niche (required). Optional: status, revenuePotential, owner
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="csv-file">CSV File</Label>
+            <Label htmlFor="csv-file">CSV or Excel File</Label>
             <Input
               id="csv-file"
               type="file"
-              accept=".csv"
+              accept=".csv,.xlsx,.xls"
               onChange={handleFileChange}
               disabled={importing}
             />

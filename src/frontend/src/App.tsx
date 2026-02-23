@@ -1,5 +1,11 @@
 import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
+import { Toaster } from '@/components/ui/sonner';
+import AuthGate from './components/auth/AuthGate';
+import RequireRole from './components/auth/RequireRole';
 import AppShell from './components/layout/AppShell';
+import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import LeadsPage from './pages/LeadsPage';
 import OutreachPage from './pages/OutreachPage';
@@ -10,19 +16,33 @@ import ProjectsPage from './pages/ProjectsPage';
 import PlannerPage from './pages/PlannerPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
-import ProposalSharePage from './pages/ProposalSharePage';
-import LoginPage from './pages/LoginPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
-import AuthGate from './components/auth/AuthGate';
-import RequireRole from './components/auth/RequireRole';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailurePage from './pages/PaymentFailurePage';
 import { AppRole } from './backend';
 
-function RootComponent() {
-  return <Outlet />;
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const rootRoute = createRootRoute({
-  component: RootComponent,
+  component: () => (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <AuthGate>
+          <AppShell>
+            <Outlet />
+          </AppShell>
+        </AuthGate>
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
+  ),
 });
 
 const loginRoute = createRoute({
@@ -31,20 +51,8 @@ const loginRoute = createRoute({
   component: LoginPage,
 });
 
-const layoutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  id: 'layout',
-  component: () => (
-    <AuthGate>
-      <AppShell>
-        <Outlet />
-      </AppShell>
-    </AuthGate>
-  ),
-});
-
 const dashboardRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager, AppRole.Client]}>
@@ -54,7 +62,7 @@ const dashboardRoute = createRoute({
 });
 
 const leadsRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/leads',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager]}>
@@ -64,7 +72,7 @@ const leadsRoute = createRoute({
 });
 
 const outreachRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/outreach',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager]}>
@@ -74,17 +82,17 @@ const outreachRoute = createRoute({
 });
 
 const servicesRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/services',
   component: () => (
-    <RequireRole allowedRoles={[AppRole.Admin]}>
+    <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager, AppRole.Client]}>
       <ServicesPage />
     </RequireRole>
   ),
 });
 
-const servicesPricingRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+const pricingRoute = createRoute({
+  getParentRoute: () => rootRoute,
   path: '/pricing',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager, AppRole.Client]}>
@@ -94,7 +102,7 @@ const servicesPricingRoute = createRoute({
 });
 
 const dealsRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/deals',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager]}>
@@ -104,7 +112,7 @@ const dealsRoute = createRoute({
 });
 
 const projectsRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/projects',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager, AppRole.Client]}>
@@ -114,7 +122,7 @@ const projectsRoute = createRoute({
 });
 
 const plannerRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/planner',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager]}>
@@ -124,7 +132,7 @@ const plannerRoute = createRoute({
 });
 
 const analyticsRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/analytics',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager]}>
@@ -134,7 +142,7 @@ const analyticsRoute = createRoute({
 });
 
 const settingsRoute = createRoute({
-  getParentRoute: () => layoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/settings',
   component: () => (
     <RequireRole allowedRoles={[AppRole.Admin, AppRole.Manager, AppRole.Client]}>
@@ -143,27 +151,39 @@ const settingsRoute = createRoute({
   ),
 });
 
-const proposalShareRoute = createRoute({
+const unauthorizedRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/proposal/$proposalId',
-  component: ProposalSharePage,
+  path: '/unauthorized',
+  component: UnauthorizedPage,
+});
+
+const paymentSuccessRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/payment-success',
+  component: PaymentSuccessPage,
+});
+
+const paymentFailureRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/payment-failure',
+  component: PaymentFailurePage,
 });
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
-  layoutRoute.addChildren([
-    dashboardRoute,
-    leadsRoute,
-    outreachRoute,
-    servicesRoute,
-    servicesPricingRoute,
-    dealsRoute,
-    projectsRoute,
-    plannerRoute,
-    analyticsRoute,
-    settingsRoute,
-  ]),
-  proposalShareRoute,
+  dashboardRoute,
+  leadsRoute,
+  outreachRoute,
+  servicesRoute,
+  pricingRoute,
+  dealsRoute,
+  projectsRoute,
+  plannerRoute,
+  analyticsRoute,
+  settingsRoute,
+  unauthorizedRoute,
+  paymentSuccessRoute,
+  paymentFailureRoute,
 ]);
 
 const router = createRouter({ routeTree });
