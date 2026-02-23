@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { useUpdateLeadStatus } from '../../hooks/useLeads';
 import { toast } from 'sonner';
-import type { Lead } from '../../backend';
+import type { Lead, PaymentStatus } from '../../backend';
 
 interface LeadDetailDialogProps {
   open: boolean;
@@ -27,6 +28,8 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
     status: '',
     revenuePotential: '',
     owner: '',
+    paymentStatus: '' as '' | 'pending' | 'paid' | 'failed',
+    notes: '',
   });
 
   useEffect(() => {
@@ -39,6 +42,8 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
         status: lead.status,
         revenuePotential: Number(lead.revenuePotential).toString(),
         owner: lead.owner,
+        paymentStatus: lead.paymentStatus ? (lead.paymentStatus as 'pending' | 'paid' | 'failed') : '',
+        notes: lead.notes || '',
       });
       setIsEditing(false);
     }
@@ -57,6 +62,8 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
         status: formData.status,
         revenuePotential: BigInt(formData.revenuePotential || 0),
         owner: formData.owner,
+        paymentStatus: formData.paymentStatus ? (formData.paymentStatus as PaymentStatus) : undefined,
+        notes: formData.notes || undefined,
       };
       
       await updateLead.mutateAsync({ leadId: lead.id, lead: updatedLead });
@@ -70,6 +77,19 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
 
   const formatINR = (amount: bigint) => {
     return `₹${Number(amount).toLocaleString('en-IN')}`;
+  };
+
+  const getPaymentStatusBadge = (status?: PaymentStatus) => {
+    if (!status) return null;
+    
+    const variants: Record<string, { color: string; label: string }> = {
+      pending: { color: 'bg-yellow-500', label: 'Pending' },
+      paid: { color: 'bg-green-500', label: 'Paid' },
+      failed: { color: 'bg-red-500', label: 'Failed' },
+    };
+    
+    const variant = variants[status] || { color: 'bg-gray-500', label: status };
+    return <Badge className={variant.color}>{variant.label}</Badge>;
   };
 
   return (
@@ -124,10 +144,27 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
               </div>
             </div>
 
-            <div>
-              <Label className="text-muted-foreground">Revenue Potential</Label>
-              <p className="text-xl font-bold text-green-600">{formatINR(lead.revenuePotential)}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-muted-foreground">Revenue Potential</Label>
+                <p className="text-xl font-bold text-green-600">{formatINR(lead.revenuePotential)}</p>
+              </div>
+              {lead.paymentStatus && (
+                <div>
+                  <Label className="text-muted-foreground">Payment Status</Label>
+                  <div className="mt-1">
+                    {getPaymentStatusBadge(lead.paymentStatus)}
+                  </div>
+                </div>
+              )}
             </div>
+
+            {lead.notes && (
+              <div>
+                <Label className="text-muted-foreground">Notes</Label>
+                <p className="mt-1 whitespace-pre-wrap text-sm">{lead.notes}</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="edit" className="space-y-4 py-4">
@@ -188,6 +225,39 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
               </div>
 
               <div className="grid gap-2">
+                <Label htmlFor="edit-payment-status">Payment Status</Label>
+                <Select 
+                  value={formData.paymentStatus} 
+                  onValueChange={(value) => setFormData({ ...formData, paymentStatus: value as '' | 'pending' | 'paid' | 'failed' })}
+                >
+                  <SelectTrigger id="edit-payment-status">
+                    <SelectValue placeholder="Select payment status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="pending">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                        Pending
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="paid">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        Paid
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="failed">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                        Failed
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2">
                 <Label htmlFor="edit-revenue">Revenue Potential (₹)</Label>
                 <Input
                   id="edit-revenue"
@@ -203,6 +273,18 @@ export function LeadDetailDialog({ open, onOpenChange, lead }: LeadDetailDialogP
                   id="edit-owner"
                   value={formData.owner}
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-notes">Notes</Label>
+                <Textarea
+                  id="edit-notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="Add notes about this lead..."
+                  rows={4}
+                  className="resize-none"
                 />
               </div>
             </div>

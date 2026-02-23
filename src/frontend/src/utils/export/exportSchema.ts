@@ -1,4 +1,4 @@
-import type { Lead, Service, Project } from '../../backend';
+import type { Lead, Service, Project, PaymentStatus } from '../../backend';
 import type { Deal, OutreachActivity } from '../../types/local';
 
 export type ExportField<T> = {
@@ -19,6 +19,25 @@ export const leadFields: ExportField<Lead>[] = [
     format: (val) => `₹${Number(val).toLocaleString('en-IN')}`,
   },
   { key: 'owner', label: 'Owner' },
+  {
+    key: 'paymentStatus',
+    label: 'Payment Status',
+    format: (val: PaymentStatus | undefined) => {
+      if (!val) return '';
+      const labels: Record<string, string> = {
+        pending: 'Pending',
+        paid: 'Paid',
+        failed: 'Failed',
+        cancelled: 'Cancelled',
+      };
+      return labels[val] || val;
+    },
+  },
+  {
+    key: 'notes',
+    label: 'Notes',
+    format: (val: string | undefined) => val || '',
+  },
   { key: 'agency', label: 'Agency' },
   {
     key: 'createdAt',

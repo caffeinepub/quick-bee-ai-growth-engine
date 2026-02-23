@@ -1,44 +1,48 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Lead management system with data uploads and Stripe payment integration",
-  "architectural_notes": [
-    "Backend lead storage with CSV/Excel upload support",
-    "Stripe integration for payment processing",
-    "Dashboard for lead viewing and analytics"
-  ],
+  "summary": "Lead management app with payment workflow support: payment status tracking, notes, and data export",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-bulk-csv-excel-file-upload-capability-for-importing-leads-into-the-system-the-upload-should-validate-required-columns-name-contact-city-niche-and-provide-feedback-on-successful-imports-and-any-parsing-errors",
-      "title": "Add bulk CSV/Excel file upload capability for importing leads into the system. The upload should validate required columns (name, contact, city, niche) and provide feedback on successful imports and any parsing errors.",
+      "id": "feature-update-the-leaddetaildialog-component-to-display-and-allow-editing-of-the-new-payment-status-field-show-status-as-a-dropdown-selector-with-pending-paid-failed-options-with-appropriate-color-coding-yellow-for-pending-green-for-paid-red-for-failed",
+      "title": "Update the LeadDetailDialog component to display and allow editing of the new payment status field. Show status as a dropdown selector with Pending/Paid/Failed options, with appropriate color coding (yellow for Pending, green for Paid, red for Failed).",
       "reqIds": [
-        "REQ-1"
+        "REQ-7"
       ],
       "version": 1
     },
     {
-      "id": "feature-enhance-the-existing-lead-dashboard-with-comprehensive-search-and-filtering-capabilities-users-should-be-able-to-search-leads-by-name-filter-by-status-and-niche-and-manage-lead-data-through-the-interface",
-      "title": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities. Users should be able to search leads by name, filter by status and niche, and manage lead data through the interface.",
+      "id": "feature-update-the-leaddetaildialog-component-to-display-and-allow-editing-of-the-notes-field-show-as-a-multi-line-textarea-with-at-least-4-rows-of-height",
+      "title": "Update the LeadDetailDialog component to display and allow editing of the notes field. Show as a multi-line textarea with at least 4 rows of height.",
       "reqIds": [
-        "REQ-2"
+        "REQ-8"
       ],
       "version": 1
     },
     {
-      "id": "feature-integrate-stripe-payment-processing-into-the-application-users-should-be-able-to-make-payments-for-services-view-payment-history-and-admins-should-be-able-to-update-payment-status",
-      "title": "Integrate Stripe payment processing into the application. Users should be able to make payments for services, view payment history, and admins should be able to update payment status.",
+      "id": "feature-include-payment-status-and-notes-fields-in-all-data-export-formats-csv-excel-pdf-ready-html-rtf-docx-add-these-as-new-columns-in-the-leads-section-of-exports",
+      "title": "Include payment status and notes fields in all data export formats (CSV, Excel, PDF-ready HTML, RTF/DOCX). Add these as new columns in the leads section of exports.",
       "reqIds": [
-        "REQ-3"
+        "REQ-9"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-web-forms-for-capturing-new-leads-directly-through-the-application-the-form-should-collect-essential-lead-information-name-contact-city-niche-status-revenue-potential-owner-and-save-it-to-the-backend",
-      "title": "Create web forms for capturing new leads directly through the application. The form should collect essential lead information (name, contact, city, niche, status, revenue potential, owner) and save it to the backend.",
+      "id": "feature-update-the-leadcard-component-to-display-a-payment-status-badge-when-present-show-badge-with-appropriate-color-and-position-it-prominently-alongside-the-existing-status-badge",
+      "title": "Update the LeadCard component to display a payment status badge when present. Show badge with appropriate color and position it prominently alongside the existing status badge.",
       "reqIds": [
-        "REQ-4"
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-payment-status-as-a-filterable-option-on-the-leadspage-include-a-payment-status-filter-dropdown-alongside-existing-status-and-niche-filters",
+      "title": "Add payment status as a filterable option on the LeadsPage. Include a payment status filter dropdown alongside existing status and niche filters.",
+      "reqIds": [
+        "REQ-11"
       ],
       "version": 1
     }
@@ -46,30 +50,40 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Lead database with CSV/Excel bulk data upload capability",
+      "summary": "Add payment status field to customer records (Pending/Paid/Failed)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Lead dashboard with search, filter, and management features",
+      "summary": "Add notes/comments field for tracking payment conversations",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Stripe payment processing integration",
+      "summary": "Implement better data export functionality",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Web forms for capturing new leads",
-      "reqIds": [],
+      "summary": "Add a payment status field to the Lead data model with three possible values: Pending, Paid, and Failed. Store this as an optional variant type in the backend.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add a notes field to the Lead data model for tracking payment conversations and general lead notes. Store as optional text field with no length restrictions.",
+      "reqIds": [
+        "REQ-6"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Quick Bee Agency",
+  "projectName": "Quick Bee",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

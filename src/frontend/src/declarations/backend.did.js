@@ -48,9 +48,16 @@ export const Deal = IDL.Record({
   'agency' : IDL.Text,
   'leadId' : IDL.Text,
 });
+export const PaymentStatus = IDL.Variant({
+  'cancelled' : IDL.Null,
+  'pending' : IDL.Null,
+  'paid' : IDL.Null,
+  'failed' : IDL.Null,
+});
 export const Lead = IDL.Record({
   'id' : IDL.Text,
   'status' : IDL.Text,
+  'paymentStatus' : IDL.Opt(PaymentStatus),
   'contact' : IDL.Text,
   'owner' : IDL.Text,
   'city' : IDL.Text,
@@ -59,6 +66,7 @@ export const Lead = IDL.Record({
   'revenuePotential' : IDL.Nat,
   'agency' : IDL.Text,
   'niche' : IDL.Text,
+  'notes' : IDL.Opt(IDL.Text),
 });
 export const OutreachActivity = IDL.Record({
   'createdAt' : IDL.Int,
@@ -107,12 +115,6 @@ export const Service = IDL.Record({
   'price' : IDL.Nat,
   'requirements' : IDL.Vec(IDL.Text),
   'supportedProviders' : IDL.Vec(IDL.Text),
-});
-export const PaymentStatus = IDL.Variant({
-  'cancelled' : IDL.Null,
-  'pending' : IDL.Null,
-  'paid' : IDL.Null,
-  'failed' : IDL.Null,
 });
 export const Payment = IDL.Record({
   'id' : IDL.Text,
@@ -331,9 +333,16 @@ export const idlFactory = ({ IDL }) => {
     'agency' : IDL.Text,
     'leadId' : IDL.Text,
   });
+  const PaymentStatus = IDL.Variant({
+    'cancelled' : IDL.Null,
+    'pending' : IDL.Null,
+    'paid' : IDL.Null,
+    'failed' : IDL.Null,
+  });
   const Lead = IDL.Record({
     'id' : IDL.Text,
     'status' : IDL.Text,
+    'paymentStatus' : IDL.Opt(PaymentStatus),
     'contact' : IDL.Text,
     'owner' : IDL.Text,
     'city' : IDL.Text,
@@ -342,6 +351,7 @@ export const idlFactory = ({ IDL }) => {
     'revenuePotential' : IDL.Nat,
     'agency' : IDL.Text,
     'niche' : IDL.Text,
+    'notes' : IDL.Opt(IDL.Text),
   });
   const OutreachActivity = IDL.Record({
     'createdAt' : IDL.Int,
@@ -390,12 +400,6 @@ export const idlFactory = ({ IDL }) => {
     'price' : IDL.Nat,
     'requirements' : IDL.Vec(IDL.Text),
     'supportedProviders' : IDL.Vec(IDL.Text),
-  });
-  const PaymentStatus = IDL.Variant({
-    'cancelled' : IDL.Null,
-    'pending' : IDL.Null,
-    'paid' : IDL.Null,
-    'failed' : IDL.Null,
   });
   const Payment = IDL.Record({
     'id' : IDL.Text,

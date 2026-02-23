@@ -1,168 +1,111 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Lead management system with CSV uploads and Stripe integration",
+  "title": "Add payment tracking fields and enhanced data export",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Add bulk CSV/Excel file upload capability for importing leads into the system with validation and feedback",
+      "id": "REQ-7",
+      "summary": "Update LeadDetailDialog to display and allow editing of payment status with color-coded dropdown",
       "acceptanceCriteria": [
-        "Users can upload CSV files containing lead data",
-        "Users can upload Excel files containing lead data",
-        "System validates that required columns (name, contact, city, niche) are present",
-        "System displays a summary of successfully imported leads",
-        "System displays errors for any leads that failed to import",
-        "Imported leads are stored in the backend and appear in the leads list"
+        "Payment status appears in the lead detail view",
+        "Status can be changed via dropdown in edit mode",
+        "Status colors match: Pending (yellow), Paid (green), Failed (red)",
+        "Changes persist when dialog is saved"
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/components/leads/ImportLeadsCsvDialog.tsx",
-          "operation": "modify",
-          "description": "Extend the existing CSV import dialog to support Excel file uploads (.xlsx, .xls) in addition to CSV. Add file type detection and appropriate parsing for both formats. Update the file input accept attribute to include Excel MIME types. Use the blob-storage component for handling file uploads by converting uploaded files to ExternalBlob format before sending to backend. Verify the component's usage instructions before implementing. Display comprehensive feedback including success count, error count, and detailed error messages for failed rows with row numbers and reasons."
-        },
-        {
-          "path": "frontend/src/utils/leads/csv.ts",
-          "operation": "modify",
-          "description": "Add Excel file parsing capability alongside existing CSV parsing. Implement detection of file type based on file extension or content. For Excel files, parse the first sheet and extract data into the same Lead object structure. Ensure validation of required columns (name, contact, city, niche) works for both CSV and Excel formats. Return parsing errors with row numbers and specific validation failures for user feedback."
-        },
-        {
-          "path": "frontend/src/hooks/useLeads.ts",
-          "operation": "modify",
-          "description": "Update the import leads mutation to handle ExternalBlob file uploads. Ensure the mutation calls the backend uploadLeadsFromCSV function with the ExternalBlob parameter. Add error handling for file upload failures and backend validation errors. Invalidate the leads query cache after successful import to refresh the leads list immediately."
-        },
-        {
-          "path": "frontend/src/pages/LeadsPage.tsx",
-          "operation": "modify",
-          "description": "Ensure the ImportLeadsCsvDialog is properly wired into the leads page. Verify the dialog trigger button is visible and accessible. After successful import, display a toast notification or success message with the count of imported leads. Refresh the leads list to show newly imported leads without requiring page reload."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities",
-      "acceptanceCriteria": [
-        "Search field filters leads by name in real-time",
-        "Status dropdown filters leads by their current status",
-        "Niche dropdown filters leads by service niche/category",
-        "Filtered results update dynamically as filters change",
-        "Users can view full lead details by clicking on a lead card",
-        "Users can edit lead information through the detail dialog"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/LeadsPage.tsx",
-          "operation": "modify",
-          "description": "Verify that the existing search field, status dropdown, and niche dropdown filters are working correctly with debounced search. Ensure all filter controls are visible and properly styled. Confirm that clicking on a LeadCard opens the LeadDetailDialog with the selected lead's data. Test that filtered results update dynamically as users change filter values. Add loading states during filter application if needed."
-        },
         {
           "path": "frontend/src/components/leads/LeadDetailDialog.tsx",
           "operation": "modify",
-          "description": "Enhance the lead detail dialog to support editing all lead fields including name, contact, city, niche, status, revenue potential, and owner. Add form validation for required fields. Implement save functionality that calls the updateLead mutation. Show success/error feedback after save attempts. Ensure the dialog closes and the leads list refreshes after successful update."
+          "description": "Add payment status field to the lead detail form with a dropdown selector. Include three options: Pending (yellow badge), Paid (green badge), Failed (red badge). Display the status as a color-coded badge in view mode and as a select dropdown in edit mode. Ensure the payment status is included when calling the updateLead mutation and persists properly. Handle optional payment status gracefully for leads without this field set."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Update LeadDetailDialog to display and allow editing of notes field as multi-line textarea",
+      "acceptanceCriteria": [
+        "Notes field appears in the lead detail dialog",
+        "Textarea allows multiple lines of text entry",
+        "Notes persist when dialog is saved",
+        "Empty notes display gracefully without errors"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/leads/LeadDetailDialog.tsx",
+          "operation": "modify",
+          "description": "Add a notes field to the lead detail form as a multi-line textarea with at least 4 rows of height. Display notes in view mode as formatted text (preserving line breaks) and as an editable textarea in edit mode. Include the notes field when calling the updateLead mutation. Handle empty or undefined notes gracefully without displaying errors."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Include payment status and notes fields in all data export formats",
+      "acceptanceCriteria": [
+        "CSV exports include PaymentStatus and Notes columns",
+        "Excel exports include PaymentStatus and Notes columns",
+        "PDF HTML exports include payment status and notes in lead tables",
+        "RTF/DOCX exports include payment status and notes fields",
+        "Empty values display as blank cells/fields rather than errors"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/export/exportSchema.ts",
+          "operation": "modify",
+          "description": "Add paymentStatus and notes fields to the LEAD_FIELDS schema. Define a formatter for paymentStatus that converts the variant enum to a readable string (Pending/Paid/Failed) or returns empty string if undefined. Define a formatter for notes that returns the text value or empty string if undefined. Ensure both fields are properly included in the field definitions array."
         },
         {
-          "path": "frontend/src/hooks/useLeads.ts",
+          "path": "frontend/src/utils/export/exportCsv.ts",
           "operation": "modify",
-          "description": "Verify the useUpdateLead mutation exists and properly invalidates the leads query cache after successful updates. Add optimistic updates if not present to improve perceived performance. Ensure error handling provides user-friendly error messages."
+          "description": "Ensure the CSV export includes the new paymentStatus and notes columns for leads by using the updated LEAD_FIELDS schema. Verify that empty values are handled gracefully with proper CSV escaping."
         },
+        {
+          "path": "frontend/src/utils/export/exportXlsx.ts",
+          "operation": "modify",
+          "description": "Ensure the Excel export includes the new paymentStatus and notes columns for leads by using the updated LEAD_FIELDS schema. Verify that empty values are rendered as blank cells without errors."
+        },
+        {
+          "path": "frontend/src/utils/export/exportPdf.ts",
+          "operation": "modify",
+          "description": "Ensure the PDF HTML export includes the new paymentStatus and notes columns in the leads table by using the updated LEAD_FIELDS schema. Verify that empty values display as blank cells in the table."
+        },
+        {
+          "path": "frontend/src/utils/export/exportDocx.ts",
+          "operation": "modify",
+          "description": "Ensure the RTF/DOCX export includes the new paymentStatus and notes fields in the leads section by using the updated LEAD_FIELDS schema. Verify that empty values are handled gracefully without displaying errors."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Update LeadCard to display payment status badge with appropriate color",
+      "acceptanceCriteria": [
+        "Payment status badge appears on lead cards when status is set",
+        "Badge colors match the status dropdown (Pending/yellow, Paid/green, Failed/red)",
+        "Badge does not appear for leads without payment status",
+        "Layout remains clean with both status and payment status visible"
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/components/common/LeadCard.tsx",
           "operation": "modify",
-          "description": "Ensure the LeadCard component properly triggers the LeadDetailDialog when clicked. Add visual feedback (hover state, cursor pointer) to indicate the card is clickable. Verify all lead information (status, niche, location, revenue, owner) is displayed correctly with appropriate formatting and icons."
+          "description": "Add a payment status badge to the LeadCard component that displays when lead.paymentStatus is defined. Position the badge prominently alongside the existing status badge. Apply color coding: yellow/amber for Pending, green for Paid, red for Failed. Conditionally render the badge only when paymentStatus exists. Ensure the layout remains clean and visually balanced with both badges visible."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Integrate Stripe payment processing into the application with payment history and status management",
+      "id": "REQ-11",
+      "summary": "Add payment status filter to LeadsPage alongside existing filters",
       "acceptanceCriteria": [
-        "Users can initiate Stripe checkout for services",
-        "Payment orders are created and stored in the backend",
-        "Users can view their payment history on the settings page",
-        "Payment status is tracked (pending, paid, failed, refunded)",
-        "Admins can manually update payment status through the interface",
-        "Stripe payment method is available alongside existing UPI and Razorpay options"
+        "Payment status filter dropdown appears on leads page",
+        "Filter includes All/Pending/Paid/Failed options",
+        "Filtering updates the displayed leads list",
+        "Filter works in combination with existing status and niche filters"
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/hooks/useStripeCheckout.ts",
-          "operation": "create",
-          "description": "Create a custom hook for initiating Stripe checkout sessions. Use the stripe component to support Stripe payment processing. Verify the component's usage instructions before implementing. Implement useMutation that calls the backend createCheckoutSession function with ShoppingItem array, successUrl, and cancelUrl parameters. Parse the JSON response to extract the CheckoutSession with id and url fields. Validate that session.url exists and is non-empty before redirecting. Return mutation state and mutateAsync function for use in checkout components. Add error handling for missing actor, failed requests, and invalid session responses."
-        },
-        {
-          "path": "frontend/src/hooks/useStripeConfiguration.ts",
-          "operation": "create",
-          "description": "Create hooks for managing Stripe configuration. Implement useIsStripeConfigured query hook that calls backend isStripeConfigured. Implement useSetStripeConfiguration mutation hook that calls backend setStripeConfiguration with StripeConfiguration object containing secretKey and allowedCountries. Add admin role validation before allowing configuration updates. Include proper error handling and query invalidation after configuration changes."
-        },
-        {
-          "path": "frontend/src/components/payments/StripeConfigurationDialog.tsx",
-          "operation": "create",
-          "description": "Create an admin-only dialog for configuring Stripe integration. Use the stripe component which requires configuration before use. Verify the component's usage instructions before implementing. Include form fields for Stripe secret key (password input) and allowed countries (multi-select or comma-separated text input with country code validation). Display the dialog automatically when an admin logs in and Stripe is not yet configured. Use useSetStripeConfiguration hook to save configuration. Show success message after successful configuration. Add validation for secret key format and country codes."
-        },
-        {
-          "path": "frontend/src/components/payments/CheckoutDialog.tsx",
-          "operation": "modify",
-          "description": "Add Stripe as a payment method option in the existing CheckoutDialog alongside UPI and Razorpay. When Stripe is selected, use the useStripeCheckout hook to create a checkout session with the current service as a ShoppingItem. On successful session creation, redirect to the Stripe checkout URL using window.location.href (not router navigation). Validate that session.url exists before redirecting; show error if missing. Pass successUrl and cancelUrl pointing to /payment-success and /payment-failure routes respectively. Show loading state during checkout session creation."
-        },
-        {
-          "path": "frontend/src/pages/PaymentSuccessPage.tsx",
-          "operation": "create",
-          "description": "Create a payment success page that displays a success message, order summary, and next steps. Extract session_id from URL query parameters. Optionally call backend getStripeSessionStatus to verify payment completion. Show a link to view payment history in settings. Provide a button to return to services catalog or dashboard. Style with success colors and checkmark icon."
-        },
-        {
-          "path": "frontend/src/pages/PaymentFailurePage.tsx",
-          "operation": "create",
-          "description": "Create a payment failure page that displays an error message explaining the payment was cancelled or failed. Extract session_id from URL query parameters if present. Provide options to retry payment (return to checkout) or browse services. Include a link to contact support if needed. Style with warning colors and appropriate icon."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register two new routes in the TanStack Router configuration: /payment-success mapped to PaymentSuccessPage and /payment-failure mapped to PaymentFailurePage. These routes should be public (not wrapped in RequireRole) since users are redirected here from external Stripe checkout. Ensure proper route definitions with lazy loading if applicable."
-        },
-        {
-          "path": "frontend/src/pages/SettingsPage.tsx",
-          "operation": "modify",
-          "description": "Verify that the existing payment history tab displays payments with Stripe payment method. Ensure the PaymentsList component shows Stripe payments alongside UPI and Razorpay. Add a section in payment settings tab for Stripe configuration status with a button to open StripeConfigurationDialog (admin-only). Display whether Stripe is configured and allow admins to update configuration."
-        },
-        {
-          "path": "frontend/src/components/payments/PaymentsList.tsx",
-          "operation": "modify",
-          "description": "Ensure the PaymentsList component properly displays Stripe payments with appropriate payment method badges. Verify that the payment status dropdown for admins includes all statuses: pending, paid, failed, cancelled, and refunded. Ensure the useUpdatePaymentStatus mutation is called when an admin changes payment status. Add filtering or sorting options if payment list becomes long."
-        },
-        {
-          "path": "frontend/src/hooks/usePayments.ts",
-          "operation": "modify",
-          "description": "Verify that useCreatePayment mutation supports PaymentMethod.stripe. Ensure useGetUserPayments and useGetAllPayments queries return payments with all payment methods including Stripe. Confirm useUpdatePaymentStatus mutation accepts all payment statuses including refunded and cancelled. Add proper error handling for all payment operations."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Create web forms for capturing new leads directly through the application",
-      "acceptanceCriteria": [
-        "Form includes fields for lead name, contact info, city, and niche",
-        "Form includes dropdown for lead status selection",
-        "Form includes field for revenue potential estimation",
-        "Form includes dropdown for assigning lead owner",
-        "Form validates required fields before submission",
-        "Successfully submitted leads appear in the leads list immediately",
-        "Form displays success message after lead creation",
-        "Form resets after successful submission"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/leads/AddLeadDialog.tsx",
-          "operation": "modify",
-          "description": "Enhance the existing add lead dialog form to ensure all required fields are present: name (text input), contact (text input with phone/email validation), city (text input), niche (dropdown or text input), status (dropdown with options: New, Contacted, Qualified, Proposal, Won, Lost), revenue potential (number input with currency formatting), and owner (dropdown populated with available users or agency members). Add comprehensive form validation requiring name, contact, city, and niche as mandatory fields. Implement the useAddLead mutation hook to save the new lead. Display a success toast notification after successful creation. Reset all form fields to empty state after successful submission. Ensure the leads list refreshes immediately by invalidating the query cache. Add loading state during submission and disable submit button while processing."
-        },
-        {
-          "path": "frontend/src/hooks/useLeads.ts",
-          "operation": "modify",
-          "description": "Verify the useAddLead mutation properly creates leads with all fields including name, contact, city, niche, status, revenuePotential, and owner. Ensure the mutation calls backend createLead function. Add automatic query invalidation for the leads list after successful creation so new leads appear immediately. Implement proper error handling with user-friendly error messages. Add optimistic updates if appropriate to improve perceived performance."
-        },
         {
           "path": "frontend/src/pages/LeadsPage.tsx",
           "operation": "modify",
-          "description": "Ensure the AddLeadDialog is properly wired into the leads page with a visible 'Add Lead' button in an appropriate location (e.g., page header or top-right corner). Verify the dialog opens when the button is clicked. Confirm that after successful lead creation, the dialog closes and the leads list updates to show the new lead without requiring page reload. Add success feedback such as a toast notification showing 'Lead added successfully'."
+          "description": "Add a payment status filter dropdown to the LeadsPage alongside the existing status and niche filters. Include options for All, Pending, Paid, and Failed. Add local state to track the selected payment status filter. Update the filtering logic to filter leads based on the selected payment status in combination with existing status and niche filters. Ensure the filter is positioned logically in the filter row and maintains consistent styling with other filter controls."
         }
       ]
     }

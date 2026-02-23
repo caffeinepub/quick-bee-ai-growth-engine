@@ -35,6 +35,7 @@ export type ExternalBlob = Uint8Array;
 export interface Lead {
   'id' : string,
   'status' : string,
+  'paymentStatus' : [] | [PaymentStatus],
   'contact' : string,
   'owner' : string,
   'city' : string,
@@ -43,6 +44,7 @@ export interface Lead {
   'revenuePotential' : bigint,
   'agency' : string,
   'niche' : string,
+  'notes' : [] | [string],
 }
 export interface OutreachActivity {
   'createdAt' : bigint,

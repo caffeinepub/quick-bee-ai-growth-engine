@@ -1,114 +1,154 @@
 {
   "kind": "build_request",
-  "title": "Implement lead management system with data uploads and Stripe integration",
-  "projectName": "Quick Bee Agency",
+  "title": "Add payment tracking fields and enhanced data export",
+  "projectName": "Quick Bee",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Add bulk CSV/Excel file upload capability for importing leads into the system. The upload should validate required columns (name, contact, city, niche) and provide feedback on successful imports and any parsing errors.",
-      "target": "both",
+      "id": "REQ-5",
+      "text": "Add a payment status field to the Lead data model with three possible values: Pending, Paid, and Failed. Store this as an optional variant type in the backend.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-conversation"
+          "msg-20"
         ],
         "quotes": [
-          "Lead database with CSV/Excel bulk data upload capability"
+          "add payment status fields"
         ]
       },
       "acceptanceCriteria": [
-        "Users can upload CSV files containing lead data",
-        "Users can upload Excel files containing lead data",
-        "System validates that required columns (name, contact, city, niche) are present",
-        "System displays a summary of successfully imported leads",
-        "System displays errors for any leads that failed to import",
-        "Imported leads are stored in the backend and appear in the leads list"
+        "Lead type includes optional paymentStatus field with Pending/Paid/Failed variants",
+        "Existing leads without payment status remain valid (backward compatible)",
+        "Payment status can be queried and updated through backend methods"
       ]
     },
     {
-      "id": "REQ-2",
-      "text": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities. Users should be able to search leads by name, filter by status and niche, and manage lead data through the interface.",
+      "id": "REQ-6",
+      "text": "Add a notes field to the Lead data model for tracking payment conversations and general lead notes. Store as optional text field with no length restrictions.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "notes for tracking"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Lead type includes optional notes field of type Text",
+        "Notes can be added and updated independently of other lead fields",
+        "Empty notes field does not affect existing lead operations"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Update the LeadDetailDialog component to display and allow editing of the new payment status field. Show status as a dropdown selector with Pending/Paid/Failed options, with appropriate color coding (yellow for Pending, green for Paid, red for Failed).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-conversation"
+          "msg-20"
         ],
         "quotes": [
-          "Lead dashboard with search, filter, and management features"
+          "add payment status fields"
         ]
       },
       "acceptanceCriteria": [
-        "Search field filters leads by name in real-time",
-        "Status dropdown filters leads by their current status",
-        "Niche dropdown filters leads by service niche/category",
-        "Filtered results update dynamically as filters change",
-        "Users can view full lead details by clicking on a lead card",
-        "Users can edit lead information through the detail dialog"
+        "Payment status appears in the lead detail view",
+        "Status can be changed via dropdown in edit mode",
+        "Status colors match: Pending (yellow), Paid (green), Failed (red)",
+        "Changes persist when dialog is saved"
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Integrate Stripe payment processing into the application. Users should be able to make payments for services, view payment history, and admins should be able to update payment status.",
-      "target": "both",
+      "id": "REQ-8",
+      "text": "Update the LeadDetailDialog component to display and allow editing of the notes field. Show as a multi-line textarea with at least 4 rows of height.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-conversation"
+          "msg-20"
         ],
         "quotes": [
-          "Stripe payment processing integration"
+          "notes for tracking"
         ]
       },
       "acceptanceCriteria": [
-        "Users can initiate Stripe checkout for services",
-        "Payment orders are created and stored in the backend",
-        "Users can view their payment history on the settings page",
-        "Payment status is tracked (pending, paid, failed, refunded)",
-        "Admins can manually update payment status through the interface",
-        "Stripe payment method is available alongside existing UPI and Razorpay options"
+        "Notes field appears in the lead detail dialog",
+        "Textarea allows multiple lines of text entry",
+        "Notes persist when dialog is saved",
+        "Empty notes display gracefully without errors"
       ]
     },
     {
-      "id": "REQ-4",
-      "text": "Create web forms for capturing new leads directly through the application. The form should collect essential lead information (name, contact, city, niche, status, revenue potential, owner) and save it to the backend.",
-      "target": "both",
+      "id": "REQ-9",
+      "text": "Include payment status and notes fields in all data export formats (CSV, Excel, PDF-ready HTML, RTF/DOCX). Add these as new columns in the leads section of exports.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-conversation"
+          "msg-20"
         ],
         "quotes": [
-          "Web forms for capturing new leads"
+          "better data export"
         ]
       },
       "acceptanceCriteria": [
-        "Form includes fields for lead name, contact info, city, and niche",
-        "Form includes dropdown for lead status selection",
-        "Form includes field for revenue potential estimation",
-        "Form includes dropdown for assigning lead owner",
-        "Form validates required fields before submission",
-        "Successfully submitted leads appear in the leads list immediately",
-        "Form displays success message after lead creation",
-        "Form resets after successful submission"
+        "CSV exports include PaymentStatus and Notes columns",
+        "Excel exports include PaymentStatus and Notes columns",
+        "PDF HTML exports include payment status and notes in lead tables",
+        "RTF/DOCX exports include payment status and notes fields",
+        "Empty values display as blank cells/fields rather than errors"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Update the LeadCard component to display a payment status badge when present. Show badge with appropriate color and position it prominently alongside the existing status badge.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "add payment status fields"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Payment status badge appears on lead cards when status is set",
+        "Badge colors match the status dropdown (Pending/yellow, Paid/green, Failed/red)",
+        "Badge does not appear for leads without payment status",
+        "Layout remains clean with both status and payment status visible"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Add payment status as a filterable option on the LeadsPage. Include a payment status filter dropdown alongside existing status and niche filters.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "add payment status fields"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Payment status filter dropdown appears on leads page",
+        "Filter includes All/Pending/Paid/Failed options",
+        "Filtering updates the displayed leads list",
+        "Filter works in combination with existing status and niche filters"
       ]
     }
   ],
   "constraints": [
-    "Use only Stripe for payment processing - do not implement Razorpay, WhatsApp, phone calls, LinkedIn, or Facebook integrations",
-    "Do not modify Internet Identity authentication hooks (useInternetIdentity.ts, useInternetIdentity.tsx)",
-    "Do not edit read-only UI component sources in frontend/src/components/ui",
-    "Maintain role-based access control (RBAC) throughout the implementation",
-    "Keep all Motoko logic in the single main actor file (backend/main.mo)",
-    "Preserve existing analytics features and dashboard functionality"
+    "Maintain backward compatibility with existing Lead records that do not have payment status or notes",
+    "Payment status must use variant types (not plain text) to ensure type safety",
+    "Do not modify the existing Payment entity structure - these fields belong to Lead records",
+    "Export functionality must handle missing/optional fields gracefully"
   ],
   "nonGoals": [
-    "WhatsApp Business API integration",
-    "Razorpay payment gateway integration",
-    "Telephony or calling features",
-    "LinkedIn or Facebook API integrations",
-    "Free email sending capabilities",
-    "AI automation service integrations (OpenAI, Anthropic, etc.)",
-    "External data export to third-party automation platforms",
-    "Real-time WebSocket features",
-    "Mobile app development"
+    "Integration with external payment systems (Razorpay, PayPal, etc.)",
+    "Automated payment status updates from payment gateways",
+    "Payment reminder notifications or automation",
+    "Financial reporting or revenue analytics for lead payment status",
+    "Bulk payment status updates"
   ],
   "imageRequirements": {
     "required": [],

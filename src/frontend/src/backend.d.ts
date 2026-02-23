@@ -79,6 +79,7 @@ export interface http_request_result {
 export interface Lead {
     id: string;
     status: string;
+    paymentStatus?: PaymentStatus;
     contact: string;
     owner: string;
     city: string;
@@ -87,6 +88,7 @@ export interface Lead {
     revenuePotential: bigint;
     agency: string;
     niche: string;
+    notes?: string;
 }
 export interface Settings {
     defaultSort: string;

@@ -1,12 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Implement a comprehensive lead management system with bulk data imports, advanced filtering, web forms for lead capture, and Stripe payment integration.
+**Goal:** Add payment tracking capabilities to leads with status field, notes field, filtering, and enhanced data exports.
 
 **Planned changes:**
-- Add CSV/Excel bulk upload for importing leads with validation and error feedback
-- Enhance lead dashboard with search by name and filtering by status and niche
-- Integrate Stripe payment processing with checkout, order tracking, and payment history
-- Create web forms for capturing new leads with fields for name, contact, city, niche, status, revenue potential, and owner assignment
+- Add payment status field (Pending/Paid/Failed) to Lead data model
+- Add notes field to Lead data model for tracking payment conversations
+- Update LeadDetailDialog to display and edit payment status with color-coded dropdown
+- Update LeadDetailDialog to display and edit notes with multi-line textarea
+- Add payment status badge to LeadCard component with appropriate colors
+- Add payment status filter to LeadsPage alongside existing filters
+- Include payment status and notes in all export formats (CSV, Excel, PDF, RTF/DOCX)
 
-**User-visible outcome:** Users can bulk import leads via CSV/Excel files, search and filter leads on the dashboard, capture new leads through web forms, and process payments through Stripe with full payment history tracking.
+**User-visible outcome:** Users can track payment status for each lead, add notes for payment conversations, filter leads by payment status, and export comprehensive lead data including payment information.

@@ -13,8 +13,9 @@ import Stripe "stripe/stripe";
 import OutCall "http-outcalls/outcall";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+import Migration "migration";
 
-
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -30,6 +31,13 @@ actor {
     #Demo;     // Maps to AccessControl #guest with demo flag
   };
 
+  public type PaymentStatus = {
+    #pending;
+    #paid;
+    #failed;
+    #cancelled;
+  };
+
   public type Lead = {
     id : Text;
     agency : Text;
@@ -41,6 +49,8 @@ actor {
     revenuePotential : Nat;
     createdAt : Int;
     owner : Text;
+    paymentStatus : ?PaymentStatus;
+    notes : ?Text;
   };
 
   public type OutreachActivity = {
@@ -132,13 +142,6 @@ actor {
     #upi;
     #razorpay;
     #stripe;
-  };
-
-  public type PaymentStatus = {
-    #pending;
-    #paid;
-    #failed;
-    #cancelled;
   };
 
   public type PaymentSettings = {
@@ -670,4 +673,3 @@ actor {
     OutCall.transform(input);
   };
 };
-

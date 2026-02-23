@@ -25,6 +25,7 @@ export default function LeadsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [nicheFilter, setNicheFilter] = useState<string>('all');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('all');
   
   const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
@@ -42,10 +43,12 @@ export default function LeadsPage() {
       
       const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
       const matchesNiche = nicheFilter === 'all' || lead.niche === nicheFilter;
+      const matchesPaymentStatus = paymentStatusFilter === 'all' || 
+        (paymentStatusFilter === 'none' ? !lead.paymentStatus : lead.paymentStatus === paymentStatusFilter);
       
-      return matchesSearch && matchesStatus && matchesNiche;
+      return matchesSearch && matchesStatus && matchesNiche && matchesPaymentStatus;
     });
-  }, [leads, debouncedSearch, statusFilter, nicheFilter]);
+  }, [leads, debouncedSearch, statusFilter, nicheFilter, paymentStatusFilter]);
 
   const handleLoadMore = () => {
     setOffset(prev => prev + ITEMS_PER_PAGE);
@@ -142,6 +145,34 @@ export default function LeadsPage() {
               ))}
             </SelectContent>
           </Select>
+          <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <Filter className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Payment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Payments</SelectItem>
+              <SelectItem value="none">No Status</SelectItem>
+              <SelectItem value="pending">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                  Pending
+                </div>
+              </SelectItem>
+              <SelectItem value="paid">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  Paid
+                </div>
+              </SelectItem>
+              <SelectItem value="failed">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  Failed
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       )}
 
@@ -170,16 +201,18 @@ export default function LeadsPage() {
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredLeads.map(lead => (
-              <div key={lead.id} onClick={() => handleLeadClick(lead)} className="cursor-pointer">
-                <LeadCard lead={lead} />
-              </div>
+            {filteredLeads.map((lead) => (
+              <LeadCard key={lead.id} lead={lead} />
             ))}
           </div>
-          
+
           {leads.length >= ITEMS_PER_PAGE && (
             <div className="flex justify-center">
-              <Button onClick={handleLoadMore} variant="outline" disabled={isLoading}>
+              <Button
+                variant="outline"
+                onClick={handleLoadMore}
+                disabled={isLoading}
+              >
                 {isLoading ? 'Loading...' : 'Load More'}
               </Button>
             </div>
@@ -189,7 +222,11 @@ export default function LeadsPage() {
 
       <AddLeadDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <ImportLeadsCsvDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
-      <LeadDetailDialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen} lead={selectedLead} />
+      <LeadDetailDialog
+        lead={selectedLead}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+      />
     </div>
   );
 }

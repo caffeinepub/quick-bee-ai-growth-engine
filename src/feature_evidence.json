@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-bulk-csv-excel-file-upload-capability-for-importing-leads-into-the-system-the-upload-should-validate-required-columns-name-contact-city-niche-and-provide-feedback-on-successful-imports-and-any-parsing-errors",
-      "featureTitle": "Add bulk CSV/Excel file upload capability for importing leads into the system. The upload should validate required columns (name, contact, city, niche) and provide feedback on successful imports and any parsing errors.",
+      "featureId": "feature-update-the-leaddetaildialog-component-to-display-and-allow-editing-of-the-new-payment-status-field-show-status-as-a-dropdown-selector-with-pending-paid-failed-options-with-appropriate-color-coding-yellow-for-pending-green-for-paid-red-for-failed",
+      "featureTitle": "Update the LeadDetailDialog component to display and allow editing of the new payment status field. Show status as a dropdown selector with Pending/Paid/Failed options, with appropriate color coding (yellow for Pending, green for Paid, red for Failed).",
       "files": [
-        "frontend/src/components/leads/ImportLeadsCsvDialog.tsx",
-        "frontend/src/pages/LeadsPage.tsx",
-        "frontend/src/utils/leads/csv.ts"
+        "frontend/src/components/leads/LeadDetailDialog.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,15 +19,81 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-7"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-enhance-the-existing-lead-dashboard-with-comprehensive-search-and-filtering-capabilities-users-should-be-able-to-search-leads-by-name-filter-by-status-and-niche-and-manage-lead-data-through-the-interface",
-      "featureTitle": "Enhance the existing lead dashboard with comprehensive search and filtering capabilities. Users should be able to search leads by name, filter by status and niche, and manage lead data through the interface.",
+      "featureId": "feature-update-the-leaddetaildialog-component-to-display-and-allow-editing-of-the-notes-field-show-as-a-multi-line-textarea-with-at-least-4-rows-of-height",
+      "featureTitle": "Update the LeadDetailDialog component to display and allow editing of the notes field. Show as a multi-line textarea with at least 4 rows of height.",
       "files": [
-        "frontend/src/components/leads/LeadDetailDialog.tsx",
+        "frontend/src/components/leads/LeadDetailDialog.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-include-payment-status-and-notes-fields-in-all-data-export-formats-csv-excel-pdf-ready-html-rtf-docx-add-these-as-new-columns-in-the-leads-section-of-exports",
+      "featureTitle": "Include payment status and notes fields in all data export formats (CSV, Excel, PDF-ready HTML, RTF/DOCX). Add these as new columns in the leads section of exports.",
+      "files": [
+        "frontend/src/utils/export/exportCsv.ts",
+        "frontend/src/utils/export/exportSchema.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-leadcard-component-to-display-a-payment-status-badge-when-present-show-badge-with-appropriate-color-and-position-it-prominently-alongside-the-existing-status-badge",
+      "featureTitle": "Update the LeadCard component to display a payment status badge when present. Show badge with appropriate color and position it prominently alongside the existing status badge.",
+      "files": [
+        "frontend/src/components/common/LeadCard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-payment-status-as-a-filterable-option-on-the-leadspage-include-a-payment-status-filter-dropdown-alongside-existing-status-and-niche-filters",
+      "featureTitle": "Add payment status as a filterable option on the LeadsPage. Include a payment status filter dropdown alongside existing status and niche filters.",
+      "files": [
         "frontend/src/pages/LeadsPage.tsx"
       ],
       "components": [
@@ -44,59 +108,7 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-integrate-stripe-payment-processing-into-the-application-users-should-be-able-to-make-payments-for-services-view-payment-history-and-admins-should-be-able-to-update-payment-status",
-      "featureTitle": "Integrate Stripe payment processing into the application. Users should be able to make payments for services, view payment history, and admins should be able to update payment status.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/payments/CheckoutDialog.tsx",
-        "frontend/src/components/payments/StripeConfigurationDialog.tsx",
-        "frontend/src/hooks/useStripeCheckout.ts",
-        "frontend/src/hooks/useStripeConfiguration.ts",
-        "frontend/src/pages/PaymentFailurePage.tsx",
-        "frontend/src/pages/PaymentSuccessPage.tsx",
-        "frontend/src/pages/SettingsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-web-forms-for-capturing-new-leads-directly-through-the-application-the-form-should-collect-essential-lead-information-name-contact-city-niche-status-revenue-potential-owner-and-save-it-to-the-backend",
-      "featureTitle": "Create web forms for capturing new leads directly through the application. The form should collect essential lead information (name, contact, city, niche, status, revenue potential, owner) and save it to the backend.",
-      "files": [
-        "frontend/src/components/leads/AddLeadDialog.tsx",
-        "frontend/src/pages/LeadsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-11"
       ],
       "confidence": "high"
     }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, DollarSign, User, Eye } from 'lucide-react';
 import { LeadDetailDialog } from '../leads/LeadDetailDialog';
 import { ServiceNiche3dIcon } from './ServiceNiche3dIcon';
-import type { Lead } from '../../backend';
+import type { Lead, PaymentStatus } from '../../backend';
 
 interface LeadCardProps {
   lead: Lead;
@@ -19,6 +19,18 @@ const statusColors: Record<string, string> = {
   negotiation: 'bg-orange-500',
   closed: 'bg-emerald-600',
   lost: 'bg-gray-500',
+};
+
+const paymentStatusColors: Record<string, string> = {
+  pending: 'bg-yellow-500',
+  paid: 'bg-green-500',
+  failed: 'bg-red-500',
+};
+
+const paymentStatusLabels: Record<string, string> = {
+  pending: 'Pending',
+  paid: 'Paid',
+  failed: 'Failed',
 };
 
 export function LeadCard({ lead }: LeadCardProps) {
@@ -35,9 +47,16 @@ export function LeadCard({ lead }: LeadCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between">
             <CardTitle className="text-lg">{lead.name}</CardTitle>
-            <Badge className={statusColors[lead.status] || 'bg-gray-500'}>
-              {lead.status}
-            </Badge>
+            <div className="flex flex-col gap-1 items-end">
+              <Badge className={statusColors[lead.status] || 'bg-gray-500'}>
+                {lead.status}
+              </Badge>
+              {lead.paymentStatus && (
+                <Badge className={paymentStatusColors[lead.paymentStatus] || 'bg-gray-500'}>
+                  {paymentStatusLabels[lead.paymentStatus] || lead.paymentStatus}
+                </Badge>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
